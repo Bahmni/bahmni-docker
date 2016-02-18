@@ -55,7 +55,7 @@ restore_pgsql_db(){
 
 install_bahmni(){
     yum install -y openmrs
-    yum install -y bahmni-emr-$BAHMNI_VERSION bahmni-web-$BAHMNI_VERSION bahmni-reports-$BAHMNI_VERSION bahmni-lab-$BAHMNI_VERSION bahmni-lab-connect-$BAHMNI_VERSION bahmni-erp-$BAHMNI_VERSION bahmni-erp-connect-$BAHMNI_VERSION
+    yum install -y bahmni-emr-"$BAHMNI_VERSION" bahmni-web-"$BAHMNI_VERSION" bahmni-reports-"$BAHMNI_VERSION" bahmni-lab-"$BAHMNI_VERSION" bahmni-lab-connect-"$BAHMNI_VERSION" bahmni-erp-"$BAHMNI_VERSION" bahmni-erp-connect-"$BAHMNI_VERSION"
 }
 
 config_services(){
@@ -76,6 +76,8 @@ cleanup(){
     rm pgsql_backup.sql.gz pgsql_backup.sql
     yum clean all
 }
+
+yum install -y sudo
 
 setup_repos
 install_oracle_jre
