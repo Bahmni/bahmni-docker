@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BAHMNI_VERSION=0.80
+BAHMNI_VERSION=0.79
 
 setup_repos(){
 echo "# Enable to use MySQL 5.6
