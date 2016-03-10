@@ -71,13 +71,14 @@ config_services(){
 cleanup(){
     rm jre-7u79-linux-x64.rpm
     rm pgdg-centos92-9.2-7.noarch.rpm
-    rm mysql_backup.sql.gz mysql_backup.sql
-    rm pgsql_backup.sql.gz pgsql_backup.sql
+    rm mysql_backup.sql
+    rm pgsql_backup.sql
     yum clean all
 }
 
 yum install -y wget
 yum install -y sudo
+yum install -y tar
 
 setup_repos
 install_oracle_jre
