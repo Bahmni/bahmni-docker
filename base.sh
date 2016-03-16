@@ -25,6 +25,7 @@ install_oracle_jre(){
 
 install_mysql(){
     yum remove -y mysql-libs
+    yum clean all
     yum install -y mysql-community-server
     service mysqld start
     mysqladmin -u root password password
@@ -50,6 +51,10 @@ install_pgsql(){
 restore_pgsql_db(){
     wget https://github.com/Bahmni/emr-functional-tests/blob/master/dbdump/pgsql_backup.sql.gz?raw=true -O pgsql_backup.sql.gz
     gzip -d pgsql_backup.sql.gz
+    for db in `grep "CREATE DATABASE" pgsql_backup.sql  |awk ' {print $3}'`
+    do
+        echo DROP DATABASE IF EXISTS $db | psql -Upostgres > /dev/null
+    done
     psql -Upostgres < pgsql_backup.sql >/dev/null
 }
 
