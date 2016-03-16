@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 setup_repos(){
 echo "# Enable to use MySQL 5.6
 [mysql56-community]
