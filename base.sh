@@ -86,6 +86,8 @@ yum install -y wget
 yum install -y sudo
 yum install -y tar
 
+sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers
+
 setup_repos
 install_oracle_jre
 install_mysql
