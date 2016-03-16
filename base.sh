@@ -1,7 +1,5 @@
 #!/bin/bash
 
-BAHMNI_VERSION=0.80
-
 setup_repos(){
 echo "# Enable to use MySQL 5.6
 [mysql56-community]
@@ -55,14 +53,14 @@ restore_pgsql_db(){
 
 install_bahmni(){
     yum install -y openmrs
-    yum install -y bahmni-emr-"$BAHMNI_VERSION"
-    yum install -y bahmni-web-"$BAHMNI_VERSION"
+    yum install -y bahmni-emr
+    yum install -y bahmni-web
     yum install -y bahmni-certs
-    yum install -y bahmni-reports-"$BAHMNI_VERSION"
-    yum install -y bahmni-lab-"$BAHMNI_VERSION"
-    yum install -y bahmni-lab-connect-"$BAHMNI_VERSION"
-    yum install -y bahmni-erp-"$BAHMNI_VERSION"
-    yum install -y bahmni-erp-connect-"$BAHMNI_VERSION"
+    yum install -y bahmni-reports
+    yum install -y bahmni-lab
+    yum install -y bahmni-lab-connect
+    yum install -y bahmni-erp
+    yum install -y bahmni-erp-connect
 }
 
 config_services(){
