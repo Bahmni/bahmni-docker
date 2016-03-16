@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BAHMNI_VERSION=0.79
+BAHMNI_VERSION=0.80
 
 setup_repos(){
 echo "# Enable to use MySQL 5.6
@@ -12,6 +12,7 @@ gpgcheck=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql" > /etc/yum.repos.d/mysql56.repo
 
     wget https://bintray.com/bahmni/rpm/rpm -O /etc/yum.repos.d/bintray-bahmni-rpm.repo
+    sed -i "s#http://dl.bintray.com/bahmni/rpm#https://bahmni-repo.twhosted.com/rpm/bahmni#g" /etc/yum.repos.d/bintray-bahmni-rpm.repo
     wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm -O epel-release-latest-6.noarch.rpm
     rpm -Uvh epel-release-latest-6.noarch.rpm
     yum -y -x 'bahmni*' -x 'openmrs' -x 'mysql-community*' update
