@@ -2,11 +2,11 @@
 
 case $@ in
     setup)
-        docker run -d -p 443:443 -p 8080:8080 -p 8069:8069 -p 8081:8081 --name bahmni jaswanth/bahmni-docker
+        docker run -d -p 443:443 -p 8080:8080 -p 8069:8069 -p 8081:8081 --name bahmni jaswanth/bahmni
         ;;
     setup-dev)
         docker run -d -p 443:443 -p 3306:3306 -p 5432:5432 -p 8080:8080 -p 8069:8069 -p 8081:8081 -p 8000:8000 \
-        --name bahmni -v ~/bahmni-code:/bahmni-code:ro jaswanth/bahmni-docker
+        --name bahmni -v ~/bahmni-code:/bahmni-code:ro jaswanth/bahmni
         ;;
     start)
         docker start bahmni
@@ -28,8 +28,11 @@ case $@ in
         docker exec -it bahmni /bahmni-code/bahmni-core/scripts/docker-link.sh
         docker exec -it bahmni /bahmni-code/default-config/scripts/docker-link.sh
         ;;
+    update)
+        docker pull jaswanth/bahmni
+        ;;
     *)
         echo "Invalid option";
-        echo "Available options : setup, setup-dev, start, status, stop, delete, shell, link";
+        echo "Available options : setup, setup-dev, start, status, stop, delete, shell, link, update";
         ;;
 esac

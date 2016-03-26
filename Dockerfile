@@ -12,20 +12,26 @@ COPY supervisord.conf /etc/supervisord.conf
 # Apache
 EXPOSE 443
 
-# Apps
+# OpenMRS
 EXPOSE 8080
+
+# OpenERP
 EXPOSE 8069
+
+#OpenELIS
 EXPOSE 8081
 
-# Apps debug
+# JVM Debug ports
 EXPOSE 8000
 EXPOSE 8001
 EXPOSE 8002
 EXPOSE 8003
 EXPOSE 8004
 
-# Databases
+# MySQL
 EXPOSE 3306
+
+# Postgresql
 EXPOSE 5432
 
 CMD ["/usr/bin/supervisord"]
