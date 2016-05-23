@@ -2,10 +2,10 @@
 
 case $@ in
     setup)
-        docker run -d -p 443:443 -p 8080:8080 -p 8069:8069 -p 8081:8081 --name bahmni jaswanth/bahmni
+        docker run -d -p 443:443 -p 8050:8050 -p 8069:8069 -p 8052:8052 --name bahmni jaswanth/bahmni
         ;;
     setup-dev)
-        docker run -d -p 443:443 -p 3306:3306 -p 5432:5432 -p 8080:8080 -p 8069:8069 -p 8081:8081 -p 8000:8000 \
+        docker run -d -p 443:443 -p 3306:3306 -p 5432:5432 -p 8050:8050 -p 8069:8069 -p 8052:8052 \
         --name bahmni -v ~/bahmni-code:/bahmni-code:ro jaswanth/bahmni
         ;;
     start)
