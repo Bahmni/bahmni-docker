@@ -31,13 +31,6 @@ install_mysql(){
     mysqladmin -u root password password
 }
 
-restore_mysql_db(){
-    wget https://github.com/Bahmni/emr-functional-tests/blob/master/dbdump/mysql_backup.sql.gz?raw=true -O mysql_backup.sql.gz
-    gzip -d mysql_backup.sql.gz
-    mysql -uroot -ppassword < mysql_backup.sql
-    mysql -uroot -ppassword -e "FLUSH PRIVILEGES;"
-}
-
 install_pgsql(){
     wget http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-7.noarch.rpm -O pgdg-centos92-9.2-7.noarch.rpm
     rpm -ivh pgdg-centos92-9.2-7.noarch.rpm
@@ -48,18 +41,8 @@ install_pgsql(){
     service postgresql-9.2 start
 }
 
-restore_pgsql_db(){
-    wget https://github.com/Bahmni/emr-functional-tests/blob/master/dbdump/pgsql_backup.sql.gz?raw=true -O pgsql_backup.sql.gz
-    gzip -d pgsql_backup.sql.gz
-    for db in `grep "CREATE DATABASE" pgsql_backup.sql  |awk ' {print $3}'`
-    do
-        echo DROP DATABASE IF EXISTS $db | psql -Upostgres > /dev/null
-    done
-    psql -Upostgres < pgsql_backup.sql >/dev/null
-}
-
 install_bahmni(){
-    yum install -y openmrs
+    yum install -y bahmni-openmrs
     yum install -y bahmni-emr
     yum install -y bahmni-web
     yum install -y bahmni-certs
@@ -98,9 +81,7 @@ sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers
 setup_repos
 install_oracle_jre
 install_mysql
-restore_mysql_db
 install_pgsql
-restore_pgsql_db
 install_bahmni
 config_services
 cleanup
