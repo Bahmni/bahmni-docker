@@ -6,7 +6,7 @@ ADD base.sh /tmp/base.sh
 RUN chmod +x /tmp/base.sh
 RUN /tmp/base.sh
 
-RUN yum clean all; yum install -y supervisor
+RUN touch /var/lib/rpm/*; yum install -y supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
 # Apache
