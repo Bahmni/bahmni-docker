@@ -43,8 +43,8 @@ install_pgsql(){
 
 install_bahmni(){
     yum install -y bahmni-openmrs
-    yum install -y bahmni-emr
     yum install -y bahmni-web
+    yum install -y bahmni-emr
     yum install -y bahmni-certs
     yum install -y bahmni-reports
     yum install -y bahmni-lab
