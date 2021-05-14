@@ -6,11 +6,13 @@ services:
       context: mysql/
     command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
     environment:
+      BAHMNI_IMPLEMENTATION_NAME: ${BAHMNI_IMPLEMENTATION_NAME:-default}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
-      OPENMRS_DB_USER: ${OPENMRS_DB_USER:-openmrs-user}
-      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-openmrs}
+      MYSQL_USER: ${MYSQL_USER:-openmrs-user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
     healthcheck:
-      test: mysql --user=$$OPENMRS_DB_USER --password=$$OPENMRS_DB_PASSWORD -e 'SHOW DATABASES;'
+      test: mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD -e 'SHOW DATABASES;'
       timeout: 1s
     image: bahmni/mysql
     ports:
