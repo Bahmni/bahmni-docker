@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
+  # This service provides MySQL with an empty openmrs database. The database
+  # is initialised by the openmrs service.
+  #
   mysql:
-    build:
-      context: mysql/
     command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
     environment:
-      BAHMNI_IMPLEMENTATION_NAME: ${BAHMNI_IMPLEMENTATION_NAME:-default}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-openmrs}
       MYSQL_USER: ${MYSQL_USER:-openmrs-user}
@@ -14,7 +14,60 @@ services:
     healthcheck:
       test: mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD -e 'SHOW DATABASES;'
       timeout: 1s
-    image: bahmni/mysql
+    image: mysql:5.7
     ports:
       - "3306:3306"
     restart: "always"
+    volumes:
+      - "${MYSQL_DATADIR:-mysql-data}:/var/lib/mysql/:rw"
+
+  # This service provides MySQL and loads a data dump into the openmrs database.
+  #
+  # mysql:
+  #   build:
+  #     context: mysql/
+  #   command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+  #   environment:
+  #     BAHMNI_IMPLEMENTATION_NAME: ${BAHMNI_IMPLEMENTATION_NAME:-anything-but-default}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE:-openmrs}
+  #     MYSQL_USER: ${MYSQL_USER:-openmrs-user}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+  #   healthcheck:
+  #     test: mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD -e 'SHOW DATABASES;'
+  #     timeout: 1s
+  #   image: bahmni/mysql
+  #   ports:
+  #     - "3306:3306"
+  #   restart: "always"
+  #   volumes:
+  #     - "${MYSQL_DATADIR:-mysql-demo-data}:/var/lib/mysql/:rw"
+
+  openmrs:
+    build:
+      context: openmrs/
+    depends_on:
+      - mysql
+    dns: 8.8.8.8
+    environment:
+      DB_AUTO_UPDATE: 'false'
+      DB_CREATE_TABLES: 'false'
+      DB_DATABASE: ${MYSQL_DATABASE:-openmrs}
+      DB_HOST: mysql
+      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_USERNAME: ${MYSQL_USER:-openmrs-user}
+      MODULE_WEB_ADMIN: 'true'
+    healthcheck:
+      test: curl -f http://localhost:8080/openmrs
+      timeout: 20s
+    image: bahmni/openmrs
+    ports:
+      - "8080:8080"
+    restart: "always"
+    volumes:
+      - "openmrs-modules:/usr/local/tomcat/.OpenMRS/modules/:rw"
+
+volumes:
+  mysql-data:
+  mysql-demo-data:
+  openmrs-modules:
