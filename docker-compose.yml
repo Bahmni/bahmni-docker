@@ -44,28 +44,30 @@ services:
   #     - "${MYSQL_DATADIR:-mysql-demo-data}:/var/lib/mysql/:rw"
 
   openmrs:
-    build:
-      context: openmrs/
+    # build:
+    #   context: openmrs/
     depends_on:
       - mysql
-    dns: 8.8.8.8
+    # dns: 8.8.8.8
     environment:
-      DB_AUTO_UPDATE: 'false'
-      DB_CREATE_TABLES: 'false'
       DB_DATABASE: ${MYSQL_DATABASE:-openmrs}
       DB_HOST: mysql
-      DB_PASSWORD: ${MYSQL_PASSWORD:?}
       DB_USERNAME: ${MYSQL_USER:-openmrs-user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_CREATE_TABLES: 'true'
+      DB_AUTO_UPDATE: 'true'
       MODULE_WEB_ADMIN: 'true'
+      DEBUG: 'false'
     healthcheck:
       test: curl -f http://localhost:8080/openmrs
       timeout: 20s
-    image: bahmni/openmrs
+    # image: bahmni/openmrs
+    image: openmrs/openmrs-distro-platform:2.3.3
     ports:
       - "8080:8080"
     restart: "always"
-    volumes:
-      - "openmrs-modules:/usr/local/tomcat/.OpenMRS/modules/:rw"
+    # volumes:
+    #   - "openmrs-modules:/usr/local/tomcat/.OpenMRS/modules/:rw"
 
 volumes:
   mysql-data:
