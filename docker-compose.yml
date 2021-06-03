@@ -66,8 +66,8 @@ services:
     ports:
       - "8080:8080"
     restart: "always"
-    # volumes:
-    #   - "openmrs-modules:/usr/local/tomcat/.OpenMRS/modules/:rw"
+    volumes:
+      - "openmrs-modules:/usr/local/tomcat/.OpenMRS/modules/:rw"
 
 volumes:
   mysql-data:
