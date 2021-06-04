@@ -11,7 +11,6 @@ in a future story.
 * `resources/modules-pending` contains modules that are also needed for Bahmni
 
 The modules in `resources/modules-pending` are
-* `appframework-2.10.0.omod` - this module interferes with the OpenMRS legacy UI
 * `bahmnicore-0.93-SNAPSHOT.omod` - this module interferes with the OpenMRS legacy UI
 * `openelis-atomfeed-client-0.93-SNAPSHOT.omod` - this module is not needed until OpenElis is
 added to the Bahmni Docker distribution.
