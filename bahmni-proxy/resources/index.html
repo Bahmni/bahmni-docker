@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<meta name="googlebot" content="noindex,nofollow" />
+	<title>Bahmni</title>
+	<style>
+		html {
+			overflow: auto;
+		}
+
+		body {
+			font-family: OpenSans, Arial, sans-serif;
+			position: relative;
+			background: #f8f8f8;
+			overflow: hidden;
+			padding-bottom: 40px;
+		}
+
+		a {
+			text-decoration: none;
+		}
+
+		.container {
+			width: 750px;
+			margin: 20px auto 0;
+			padding: 0 15px 20px;
+			overflow: hidden;
+			background: #f8f8f8;
+			z-index: 2;
+		}
+
+		.container>h4 {
+			margin: 0;
+			text-align: center;
+			color: #646464;
+			font-size: 16px;
+		}
+
+		.section {
+			position: relative;
+			width: 207px;
+			min-height: 200px;
+			display: inline-block;
+			margin: 10px 15px;
+			background: #fff;
+			padding: 5px;
+			border-radius: 11px;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+			transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+			z-index: 2;
+			vertical-align: top;
+		}
+
+		.section:hover {
+			box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+				0 10px 10px rgba(0, 0, 0, 0.22);
+		}
+
+		.launch {
+			text-align: center;
+			font-size: 20px;
+		}
+
+		.launch img {
+			width: 100px;
+			height: 100px;
+			display: block;
+			margin: 15px auto;
+		}
+
+		.launch span {
+			min-height: 55px;
+			display: inline-block;
+			color: #f4834d;
+			font-weight: bold;
+			font-size: 18px;
+			text-transform: uppercase;
+		}
+
+		.warning-message {
+			text-align: center;
+			margin: 0 auto;
+			color: #ffac2e;
+			width: 50%;
+			background: #f8f8f8;
+			padding-top: 10px;
+		}
+
+		.warning-message span {
+			font-weight: bolder;
+			font-size: 13px;
+			display: inline-block;
+			margin-bottom: 5px;
+		}
+
+		.warning-message p {
+			padding: 0 50px;
+			margin: 0;
+			font-size: 14px;
+		}
+
+		.header_text {
+			text-align: center;
+			margin: 35px auto 25px;
+			color: #646464;
+			font-size: 24px;
+			width: 100%;
+		}
+
+		.power-by {
+			position: fixed;
+			width: 100%;
+			bottom: 7px;
+			text-align: center;
+			background: #f8f8f8;
+			padding-bottom: 5px;
+			font-size: 12px;
+			z-index: -1;
+			color: #898989;
+		}
+
+		.power-by img {
+			width: 55px;
+			vertical-align: middle;
+			margin: 0 1px;
+		}
+
+		.power-by a {
+			color: #000;
+		}
+
+		.clint-logo-wrapper {
+			display: block;
+			text-align: center;
+			padding-top: 10px;
+		}
+
+		.clint-logo-wrapper img {
+			max-width: 200px;
+			vertical-align: middle;
+			max-height: 120px;
+		}
+
+		.clint-logo-wrapper span {
+			vertical-align: middle;
+			color: #888;
+			font-size: 20px;
+		}
+
+		.bottom-banner-wrapper {
+			position: fixed;
+			text-align: center;
+			bottom: 20px;
+			width: 100%;
+		}
+
+		.bottom-banner-wrapper img {
+			max-width: 35%;
+			height: auto;
+		}
+
+		.sections {
+			min-width: 200px;
+			text-align: center;
+			margin: 10px auto;
+		}
+	</style>
+
+	<script>
+		function init() {
+			serverTimeZone();
+			getLogoAndHeaderText();
+			getApps();
+		}
+
+		function callAjax(url, callback) {
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function () {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					try {
+						callback(JSON.parse(xmlhttp.responseText));
+					} catch (ex) {
+						callback(undefined);
+					}
+				}
+			};
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();
+		}
+
+		function serverTimeZone() {
+			callAjax("/cgi-bin/systemdate", function (data) {
+				if (data) {
+					var serverTime = data.date;
+					var offset = data.offset;
+					var localTime = new Date().toLocaleString();
+					var localTimeZone = getLocalTimeZone();
+					if (offset && !new Date().toString().includes(offset)) {
+						var warningMessageParagraph = document.getElementsByClassName(
+							"warning-message-paragraph"
+						)[0];
+						var warningMessage = document.getElementsByClassName(
+							"warning-message-span"
+						)[0];
+						warningMessage.innerHTML =
+							"<img src='/bahmni/images/warning.png'> Warning";
+						warningMessageParagraph.innerHTML =
+							"The server timezone (" +
+							serverTime +
+							") is different from your browser's time/timezone (" +
+							localTime +
+							" " +
+							localTimeZone +
+							"). This can cause some data or reports to appear incorrect. Please contact the administrator for further assistance.";
+					}
+				}
+			});
+		}
+		var getLocalTimeZone = function () {
+			var currentLocalTime = new Date().toString();
+			var localTimeZoneList = currentLocalTime.split(" ");
+			var localTimeZone = localTimeZoneList[localTimeZoneList.length - 1];
+			localTimeZone = localTimeZone.substring(1, localTimeZone.length - 1);
+			return localTimeZone;
+		};
+
+		function getLogoAndHeaderText() {
+			callAjax(
+				"/bahmni_config/openmrs/apps/home/whiteLabel.json",
+				function (data) {
+					if (data) {
+						if (data.homePage.header_text) {
+							var headerTextElement =
+								document.getElementsByClassName("header_text")[0];
+							headerTextElement.innerHTML =
+								"<b>" + data.homePage.header_text + "</b>";
+						}
+
+						if (data.homePage.logo) {
+							var logoImage =
+								document.getElementsByClassName("client_logo")[0];
+							logoImage.src = data.homePage.logo;
+						}
+
+						if (data.helpLink.url) {
+							var headerTextElement =
+								document.getElementsByClassName("helper_url")[0];
+							headerTextElement.href = data.helpLink.url;
+						}
+						if (data.homePage.title_text) {
+							var titleTextElement =
+								document.getElementsByClassName("title_text")[0];
+							titleTextElement.innerHTML = data.homePage.title_text;
+						}
+						if (data.homePage.bottomBanner) {
+							document.getElementById("bottom-banner-image").src =
+								data.homePage.bottomBanner;
+						}
+					}
+				}
+			);
+		}
+
+		const getAppLink = (app) => {
+			if (app.name === "crater" || app.name === "odoo") {
+				let url = '/';
+				if (window.location.host === "localhost") {
+					if (app.name === "odoo")
+						url = `http://${window.location.host}:8069`;
+					else
+						url = `http://${window.location.host}:81`;
+				} else if (app.linkPrefix) {
+					url =
+						window.location.protocol +
+						`//${app.linkPrefix}-` +
+						window.location.host;
+				}
+				return url;
+			}
+
+			return app.link ?? "/";
+		};
+
+		function getApps() {
+			callAjax(
+				"/bahmni_config/openmrs/apps/home/whiteLabel.json",
+				function (data) {
+					if (data && data.landingPage) {
+						const sections = document.getElementsByClassName("sections")[0];
+						for (app of data.landingPage) {
+							if (app.enabled) {
+								sections.innerHTML += `<div class="section">
+			                             <div class="launch">
+			                                 <a href="${getAppLink(app)}">
+			                                 <img src="${app.logo}" />
+			                                 <span> ${app.title}</span>
+			                                 </a>
+			                             </div>
+			                          </div>`;
+							}
+						}
+					}
+				}
+			);
+		}
+	</script>
+</head>
+
+<body onload="init()">
+	<div class="clint-logo-wrapper">
+		<img class="client_logo" src="/bahmni/images/bahmniLogoFull.png" />
+		<span class="title_text"> TITLE TEXT </span>
+	</div>
+	<div class="header_text">
+		<b>WELCOME TO<br />BAHMNI EMR & HOSPITAL SERVICE</b>
+	</div>
+	<div class="container">
+		<h4>GET STARTED</h4>
+		<div class="sections" />
+	</div>
+	<div class="warning-message">
+		<span class="warning-message-span"></span>
+		<p class="warning-message-paragraph"></p>
+	</div>
+	</div>
+	<div class="bottom-banner-wrapper">
+		<img id="bottom-banner-image" />
+	</div>
+	<div class="power-by">
+		<img src="/bahmni/images/bahmniLogoFull.png" alt="Bahmni" />
+		<a class="helper_url" href="https://bahmni.atlassian.net/wiki/display/BAH/Bahmni+Home">
+			Bahmni Help</a>
+	</div>
+</body>
+
+</html>
