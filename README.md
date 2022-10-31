@@ -106,6 +106,14 @@ docker-compose --profile logging up -d
 - Use the log browser to choose label as `compose_service` and value with the container needed, then Click on `Run Query` on the top right of the screen. This will show the current logs.
 - You can also click on `Live` on the top right to see the live stream of the logs.
 
+### View JVM metrics in Grafana
+OpenMRS JVM metrics could be represented in Grafana with the help of [JVM dashboard](https://grafana.com/grafana/dashboards/8563-jvm-dashboard/).
+- Sign in to monitoring env
+- Open Dashboards &rarr; Import
+- Add the following ID (`8563`) to add JVM dashboard in Grafana
+- Click `load` button
+- The dashboard would load up with JVM metrics for OpenMRS
+
 # Profile Configuration
 Bahmni docker-compose has been configured with profiles which allows you to run the required services. More about compose profiles can be found [here](https://docs.docker.com/compose/profiles/). The list of different profiles can be found below.
 
@@ -300,6 +308,10 @@ Note: When connected with a different host, the master data should match. Otherw
 
 ### Setting up a fresh OpenMRS Instance
 By default, the configuration of openmrs and openmrsdb services are set to load demo data from a backup file. If you want to start the installation with a fresh schema, set `OPENMRS_DB_CREATE_TABLES` to `true` and then set `OPENMRS_DB_IMAGE_NAME` to `mysql:5.6`. Now when start the schema will be created by liquibase migrations of OpenMRS and other OMODS loaded.
+
+### JVM metrics for OpenMRS
+The JVM metrics for openmrs is fetched and displayed on `localhost:8280/metrics`
+with the help of [jmx-exporter](https://github.com/prometheus/jmx_exporter). Information related to heap space, GC count CPU load are provided in this route. These metrics can be visualised with the help of [JVM dashboard](https://grafana.com/grafana/dashboards/8563-jvm-dashboard/) in Grafana.
 
 ## Crater Configurations:
 | Variable Name                   | Description                                                                                                                                                                       |
