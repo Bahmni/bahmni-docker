@@ -106,6 +106,9 @@ docker-compose --profile logging up -d
 - Use the log browser to choose label as `compose_service` and value with the container needed, then Click on `Run Query` on the top right of the screen. This will show the current logs.
 - You can also click on `Live` on the top right to see the live stream of the logs.
 
+### 5. Logs retention
+- We can retain logs & customised retention duration as per our needs. Follow [documentation ](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/3090251784/Monitoring+Grafana+Loki+-+Persistent+logs) to implement log retention.
+
 # Profile Configuration
 Bahmni docker-compose has been configured with profiles which allows you to run the required services. More about compose profiles can be found [here](https://docs.docker.com/compose/profiles/). The list of different profiles can be found below.
 
