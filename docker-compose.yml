@@ -309,7 +309,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./logging/loki-config.yaml:/etc/loki/local-config.yaml
-      - loki:/data/loki
+      - loki:/loki
 
   promtail:
     profiles : ["default","logging"]
