@@ -307,6 +307,9 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./logging/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki:/loki
 
   promtail:
     profiles : ["default","logging"]
@@ -454,3 +457,4 @@ volumes:
   dcm4chee-archive:
   crater-app-data:
   bahmni-config:
+  loki:
