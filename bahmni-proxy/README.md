@@ -6,13 +6,13 @@ This directory contains resources for building Docker image for Bahmni Proxy Con
 3. SSL configurations for the application are done through this service.
 
 ## Building the image locally
-1. Checkout the [client_side_logging](https://github.com/Bahmni/client_side_logging) repository in the same location as bahmni-package.
-2. Navigate into bahmni-package directory.
-3. Set the environment variables. 
-     > export BAHMNI_VERSION=0.94 
+1. Checkout this repository and navigate into the `bahmni-proxy` folder.
+2. Run the docker build command to build the image
+    ```shell
+     docker build -t bahmni/proxy:local .
+     ```
+3. Once the image is successfully built, update the image tag in the [.env](../.env) file in the `PROXY_IMAGE_TAG` variable.
 
-     > export GITHUB_RUN_NUMBER=1
-4. Run the build script `./bahmni-proxy/scripts/docker_build.sh`
 
 ### Notes:
 
