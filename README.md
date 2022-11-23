@@ -38,6 +38,7 @@ This is a Work In Progress directory.
 * [Adding / Upgrading OpenMRS Modules](#adding-upgrading-openmrs-modules)
 * [Development on Bahmni UI](#development-on-bahmni-ui)
 * [Development on Appointments Frontend](#development-on-appointments-frontend)
+* [Setup Email Configuration](#setup-email-configuration)
 * [Development Setup for Implementer Interface](#development-setup-for-implementer-interface)
 * [Adding Custom Reports](#adding-custom-reports)
 * [Setting up PACS](#setting-up-pacs)
@@ -504,6 +505,13 @@ When you want to develop on appointments frontend code, follow the below steps.
 5. Start / Recreate appointments service by doing
     >docker-compose up -d appointments
 6. For every change you make, build the appointments code and the changes will reflect on refresh of the browser.
+
+# Setup Email Configuration
+- To send mail after appointment booking for type Teleconsultation you need to setup mailing configuration
+- You need to set below properties with valid values in .env file
+    - MAIL_FROM, MAIL_SMTP_HOST, MAIL_SMTP_PORT, MAIL_USER, MAIL_PASSWORD
+- Set SEND_MAIL to true to enable mail sending
+- Set MAIL_DEBUG to true to see detailed mailing logs on server
 
 # Development Setup for Implementer Interface
 1. Clone the [implementer-interface](https://github.com/Bahmni/implementer-interface) repository in your local machine.
