@@ -194,6 +194,30 @@ services:
       - 'openmrsdbdata:/var/lib/mysql'
     logging: *log-config
 
+  metabasedb:
+    image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
+    restart: on-failure:[3]
+    profiles: ["metabase","default"]
+    environment:
+      POSTGRES_DB: ${METABASE_DB_NAME:?}
+      POSTGRES_USER: ${METABASE_DB_USER:?}
+      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
+    volumes:
+      - 'metabase-data:/var/lib/postgresql/data'
+    ports:
+     - 5432:5432
+
+  metabase:
+    image: metabase/metabase:${METABASE_IMAGE_TAG}
+    restart: on-failure:[3]
+    profiles: ["metabase","default"]
+    environment:
+      MB_DB_CONNECTION_URI: ${METABASE_DB_CONNECTION_URI:?}
+    depends_on:
+     - metabasedb
+    ports:
+     - 3000:3000
+
   crater-php:
     image: bahmni/crater-php:${CRATER_PHP_IMAGE_TAG:?}
     profiles: ['default', 'crater']
@@ -460,6 +484,7 @@ volumes:
   odooappdata:
   openmrs-data:
   openmrsdbdata:
+  metabase-data:
   craterdb:
   bahmni-patient-images:
   bahmni-document-images:
