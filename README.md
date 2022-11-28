@@ -21,6 +21,7 @@ This is a Work In Progress directory.
     * [Odoo Configuration](#odoo-configurations)
     * [Odoo Connect Configuration](#odoo-connect-configurations)
     * [OpenMRS Configuration](#openmrs-configurations)
+    * [Metabase Configuration](#metabase-configuration)  
     * [Crater Configuration](#crater-configurations)
     * [Crater-Atomfeed Configuration](#crater-atomfeed-configurations)
     * [Bahmni Web Configuration](#bahmni-web-configurations)
