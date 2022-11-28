@@ -205,14 +205,19 @@ services:
     volumes:
       - 'metabase-data:/var/lib/postgresql/data'
     ports:
-     - 5432:5432
+     - 5430:5432
 
   metabase:
     image: metabase/metabase:${METABASE_IMAGE_TAG}
     restart: on-failure:[3]
     profiles: ["metabase","default"]
     environment:
-      MB_DB_CONNECTION_URI: ${METABASE_DB_CONNECTION_URI:?}
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${METABASE_DB_NAME:?}
+      MB_DB_PORT:  ${METABASE_DB_PORT:?}
+      MB_DB_USER: ${METABASE_DB_USER:?}
+      MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
+      MB_DB_HOST: ${METABASE_DB_HOST:?}
     depends_on:
      - metabasedb
     ports:
