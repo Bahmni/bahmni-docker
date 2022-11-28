@@ -129,7 +129,7 @@ Note: `proxy,bahmni-config` are generic services and it will start always irresp
 | pacs-simulator        | PACS Simulator to test PACS setup    | pacs-simulator                            |
 | logging               | Loki Stack - Centralised Logging     | grafana, promtail, loki                   |
 | atomfeed-console      | Atomfeed Console                     | atomfeed-console                          |
-| metabase              | Metabase                             | metabase,metabasedb                       | 
+| metabase              | Metabase Analytics/Reporting tool    | metabase,metabasedb                       |
 
 
 
