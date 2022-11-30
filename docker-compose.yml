@@ -34,6 +34,7 @@ services:
     logging: *log-config
 
   bahmni-lab:
+    profiles: ["lab-lite","lite"]
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
     ports:
       - '8090:80'
@@ -41,7 +42,7 @@ services:
     logging: *log-config
 
   openelis:
-    profiles: ['default', 'openelis']
+    profiles: ["openelis","standard"]
     image: 'bahmni/openelis:${OPENELIS_IMAGE_TAG:?[ERROR]}'
     ports:
       - '8052:8052'
@@ -59,7 +60,7 @@ services:
     logging: *log-config
 
   openelisdb:
-    profiles: ['default', 'openelis']
+    profiles: ["openelis","standard"]
     image: 'bahmni/openelis-db:${OPENELIS_DB_IMAGE_TAG:?[ERROR]}'
     ports:
       - '5432:5432'
@@ -78,7 +79,7 @@ services:
     logging: *log-config
 
   odoo:
-    profiles: ['default', 'odoo']
+    profiles: ["odoo","standard"]
     image: 'bahmni/odoo-10:${ODOO_IMAGE_TAG:?[ERROR]}'
     ports:
       - '8069:8069'
@@ -97,7 +98,7 @@ services:
     logging: *log-config
 
   odoodb:
-    profiles: ['default', 'odoo']
+    profiles: ["odoo","standard"]
     image: 'bahmni/odoo-10-db:${ODOO_DB_IMAGE_TAG:?[ERROR]}'
     ports:
       - '5431:5432'
@@ -115,7 +116,7 @@ services:
     logging: *log-config
 
   odoo-connect:
-    profiles: ['default', 'odoo']
+    profiles: ["odoo","standard"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
     environment:
       ODOO_DB_SERVER: odoodb
@@ -139,7 +140,7 @@ services:
     logging: *log-config
 
   openmrs:
-    profiles: ["default","openmrs","implementer-interface"]
+    profiles: ["emr","standard","lite"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
       DB_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -182,7 +183,7 @@ services:
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
-    profiles: ["default","openmrs","implementer-interface"]
+    profiles: ["emr","standard","lite"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -196,7 +197,7 @@ services:
 
   crater-php:
     image: bahmni/crater-php:${CRATER_PHP_IMAGE_TAG:?}
-    profiles: ['default', 'crater']
+    profiles: ["crater","lite"]
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
@@ -220,7 +221,7 @@ services:
 
   crater-nginx:
     image: bahmni/crater-nginx:${CRATER_NGINX_IMAGE_TAG:?}
-    profiles: ['default', 'crater']
+    profiles: ["crater","lite"]
     restart: unless-stopped
     volumes:
      - 'crater-app-data:/var/www/public/storage'
@@ -229,7 +230,7 @@ services:
 
   craterdb:
     image: mysql:5.7
-    profiles: ['default', 'crater']
+    profiles: ["crater","lite"]
     restart: always
     volumes:
       - craterdb:/var/lib/mysql
@@ -246,7 +247,7 @@ services:
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
-    profiles: ['default', 'openmrs']
+    profiles: ["emr","standard","lite"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
@@ -255,7 +256,7 @@ services:
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
-    profiles: ["default","implementer-interface"]
+    profiles: ["implementer-interface","standard"]
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
@@ -264,7 +265,7 @@ services:
 
   reports:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
-    profiles: ["default","reports"]
+    profiles: ["reports","standard","lite"]
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -291,7 +292,7 @@ services:
   reportsdb:
     platform: linux/amd64
     image: mysql:5.6
-    profiles: ["default","reports"]
+    profiles: ["reports","standard","lite"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
@@ -303,7 +304,7 @@ services:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
     ports:
       - '8099:80'
-    profiles: ["default","openmrs"]
+    profiles: ["emr","standard","lite"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
     environment:
@@ -314,13 +315,13 @@ services:
 
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
-    profiles: ["default","appointments"]
+    profiles: ["emr","standard","lite"]
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
   dcm4chee:
     image: bahmni/dcm4chee:${DCM4CHEE_IMAGE_TAG:?}
-    profiles: [ "default","pacs" ]
+    profiles: ["pacs","standard"]
     environment:
       DB_HOST: ${PACS_DB_HOST:?}
       DB_PORT: ${PACS_DB_PORT:?}
@@ -336,7 +337,7 @@ services:
 
   pacs-integration:
     image: bahmni/pacs-integration:${PACS_INTEGRATION_IMAGE_TAG:?}
-    profiles: [ "default","pacs" ]
+    profiles: ["pacs","standard"]
     environment:
       DB_HOST: ${PACS_DB_HOST:?}
       DB_PORT: ${PACS_DB_PORT:?}
@@ -351,7 +352,7 @@ services:
 
   pacsdb:
     image: postgres:9.6
-    profiles: [ "default","pacs" ]
+    profiles: ["pacs","standard"]
     environment:
       POSTGRES_PASSWORD: ${PACS_DB_ROOT_PASSWORD}
       DCM4CHEE_DB_NAME: ${DCM4CHEE_DB_NAME:?}
@@ -366,7 +367,7 @@ services:
 
   pacs-simulator:
     image: bahmni/pacs-simulator:${PACS_SIMULATOR_IMAGE_TAG:?}
-    profiles: [ "default","pacs-simulator" ]
+    profiles: ["pacs-simulator"]
     environment:
       PACS_SIMULATOR_TIMEOUT: ${PACS_SIMULATOR_TIMEOUT:?}
       PACS_SERVER_TYPE: ${PACS_SERVER_TYPE:?}
@@ -382,7 +383,7 @@ services:
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
-    profiles: ["default","atomfeed-console"]
+    profiles: ["atomfeed-console"]
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
@@ -402,7 +403,7 @@ services:
 
   crater-atomfeed:
     image: bahmni/crater-atomfeed:latest
-    profiles: ["default","crater-atomfeed"]
+    profiles: ["crater","lite"]
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST:?}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
@@ -420,7 +421,7 @@ services:
   crater-atomfeed-db:
     platform: linux/amd64
     image: mysql:5.7
-    profiles: ["default","crater-atomfeed"]
+    profiles: ["crater","lite"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${CRATER_ATOMFEED_DB_NAME:?}
