@@ -439,9 +439,9 @@ Note: Do these steps only if you need to update Bahmni Odoo modules.
 # Debugging OpenMRS Application
 Since OpenMRS is running on Tomcat, remote debugging can be enabled and can be connected with IDE supporting remote debugging.(Eclipse, Intellij IDEA etc.)
 
-1. Enable debugging by setting `OPENMRS_DEBUG` to `true` in the `.env` file
-2. Now remote debugging for OpenMRS is exposed on port `8000` in your local machine.
-3. Now you can follow the IDE configuration to setup remote debugging using host as `localhost` and port as `8000`. 
+1. Enable debugging by setting `OMRS_DEV_DEBUG_PORT` to some port (e.g 8000) in the `.env` file
+2. Now remote debugging for OpenMRS is exposed on port `OMRS_DEV_DEBUG_PORT` in your local machine.
+3. Now you can follow the IDE configuration to setup remote debugging using host as `localhost` and port as the value of `OMRS_DEV_DEBUG_PORT`. 
 4. For example in Intellij IDEA navigate to Run -> Edit Configurations. In the dialog box click on `+` icon to create a new config and select `Remote JVM Debug`. Fill in the host,port and name and click Apply. Now you can use the debugger.
 
     > ```⚠ Make sure to disable debugging by setting the variable to false if you are running in a Production Environment```
