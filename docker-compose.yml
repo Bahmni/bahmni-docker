@@ -143,19 +143,19 @@ services:
     profiles: ["emr","standard","lite"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
-      DB_DATABASE: ${OPENMRS_DB_NAME:?}
-      DB_HOST: ${OPENMRS_DB_HOST:?}
-      DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
-      DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
-      DB_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
-      DB_AUTO_UPDATE: ${OPENMRS_DB_AUTO_UPDATE}
-      MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
-      DEBUG: ${OPENMRS_DEBUG}
+      OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OMRS_DB_HOSTNAME: ${OPENMRS_DB_HOST:?}
+      OMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
+      OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
+      OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
+      OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}                
       OPENELIS_HOST: ${OPENELIS_HOST:?}
       OPENELIS_PORT: ${OPENELIS_PORT:?}
       OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
       OPENELIS_ATOMFEED_PASSWORD: ${OPENELIS_ATOMFEED_PASSWORD:?}
-      SEND_MAIL: ${SEND_MAIL}
+      SEND_MAIL: ${SEND_MAIL}  
       MAIL_TRANSPORT_PROTOCOL: ${MAIL_TRANSPORT_PROTOCOL}
       MAIL_SMTP_HOST: ${MAIL_SMTP_HOST}
       MAIL_SMTP_PORT: ${MAIL_SMTP_PORT}
@@ -168,11 +168,11 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
     ports:
       - '8080:8080'
-      - '8000:1044'
+      - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}      
     volumes:
-      - 'openmrs-data:/usr/local/tomcat/.OpenMRS/modules'
+      - 'openmrs-data:/openmrs/data/modules'
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
-      # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/usr/local/tomcat/.OpenMRS/modules/"
+      # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
@@ -194,6 +194,35 @@ services:
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
     logging: *log-config
+
+  metabasedb:
+    image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
+    restart: on-failure:[3]
+    profiles: ["metabase","default"]
+    environment:
+      POSTGRES_DB: ${METABASE_DB_NAME:?}
+      POSTGRES_USER: ${METABASE_DB_USER:?}
+      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
+    volumes:
+      - 'metabase-data:/var/lib/postgresql/data'
+    ports:
+     - 5430:5432
+
+  metabase:
+    image: metabase/metabase:${METABASE_IMAGE_TAG}
+    restart: on-failure:[3]
+    profiles: ["metabase","default"]
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${METABASE_DB_NAME:?}
+      MB_DB_PORT:  ${METABASE_DB_PORT:?}
+      MB_DB_USER: ${METABASE_DB_USER:?}
+      MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
+      MB_DB_HOST: ${METABASE_DB_HOST:?}
+    depends_on:
+     - metabasedb
+    ports:
+     - 3000:3000
 
   crater-php:
     image: bahmni/crater-php:${CRATER_PHP_IMAGE_TAG:?}
@@ -434,6 +463,7 @@ volumes:
   odooappdata:
   openmrs-data:
   openmrsdbdata:
+  metabase-data:
   craterdb:
   bahmni-patient-images:
   bahmni-document-images:
