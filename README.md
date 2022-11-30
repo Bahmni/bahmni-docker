@@ -21,6 +21,7 @@ This is a Work In Progress directory.
     * [Odoo Configuration](#odoo-configurations)
     * [Odoo Connect Configuration](#odoo-connect-configurations)
     * [OpenMRS Configuration](#openmrs-configurations)
+    * [Metabase Configuration](#metabase-configuration)  
     * [Crater Configuration](#crater-configurations)
     * [Crater-Atomfeed Configuration](#crater-atomfeed-configurations)
     * [Bahmni Web Configuration](#bahmni-web-configurations)
@@ -127,7 +128,9 @@ Note: `proxy,bahmni-config` are generic services and it will start always irresp
 | pacs                  | Bahmni PACS Setup with DCM4CHEE      | dcm4chee, pacs-integration, pacs_db       |
 | pacs-simulator        | PACS Simulator to test PACS setup    | pacs-simulator                            |
 | logging               | Loki Stack - Centralised Logging     | grafana, promtail, loki                   |
-| atomfeed-console               | Atomfeed Console     | atomfeed-console                   |
+| atomfeed-console      | Atomfeed Console                     | atomfeed-console                          |
+| metabase              | Metabase Analytics/Reporting tool    | metabase,metabasedb                       |
+
 
 
 Profiles can be set by changing the `COMPOSE_PROFILES` variable in .env variable. You can set multiple profiles by comma seperated values.
@@ -161,6 +164,7 @@ Example: COMPOSE_PROFILES=openelis,odoo. You can also pass this as an argument w
 | Oviyam 2 (DICOM Web Viewer)    | http://localhost/oviyam2               | Username: `admin` <br> Password: `admin`       | -                                                                                                                                                                                    |
 | Grafana                        | http://localhost/grafana               | Username: `admin` <br> Password: `admin`       | Recommended to change password on first login                                                                                                                                        |
 | Atomfeed Console                        |https://localhost/atomfeed-console               |        | -                                                                                                   |
+| Metabase                      |https://localhost:3000                    |                        |Sign up as a new user.
 
 
 ### Cleaning All Bahmni Application Data
@@ -303,6 +307,17 @@ Note: When connected with a different host, the master data should match. Otherw
 
 ### Setting up a fresh OpenMRS Instance
 By default, the configuration of openmrs and openmrsdb services are set to load demo data from a backup file. If you want to start the installation with a fresh schema, set `OPENMRS_DB_CREATE_TABLES` to `true` and then set `OPENMRS_DB_IMAGE_NAME` to `mysql:5.6`. Now when start the schema will be created by liquibase migrations of OpenMRS and other OMODS loaded.
+
+## Metabase Configuration
+| Variable Name                   | Description                                                                                                                                                                       |
+|:--------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| METABASE_IMAGE_TAG            | This value tells which image version to be used for Metabase. A list of tags can be found at [bahmni/Metabase image - Tags](https://hub.docker.com/r/metabase/metabase/tags).       |
+| METABASE_POSTGRES_IMAGE_TAG         | This value tells which image version to be used for Postgres image. A list of tags can be found at [bahmni/metabase-postgres - Tags](https://hub.docker.com/_/postgres/tags). |                                                                                                                              |
+| METABASE_DB_HOST                 | Host of the Metabase application database.                                                                                                                                                      |
+| METABASE_DB_PORT                  | Port of the Metabase application database.                                                                                                                                                      |
+| METABASE_DB_NAME              | Name of the Metabase application database.                                                                                                                                                     |
+| METABASE_DB_USER              | Username of the Metabase application database.                                                                                                                                                   |
+| METABASE_DB_PASSWORD              | Password of the Metabase application database.                                                                                                                                                  |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Crater Configurations:
 | Variable Name                   | Description                                                                                                                                                                       |
