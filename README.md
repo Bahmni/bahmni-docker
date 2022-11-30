@@ -136,7 +136,7 @@ Example: COMPOSE_PROFILES=openelis,odoo. You can also pass this as an argument w
 # Running Bahmni with default images
 
 ### Starting all Bahmni Components
-1. Navigate to `bahmni-docker` directory in a terminal.
+1. Navigate to `bahmni-docker` directory in a terminal. For Colima users, start with `colima start --cpu 4 --memory 8`
 2. Run `docker-compose up` .
     This pulls default images from docker hub and starts the application with demo database. Also `docker-compose up -d` can be used to run in detach mode.
 3. After the containers spin up, you will be able to access different components at below mentioned configurations.
