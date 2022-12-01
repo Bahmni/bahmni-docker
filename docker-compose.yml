@@ -209,7 +209,7 @@ services:
      - 5430:5432
 
   metabase:
-    image: bahmni-metabase
+    image: bahmni/bahmni-metabase
     restart: on-failure:[3]
     profiles: ["metabase","default"]
     environment:
