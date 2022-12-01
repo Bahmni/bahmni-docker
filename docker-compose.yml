@@ -149,7 +149,7 @@ services:
       OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
       OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
       OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
-      OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}                
+      # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}                
       OPENELIS_HOST: ${OPENELIS_HOST:?}
       OPENELIS_PORT: ${OPENELIS_PORT:?}
       OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
@@ -167,7 +167,7 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
     ports:
       - '8080:8080'
-      - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}      
+      # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}      
     volumes:
       - 'openmrs-data:/openmrs/data/modules'
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
