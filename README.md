@@ -36,6 +36,7 @@ This is a Work In Progress directory.
 * [Loading Additional Addons to Odoo](#loading-additional-addons-to-odoo)
 * [Developing Bahmni Odoo Modules](#developing-bahmni-odoo-modules)
 * [Debugging OpenMRS Application](#debugging-openmrs-application)
+* [Configuring Apache Tomcat Servlet/JSP Container Environment Variables](#Apache-Tomcat-Environment-Variables)
 * [Adding / Upgrading OpenMRS Modules](#adding-upgrading-openmrs-modules)
 * [Development on Bahmni UI](#development-on-bahmni-ui)
 * [Development on Appointments Frontend](#development-on-appointments-frontend)
@@ -460,6 +461,14 @@ Since OpenMRS is running on Tomcat, remote debugging can be enabled and can be c
 4. For example in Intellij IDEA navigate to Run -> Edit Configurations. In the dialog box click on `+` icon to create a new config and select `Remote JVM Debug`. Fill in the host,port and name and click Apply. Now you can use the debugger.
 
     > ```⚠ Make sure to disable debugging by setting the variable to false if you are running in a Production Environment```
+
+# Apache Tomcat Environment Variables
+To set CATALINA_HOME and JAVA_OPTS or other Environment variables  used by the Tomcat startup scripts, set the value of [these variables](docker-compose.yml#L153#L154), [here](.env#L81#L82). The values of CATALINA_HOME and JAVA_OPTS are set as 
+```
+JAVA_OPTS="$OMRS_JAVA_SERVER_OPTS"
+CATALINA_OPTS="${OMRS_JAVA_MEMORY_OPTS} -DOPENMRS_INSTALLATION_SCRIPT=${OMRS_SERVER_PROPERTIES_FILE} -DOPENMRS_APPLICATION_DATA_DIRECTORY=${OMRS_DATA_DIR}/"
+```
+Values of `OMRS_SERVER_PROPERTIES_FILE` by default is set to `/openmrs/openmrs-server.properties` and `OMRS_DATA_DIR` set to `/openmrs/data`
 
 # Adding/ Upgrading OpenMRS Modules
 OpenMRS modules can be added or upgraded through the OpenMRS Web Interface.
