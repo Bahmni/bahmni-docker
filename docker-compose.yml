@@ -211,7 +211,7 @@ services:
      - 5430:5432
 
   metabase:
-    image: bahmni/bahmni-metabase
+    image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
     profiles: ["metabase","default"]
     environment:
@@ -219,7 +219,6 @@ services:
       MB_PORT: ${METABASE_PORT:?}
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
-      MB_ADMIN_LAST_NAME: ${METABASE_ADMIN_LAST_NAME:?}
       MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: ${METABASE_DB_NAME:?}
@@ -231,7 +230,7 @@ services:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
-      MB_MYSQL_ENGINE: ${METABASE_MYSQL_ENGINE:?}
+      OPENMRS_DB_TYPE: ${OPENMRS_DB_TYPE:?}
     depends_on:
      - metabasedb
     ports:
