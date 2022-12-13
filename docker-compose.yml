@@ -15,6 +15,7 @@ x-log-config: &log-config
   # update this value to *loki if needed to see logs in grafana dashboard.
   <<: *default
 
+
 services:
 
   proxy:
@@ -210,16 +211,26 @@ services:
      - 5430:5432
 
   metabase:
-    image: metabase/metabase:${METABASE_IMAGE_TAG}
+    image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
     profiles: ["metabase","default"]
     environment:
+      MB_HOST: ${METABASE_HOST:?}
+      MB_PORT: ${METABASE_PORT:?}
+      MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
+      MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
+      MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: ${METABASE_DB_NAME:?}
       MB_DB_PORT:  ${METABASE_DB_PORT:?}
       MB_DB_USER: ${METABASE_DB_USER:?}
       MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
       MB_DB_HOST: ${METABASE_DB_HOST:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
+      OPENMRS_DB_TYPE: ${OPENMRS_DB_TYPE:?}
     depends_on:
      - metabasedb
     ports:
