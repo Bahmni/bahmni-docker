@@ -15,6 +15,7 @@ x-log-config: &log-config
   # update this value to *loki if needed to see logs in grafana dashboard.
   <<: *default
 
+
 services:
 
   proxy:
@@ -151,6 +152,8 @@ services:
       OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
       OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
       # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
+      OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
+      OMRS_JAVA_MEMORY_OPTS: ${OMRS_JAVA_MEMORY_OPTS}
       OPENELIS_HOST: ${OPENELIS_HOST:?}
       OPENELIS_PORT: ${OPENELIS_PORT:?}
       OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
@@ -209,16 +212,26 @@ services:
      - 5430:5432
 
   metabase:
-    image: metabase/metabase:${METABASE_IMAGE_TAG}
+    image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
     profiles: ["metabase"]
     environment:
+      MB_HOST: ${METABASE_HOST:?}
+      MB_PORT: ${METABASE_PORT:?}
+      MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
+      MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
+      MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: ${METABASE_DB_NAME:?}
       MB_DB_PORT:  ${METABASE_DB_PORT:?}
       MB_DB_USER: ${METABASE_DB_USER:?}
       MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
       MB_DB_HOST: ${METABASE_DB_HOST:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
+      OPENMRS_DB_TYPE: ${OPENMRS_DB_TYPE:?}
     depends_on:
      - metabasedb
     ports:
@@ -247,6 +260,7 @@ services:
       COMPANY_NAME: ${CRATER_COMPANY_NAME:?}
       COMPANY_SLUG: ${CRATER_COMPANY_SLUG:?}
       COUNTRY_ID: ${CRATER_COUNTRY_ID:?}
+      APP_DEBUG: ${CRATER_APP_DEBUG:?}
 
   crater-nginx:
     image: bahmni/crater-nginx:${CRATER_NGINX_IMAGE_TAG:?}
