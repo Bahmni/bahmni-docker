@@ -20,6 +20,7 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
+    profiles: ['snomed']
     volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
       - 'bahmni-patient-images:/home/bahmni/patient_images'
@@ -30,12 +31,14 @@ services:
 
   bahmni-config:
     image: '${CONFIG_IMAGE_NAME:?}:${CONFIG_IMAGE_TAG:?}'
+    profiles: ['snomed']
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
 
   bahmni-lab:
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
+    profiles: [ 'lab' ]
     ports:
       - '8090:80'
       - '8443:443'
@@ -140,7 +143,7 @@ services:
     logging: *log-config
 
   openmrs:
-    profiles: ["default","openmrs","implementer-interface"]
+    profiles: ["default","openmrs","implementer-interface", "snomed"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -185,7 +188,7 @@ services:
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
-    profiles: ["default","openmrs","implementer-interface"]
+    profiles: ["default","openmrs","implementer-interface","snomed"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -289,7 +292,7 @@ services:
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
-    profiles: ['default', 'openmrs']
+    profiles: ['default', 'openmrs', 'snomed']
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
@@ -298,7 +301,7 @@ services:
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
-    profiles: ["default","implementer-interface"]
+    profiles: ["default","implementer-interface", "snomed"]
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
@@ -307,7 +310,7 @@ services:
 
   reports:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
-    profiles: ["default","reports"]
+    profiles: ["default","reports","snomed"]
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -334,7 +337,7 @@ services:
   reportsdb:
     platform: linux/amd64
     image: mysql:5.6
-    profiles: ["default","reports"]
+    profiles: ["default","reports","snomed"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
