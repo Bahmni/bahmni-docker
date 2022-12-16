@@ -95,45 +95,6 @@ services:
       - 'openmrsdbdata:/var/lib/mysql'
     logging: *log-config
 
-  metabasedb:
-    image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
-    restart: on-failure:[3]
-    profiles: ["metabase"]
-    environment:
-      POSTGRES_DB: ${METABASE_DB_NAME:?}
-      POSTGRES_USER: ${METABASE_DB_USER:?}
-      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
-    volumes:
-      - 'metabase-data:/var/lib/postgresql/data'
-    ports:
-     - 5430:5432
-
-  metabase:
-    image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
-    restart: on-failure:[3]
-    profiles: ["metabase"]
-    environment:
-      MB_HOST: ${METABASE_HOST:?}
-      MB_PORT: ${METABASE_PORT:?}
-      MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
-      MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
-      MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: ${METABASE_DB_NAME:?}
-      MB_DB_PORT:  ${METABASE_DB_PORT:?}
-      MB_DB_USER: ${METABASE_DB_USER:?}
-      MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
-      MB_DB_HOST: ${METABASE_DB_HOST:?}
-      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
-      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
-      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
-      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
-      OPENMRS_DB_TYPE: ${OPENMRS_DB_TYPE:?}
-    depends_on:
-     - metabasedb
-    ports:
-     - 3000:3000
-
   crater-php:
     image: bahmni/crater-php:${CRATER_PHP_IMAGE_TAG:?}
     profiles: ["crater","bahmni-lite"]
@@ -294,7 +255,6 @@ services:
 volumes:
   openmrs-data:
   openmrsdbdata:
-  metabase-data:
   craterdb:
   bahmni-patient-images:
   bahmni-document-images:
