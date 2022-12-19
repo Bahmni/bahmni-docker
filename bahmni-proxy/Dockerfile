@@ -11,6 +11,7 @@ COPY resources/bahmni-logo.png /usr/local/apache2/htdocs/bahmni-logo.png
 COPY resources/favicon.png /usr/local/apache2/htdocs/favicon.png
 COPY resources/maintenance.html /usr/local/apache2/htdocs/maintenance.html
 COPY resources/unauthorized.html /usr/local/apache2/htdocs/unauthorized.html
+COPY resources/internalError.html /usr/local/apache2/htdocs/internalError.html
 COPY resources/style.css /usr/local/apache2/htdocs/style.css
 COPY resources/src.jpeg /usr/local/apache2/htdocs/src.jpeg
 RUN mkdir /var/cache/mod_proxy
