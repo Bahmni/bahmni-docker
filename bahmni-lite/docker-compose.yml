@@ -76,6 +76,8 @@ services:
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
+#      - 'configuration_checksums:/openmrs/data/configuration_checksums'
+
     depends_on:
       - openmrsdb
     logging: *log-config
@@ -93,6 +95,8 @@ services:
       - '3306:3306'
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
+#      - 'configuration_checksums:/configuration_checksums'
+
     logging: *log-config
 
   crater-php:
@@ -261,3 +265,4 @@ volumes:
   bahmni-clinical-forms:
   crater-app-data:
   bahmni-config:
+  configuration_checksums:
