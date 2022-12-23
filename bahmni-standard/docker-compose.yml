@@ -178,7 +178,7 @@ services:
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard", "bahmni-mart"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -228,6 +228,35 @@ services:
      - metabasedb
     ports:
      - 3000:3000
+
+  bahmni-martdb:
+    image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - 'mart-data:/var/lib/postgresql/data'
+    ports:
+     - 5435:5432
+  
+  bahmni-mart: 
+    image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      CRON_TIME: ${CRON_TIME:?}
+      MART_DB_HOST: ${MART_DB_HOST:?}
+      MART_DB_NAME: ${MART_DB_NAME:?}
+      MART_DB_USERNAME: ${MART_DB_USERNAME:?}
+      MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+    depends_on:
+     - bahmni-martdb
+     - openmrsdb
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
@@ -392,6 +421,7 @@ volumes:
   openmrs-data:
   openmrsdbdata:
   metabase-data:
+  mart-data:
   bahmni-patient-images:
   bahmni-document-images:
   bahmni-clinical-forms:
