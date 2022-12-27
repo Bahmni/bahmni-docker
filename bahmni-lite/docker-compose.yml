@@ -302,7 +302,7 @@ services:
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
 
   crater-atomfeed:
-    image: bahmni/crater-atomfeed:latest
+    image: bahmni/crater-atomfeed:${CRATER_ATOMFEED_IMAGE_TAG:?}
     profiles: ["crater","bahmni-lite"]
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST:?}
