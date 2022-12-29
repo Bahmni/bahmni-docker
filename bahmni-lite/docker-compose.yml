@@ -66,6 +66,7 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      OMRS_DOCKER_ENV: ${OPENMRS_DOCKER_ENV}
     ports:
       - '8080:8080'
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
