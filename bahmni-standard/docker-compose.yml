@@ -229,6 +229,36 @@ services:
     ports:
      - 3000:3000
 
+  martdb:
+    image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      POSTGRES_DB: ${MART_DB_NAME:?}
+      POSTGRES_USER: ${MART_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
+    volumes:
+      - 'mart-data:/var/lib/postgresql/data'
+    ports:
+     - 5435:5432
+  
+  mart: 
+    image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      CRON_TIME: ${MART_CRON_TIME:?}
+      MART_DB_HOST: ${MART_DB_HOST:?}
+      MART_DB_NAME: ${MART_DB_NAME:?}
+      MART_DB_USERNAME: ${MART_DB_USERNAME:?}
+      MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+    depends_on:
+     - martdb
+     - openmrsdb
+     - openmrs
+
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
     profiles: ["emr","bahmni-standard"]
@@ -392,6 +422,7 @@ volumes:
   openmrs-data:
   openmrsdbdata:
   metabase-data:
+  mart-data:
   bahmni-patient-images:
   bahmni-document-images:
   bahmni-clinical-forms:
