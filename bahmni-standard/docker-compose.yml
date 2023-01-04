@@ -258,6 +258,8 @@ services:
      - martdb
      - openmrsdb
      - openmrs
+    volumes:
+     - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
