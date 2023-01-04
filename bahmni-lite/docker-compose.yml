@@ -152,6 +152,76 @@ services:
     ports:
       - '33006:3306'
 
+  metabasedb:
+    image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
+    restart: on-failure:[3]
+    profiles: ["metabase"]
+    environment:
+      POSTGRES_DB: ${METABASE_DB_NAME:?}
+      POSTGRES_USER: ${METABASE_DB_USER:?}
+      POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
+    volumes:
+      - 'metabase-data:/var/lib/postgresql/data'
+    ports:
+     - 5430:5432
+
+  metabase:
+    image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
+    restart: on-failure:[3]
+    profiles: ["metabase"]
+    environment:
+      MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
+      MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
+      MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${METABASE_DB_NAME:?}
+      MB_DB_PORT:  ${METABASE_DB_PORT:?}
+      MB_DB_USER: ${METABASE_DB_USER:?}
+      MB_DB_PASS: ${METABASE_DB_PASSWORD:?}
+      MB_DB_HOST: ${METABASE_DB_HOST:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
+      MART_DB_HOST: ${MART_DB_HOST:?}
+      MART_DB_NAME: ${MART_DB_NAME:?}
+      MART_DB_USERNAME: ${MART_DB_USERNAME:?}
+      MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
+    depends_on:
+     - metabasedb
+
+  martdb:
+    image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      POSTGRES_DB: ${MART_DB_NAME:?}
+      POSTGRES_USER: ${MART_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
+    volumes:
+      - 'mart-data:/var/lib/postgresql/data'
+    ports:
+     - 5435:5432
+  
+  mart: 
+    image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
+    profiles: ["bahmni-mart"]
+    environment:
+      CRON_TIME: ${MART_CRON_TIME:?}
+      MART_DB_HOST: ${MART_DB_HOST:?}
+      MART_DB_NAME: ${MART_DB_NAME:?}
+      MART_DB_USERNAME: ${MART_DB_USERNAME:?}
+      MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+    depends_on:
+     - martdb
+     - openmrsdb
+     - openmrs
+    volumes:
+     - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
+
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
     profiles: ["emr","bahmni-lite"]
@@ -268,3 +338,5 @@ volumes:
   crater-app-data:
   bahmni-config:
   configuration_checksums:
+  mart-data:
+  metabase-data:

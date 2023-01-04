@@ -208,8 +208,6 @@ services:
     restart: on-failure:[3]
     profiles: ["metabase"]
     environment:
-      MB_HOST: ${METABASE_HOST:?}
-      MB_PORT: ${METABASE_PORT:?}
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
       MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
@@ -229,8 +227,6 @@ services:
       MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
     depends_on:
      - metabasedb
-    ports:
-     - 3000:3000
 
   martdb:
     image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
@@ -261,6 +257,8 @@ services:
      - martdb
      - openmrsdb
      - openmrs
+    volumes:
+     - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
