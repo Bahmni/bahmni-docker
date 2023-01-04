@@ -87,6 +87,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-lite"]
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
