@@ -133,7 +133,7 @@ services:
     volumes:
      - 'crater-app-data:/var/www/public/storage'
     ports:
-      - 81:80
+      - 444:443
 
   craterdb:
     image: mysql:5.7
