@@ -133,7 +133,7 @@ services:
     logging: *log-config
 
   openmrs:
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard", "bahmni-mart"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
