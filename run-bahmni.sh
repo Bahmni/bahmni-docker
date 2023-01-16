@@ -117,7 +117,7 @@ confirm() {
 
 
 function resetAndEraseALLVolumes {
-  if confirm "Are you sure you want to DELETE all Data and Volumes in docker on this MACHINE?? Please say Yes/No to proceed if you are absolutely sure. This will delete even non-Bahmni volumes used by Docker!"; then
+  if confirm "WARNING: Are you sure you want to DELETE all Bahmni Data and Volumes?? Please say Yes/No to proceed."; then
     echo "Proceeding with a DELETE.... "
     
     echo "1. Stopping all services.."
@@ -125,10 +125,12 @@ function resetAndEraseALLVolumes {
     docker compose ps
     
     echo "2. Deleting all volumes .."
-    docker volume rm $(docker volume ls -q)
+    docker compose down -v
+    
+    echo "All Bahmni volumes/databases deleted. If you still wish to delete some other volumes you can use the 'docker volume rm' command."
+    echo "Volumes remaining on machine: "
     docker volume ls
-
-    echo "All volumes/databases deleted"
+    
     echo "Now you can start Bahmni fresh. If you want latest images, then PULL them first and then start Bahmni."
 
   else
