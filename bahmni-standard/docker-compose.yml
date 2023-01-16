@@ -133,7 +133,7 @@ services:
     logging: *log-config
 
   openmrs:
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard", "bahmni-mart"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
@@ -178,7 +178,7 @@ services:
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -193,7 +193,7 @@ services:
   metabasedb:
     image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
     restart: on-failure:[3]
-    profiles: ["metabase"]
+    profiles: ["metabase", "bahmni-mart"]
     environment:
       POSTGRES_DB: ${METABASE_DB_NAME:?}
       POSTGRES_USER: ${METABASE_DB_USER:?}
@@ -206,7 +206,7 @@ services:
   metabase:
     image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
-    profiles: ["metabase"]
+    profiles: ["metabase", "bahmni-mart"]
     environment:
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
@@ -271,7 +271,7 @@ services:
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
-    profiles: ["implementer-interface","bahmni-standard"]
+    profiles: ["implementer-interface","emr","bahmni-standard"]
     #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
