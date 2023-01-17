@@ -262,7 +262,7 @@ services:
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard","bahmni-mart"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
