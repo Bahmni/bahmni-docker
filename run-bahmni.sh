@@ -48,18 +48,20 @@ function checkIfDirectoryIsCorrect {
 
 function start {
     echo "Executing command: 'docker compose up -d'"
+    echo "Starting Bahmni with default profile from .env file"
     docker compose up -d
 }
 
 
 function stop {
-    echo "Executing command: 'docker compose down'"
-    docker compose down
+    echo "Executing command: 'docker compose down' with all profiles"
+    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
 }
 
 function sshIntoService {
+    # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose ps
+    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
@@ -68,8 +70,9 @@ function sshIntoService {
 }
 
 function showLogsOfService {
+    # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose ps
+    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
@@ -94,8 +97,10 @@ function pullLatestImages {
 }
 
 function showStatus {
-    echo "Listing status of running services with command: 'docker ps'"
-    docker ps
+    echo "Listing status of running Services with command: 'docker compose ps'"
+    # Using all profiles, so that we can status of all services
+    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+
 }
 
 
@@ -128,7 +133,7 @@ function resetAndEraseALLVolumes {
     docker compose down -v
     
     echo "All Bahmni volumes/databases deleted. If you still wish to delete some other volumes you can use the 'docker volume rm' command."
-    echo "Volumes remaining on machine: "
+    echo "Volumes remaining on machine 'docker volume ls': "
     docker volume ls
     
     echo "Now you can start Bahmni fresh. If you want latest images, then PULL them first and then start Bahmni."
@@ -137,6 +142,23 @@ function resetAndEraseALLVolumes {
     echo "OK Aborting :)"
   fi  
 }
+
+function restartService {
+    # One can ONLY restart services in current profile (limitation of docker compose restart command). 
+    echo "Listing the running services from current profile (.env file) that can be restarted..."
+    docker compose ps
+
+    echo "Enter the name of the SERVICE to restart:"
+    read serviceName
+    
+    echo "Restarting SERVICE: $serviceName"
+    docker compose restart $serviceName
+
+    if confirm "Do you want to see the service logs?"; then
+        docker compose logs $serviceName -f
+    fi
+}
+
 
 #Function to shutdown the script
 function shutdown {
@@ -152,13 +174,14 @@ echo "Please select an option:"
 echo "------------------------"
 echo "1) START Bahmni services"
 echo "2) STOP  Bahmni services"
-echo "3) Show OpenMRS Logs"
-echo "4) Show Logs of a service"
+echo "3) LOGS: Show OpenMRS Logs"
+echo "4) LOGS: Show LOGS of a service"
 echo "5) SSH into a Container"
-echo "6) Start Bahmni Analytics (Mart and Metabase)"
+echo "6) START Bahmni Analytics (Mart and Metabase)"
 echo "7) PULL latest images from Docker hub for Bahmni"
-echo "8) RESET and ERASE All Volumes/Databases from docker"
-echo "0) Show STATUS of all containers"
+echo "8) RESET and ERASE All Volumes/Databases from docker!"
+echo "9) RESTART a service"
+echo "0) STATUS of all services"
 echo "-------------------------"
 read option
 
@@ -171,6 +194,7 @@ case $option in
     6) startMart;;
     7) pullLatestImages;;
     8) resetAndEraseALLVolumes;;
+    9) restartService;;
     0) showStatus;;   
     *) echo "Invalid option selected";;
 esac
