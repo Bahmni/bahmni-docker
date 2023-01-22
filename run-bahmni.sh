@@ -122,21 +122,35 @@ confirm() {
 
 
 function resetAndEraseALLVolumes {
-  if confirm "WARNING: Are you sure you want to DELETE all Bahmni Data and Volumes?? Please say Yes/No to proceed."; then
+  echo "Listing current volumes..."
+  docker volume ls
+  echo "---"  
+  if confirm "WARNING: Are you sure you want to DELETE all Bahmni Data and Volumes??"; then
     echo "Proceeding with a DELETE.... "
     
-    echo "1. Stopping all services.."
-    docker compose down
+    echo "1. Stopping all services, using all profiles.."
+    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    
     docker compose ps
     
-    echo "2. Deleting all volumes .."
-    docker compose down -v
+    echo "2. Deleting all volumes (-v) .."
+    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
+    RESULT=$?
+    if [ $RESULT -eq 0 ]; then
+        echo "Volumes deleted successfully."
+    else
+        echo "[ERROR] Command threw an error! Trying stopping all services, and then retry."
+    fi
     
-    echo "All Bahmni volumes/databases deleted. If you still wish to delete some other volumes you can use the 'docker volume rm' command."
     echo "Volumes remaining on machine 'docker volume ls': "
     docker volume ls
-    
-    echo "Now you can start Bahmni fresh. If you want latest images, then PULL them first and then start Bahmni."
+
+    echo "-"
+    echo "Note:"
+    echo "-----"
+    echo "1. If you still wish to delete some other volumes you can use the 'docker volume rm' command."
+    echo "2. Alternatively, to delete all containers, networks, volumes you can look at the 'docker system prune --volumes' command. Read more here: https://docs.docker.com/config/pruning/"
+    echo "3. If you want the latest Bahmni images, then PULL them first and then start Bahmni."
 
   else
     echo "OK Aborting :)"
