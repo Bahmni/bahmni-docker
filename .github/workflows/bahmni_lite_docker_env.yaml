@@ -1,0 +1,57 @@
+name: Deploy to Bahmni Lite Docker Env
+on:
+  push:
+    branches:
+      - master
+      - BAH-2782
+      - 'release-*'
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+    paths:
+      - 'bahmni-proxy/**'
+      - '.github/workflows/bahmni_lite_docker_env.yaml'
+  repository_dispatch:
+    types: [ "bahmni-helm-publish-event" ]
+  workflow_dispatch:
+    inputs:
+      stop_options:
+        description: 'Choose the option to stop application. "Simple" does not remove volumes, down-v removes the volumes'
+        required: true
+        type: choice
+        default: simple
+        options:
+          - simple
+          - down-v
+
+jobs:
+  deploy:
+    name: Deploy to Remote Instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.BAHMNI_AWS_ID }}
+          aws-secret-access-key: ${{ secrets.BAHMNI_AWS_SECRET }}
+          aws-region: ap-south-1
+          role-to-assume: arn:aws:iam::863324974761:role/BahmniInfraAdminRoleForIAMUsers
+          role-duration-seconds: 1200  # 20 mins
+          role-session-name: BahmniInfraAdminSession
+      - name: Create/Update Containers
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-lite-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          aws ssm send-command \
+          --instance-ids "$INSTANCE_ID" \
+          --document-name "AWS-RunShellScript" \
+          --comment "Check Running Containers" \
+          --parameters '{
+              "commands": [
+                "docker compose --profile bahmni-lite pull",
+                "docker compose --profile bahmni-lite up -d"
+              ],
+              "workingDirectory": [
+                "/home/ubuntu/bahmni-docker/bahmni-lite"
+            ]
+          }' | jq '.Command | {CommandId: .CommandId, Parameters: .Parameters, Status: .Status}'
+
