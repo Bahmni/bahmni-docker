@@ -3,12 +3,13 @@ on:
   push:
     branches:
       - master
+      - BAH-2782
       - 'release-*'
     tags:
         - '[0-9]+.[0-9]+.[0-9]+'
-    paths:
-      - 'bahmni-proxy/**'
-      - '.github/workflows/proxy_image_build_publish.yml'
+#    paths:
+#      - 'bahmni-proxy/**'
+#      - '.github/workflows/proxy_image_build_publish.yml'
 
 jobs:
   docker-build-publish:
@@ -39,4 +40,3 @@ jobs:
           no-cache: true
           push: true
           tags: bahmni/proxy:${{env.ARTIFACT_VERSION}},bahmni/proxy:latest
-
