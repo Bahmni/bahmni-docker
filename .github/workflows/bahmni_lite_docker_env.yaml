@@ -48,7 +48,8 @@ jobs:
           --parameters '{
               "commands": [
                 "docker compose --profile bahmni-lite pull",
-                "docker compose --profile bahmni-lite up -d"
+                "docker compose --profile bahmni-lite up -d",
+                "docker image prune -f"
               ],
               "workingDirectory": [
                 "/home/ubuntu/bahmni-docker/bahmni-lite"
