@@ -9,7 +9,9 @@ on:
       - '.github/workflows/bahmni_lite_docker_env.yaml'
       - '.github/workflows/proxy_image_build_publish.yml'
   repository_dispatch:
-    types: [ "bahmni-helm-publish-event" ]
+    types:
+      - bahmni-helm-publish-event
+      - openmrs-db-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
