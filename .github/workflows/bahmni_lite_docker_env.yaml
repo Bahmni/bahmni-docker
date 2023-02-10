@@ -4,12 +4,10 @@ on:
     branches:
       - master
       - BAH-2782
-      - 'release-*'
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
     paths:
       - 'bahmni-proxy/**'
       - '.github/workflows/bahmni_lite_docker_env.yaml'
+      - '.github/workflows/proxy_image_build_publish.yml'
   repository_dispatch:
     types: [ "bahmni-helm-publish-event" ]
   workflow_dispatch:
