@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - BAH-2782
     paths:
       - 'bahmni-proxy/**'
       - '.github/workflows/bahmni_lite_docker_env.yaml'
