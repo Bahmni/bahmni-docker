@@ -37,7 +37,7 @@ jobs:
           aws-access-key-id: ${{ secrets.BAHMNI_AWS_ID }}
           aws-secret-access-key: ${{ secrets.BAHMNI_AWS_SECRET }}
           aws-region: ap-south-1
-          role-to-assume: arn:aws:iam::863324974761:role/BahmniInfraAdminRoleForIAMUsers
+          role-to-assume: ${{ secrets.BAHMNI_INFRA_ADMIN_ROLE }}
           role-duration-seconds: 1200  # 20 mins
           role-session-name: BahmniInfraAdminSession
       - name: Create/Update Containers
