@@ -5,6 +5,7 @@ on:
       - master
     paths:
       - 'bahmni-proxy/**'
+      - 'bahmni-lite/**'
       - '.github/workflows/bahmni_lite_docker_env.yaml'
       - '.github/workflows/proxy_image_build_publish.yml'
   repository_dispatch:
