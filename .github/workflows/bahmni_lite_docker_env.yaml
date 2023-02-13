@@ -59,6 +59,7 @@ jobs:
             --comment "Update running containers" \
             --parameters '{
                 "commands": [
+                  "git pull -r",
                   "docker compose --profile bahmni-lite pull",
                   "'"$command"'",
                   "docker image prune -f"
