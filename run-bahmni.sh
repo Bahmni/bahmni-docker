@@ -14,12 +14,10 @@ function checkDockerAndDockerComposeVersion {
     DOCKER_SERVER_VERSION_MINOR=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 2)
     DOCKER_SERVER_VERSION_BUILD=$(echo "$DOCKER_SERVER_VERSION"| cut -d'.' -f 3)
 
-    if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ] && \
-    [ "${DOCKER_SERVER_VERSION_MINOR}" -ge 10 ]  && \
-    [ "${DOCKER_SERVER_VERSION_BUILD}" -ge 13 ]; then
+    if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ]; then
         echo 'Docker version >= 20.10.13, using Docker Compose V2'
     else
-        echo 'Docker versions < 20.10.13 are not supported' >&2 
+        echo 'Docker versions < 20.x are not supported' >&2 
         exit 1
     fi
 
