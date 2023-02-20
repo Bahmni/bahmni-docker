@@ -1,0 +1,64 @@
+name: Deploy to SNOMED environment
+on:
+  push:
+    branches:
+      - snomed-master
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        default: qa
+        options:
+          - qa
+          - dev
+
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'dev'}}
+
+jobs:
+  deploy:
+    name: Deploy to SNOMED ${{ github.event.inputs.environment || 'dev'}} environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.SNOMED_AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SNOMED_AWS_SECRET }}
+          aws-region: ${{ secrets.SNOMED_AWS_REGION }}
+          role-to-assume: ${{ secrets.SNOMED_CICD_ROLE_ARN }}
+          role-duration-seconds: 900 # 15 mins
+          role-session-name: SNOMED
+
+      - name: Deploy to SNOMED ${{ github.event.inputs.environment || 'dev'}} Environment
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ github.event.inputs.environment || 'dev'}}" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "Instance not running"
+            exit 1;
+          else
+            SSM_COMMAND_TARGET_JSON=${{ toJson('[{"Key":"InstanceIds","Values":["${INSTANCE_ID}"]}]') }}
+            aws ssm send-command --document-name "AWS-RunShellScript" \
+            --targets $SSM_COMMAND_TARGET_JSON \
+            --parameters '{"workingDirectory":["${{ secrets.SNOMED_WORKING_DIRECTORY }}"],"commands":["bash deploy.sh"]}' \
+            --region ${{ secrets.SNOMED_AWS_REGION }} | jq '.Command | {CommandId: .CommandId, Status: .Status}'
+          fi
+
+  notification:
+    name: Slack notification
+    needs:
+      - deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Success
+        if: ${{ needs.deploy.result == 'success' }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":">🟢 Deployement to ${{ github.event.inputs.environment || 'dev'}} Environment Started & will be available in 5 minutes. \n>*Bahmni* https://${{ github.event.inputs.environment || 'dev'}}.snomed.mybahmni.in \n> <https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|Github Actions Job #${{github.run_id}}>"}' ${{ secrets.SNOMED_SLACK_WEBHOOK_URL }}
+      - name: Failure
+        if: ${{ needs.deploy.result != 'success' }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"🔴 Deployement to ${{ github.event.inputs.environment || 'dev'}} Environment failed!!! This is where you go look what happened → <https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|Github Actions Job #${{github.run_id}}>"}' ${{ secrets.SNOMED_SLACK_WEBHOOK_URL }}
