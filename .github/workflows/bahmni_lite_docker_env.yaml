@@ -1,0 +1,71 @@
+name: Deploy to Bahmni Lite Docker Env
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'bahmni-proxy/**'
+      - 'bahmni-lite/**'
+      - '.github/workflows/bahmni_lite_docker_env.yaml'
+      - '.github/workflows/proxy_image_build_publish.yml'
+  repository_dispatch:
+    types:
+      - bahmni-helm-publish-event
+      - openmrs-db-publish-event
+  workflow_dispatch:
+    inputs:
+      update_bahmni_option:
+        description: 'Choose the option to update Bahmni. "Update without removing volumes" or "Update and remove volumes"'
+        required: true
+        type: choice
+        default: update_without_removing_volumes
+        options:
+          - update_without_removing_volumes
+          - update_and_remove_volumes
+env:
+  UPDATE_BAHMNI_OPTION: ${{ github.event.inputs.update_bahmni_option || 'update_without_removing_volumes'}}
+
+jobs:
+  deploy:
+    name: Deploy to Remote Instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.BAHMNI_AWS_ID }}
+          aws-secret-access-key: ${{ secrets.BAHMNI_AWS_SECRET }}
+          aws-region: ap-south-1
+          role-to-assume: ${{ secrets.BAHMNI_INFRA_ADMIN_ROLE }}
+          role-duration-seconds: 1200  # 20 mins
+          role-session-name: BahmniInfraAdminSession
+      - name: Create/Update Containers
+        run: |
+          if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
+            command="docker compose up -d"
+          elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
+            command="docker compose down -v && docker compose up -d"
+          fi
+          
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-lite-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          
+          if [ -z "$INSTANCE_ID" ]; then
+            echo "Instance not running"
+          else
+            aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Update running containers" \
+            --parameters '{
+                "commands": [
+                  "git pull -r",
+                  "docker compose pull",
+                  "'"$command"'",
+                  "docker image prune -f"
+                ],
+                "workingDirectory": [
+                  "/home/ubuntu/bahmni-docker/bahmni-lite"
+              ]
+            }' | jq '.Command | {CommandId: .CommandId, Parameters: .Parameters, Status: .Status}'
+          fi

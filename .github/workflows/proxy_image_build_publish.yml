@@ -39,4 +39,3 @@ jobs:
           no-cache: true
           push: true
           tags: bahmni/proxy:${{env.ARTIFACT_VERSION}},bahmni/proxy:latest
-
