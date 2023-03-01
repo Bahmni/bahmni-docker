@@ -49,7 +49,7 @@ jobs:
             command="docker compose down -v && docker compose up -d"
           fi
           
-          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-lite-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-standard-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
           
           if [ -z "$INSTANCE_ID" ]; then
             echo "Instance not running"
