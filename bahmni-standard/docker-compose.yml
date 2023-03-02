@@ -85,7 +85,8 @@ services:
       odoodb:
         condition: service_healthy
     environment:
-      HOST: odoodb
+      MODULE: ${ODOO_MODULE}
+      HOST: ${ODOO_DB_HOST}
       USER: ${ODOO_DB_USER}
       PASSWORD: ${ODOO_DB_PASSWORD}
     logging: *log-config
