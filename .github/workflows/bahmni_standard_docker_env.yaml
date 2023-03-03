@@ -12,6 +12,7 @@ on:
     types:
       - bahmni-helm-publish-event
       - openmrs-db-publish-event
+      - openelis-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
