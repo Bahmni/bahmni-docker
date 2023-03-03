@@ -14,6 +14,7 @@ on:
       - openmrs-db-publish-event
       - openelis-publish-event
       - odoo-publish-event
+      - odoo-connect-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
