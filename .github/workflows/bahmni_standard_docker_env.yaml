@@ -15,6 +15,7 @@ on:
       - openelis-publish-event
       - odoo-publish-event
       - odoo-connect-publish-event
+      - dcm4chee-pacs-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
