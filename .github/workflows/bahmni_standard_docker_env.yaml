@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - BAH-2889
     paths:
       - 'bahmni-proxy/**'
       - 'bahmni-standard/**'
