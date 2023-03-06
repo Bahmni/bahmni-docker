@@ -6,6 +6,7 @@ COPY scripts/get_client_side_logging.sh /tmp/get_client_side_logging.sh
 RUN sh /tmp/get_client_side_logging.sh && rm /tmp/get_client_side_logging.sh
 COPY resources/bahmni-proxy.conf /usr/local/apache2/conf/
 RUN echo "Include conf/bahmni-proxy.conf" >> /usr/local/apache2/conf/httpd.conf
+RUN sed -i "s/Options Indexes FollowSymLinks/Options -Indexes +FollowSymLinks/" /usr/local/apache2/conf/httpd.conf
 COPY resources/index.html /usr/local/apache2/htdocs/index.html
 COPY resources/systemdate.sh /usr/local/apache2/cgi-bin/systemdate
 COPY resources/bahmni-logo.png /usr/local/apache2/htdocs/bahmni-logo.png

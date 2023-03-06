@@ -23,6 +23,7 @@ services:
     volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
       - 'bahmni-patient-images:/home/bahmni/patient_images'
+      - 'bahmni-lab-results:/usr/local/apache2/htdocs/uploaded_results'
     ports:
       - '80:80'
       - '443:443'
@@ -41,6 +42,8 @@ services:
       - '8052:8052'
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-lab-files:/home/bahmni/uploaded-files/elis"
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
@@ -429,3 +432,5 @@ volumes:
   bahmni-clinical-forms:
   dcm4chee-archive:
   bahmni-config:
+  bahmni-lab-results:
+  bahmni-lab-files:
