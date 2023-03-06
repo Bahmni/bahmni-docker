@@ -500,6 +500,14 @@ services:
       MYSQL_USER: ${CRATER_ATOMFEED_DB_USERNAME:?}
       MYSQL_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD:?}
 
+  cdss:
+    profiles: [ "snomed" ]
+    image: bahmni/cdss-reference:${CDSS_IMAGE_TAG:?}
+    environment:
+      JAVA_OPTS: ${CDSS_JAVA_SERVER_OPTS}
+    ports:
+      - '9090:8080'
+
 volumes:
   openelisdbdata:
   odoodbdata:
