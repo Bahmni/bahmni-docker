@@ -63,6 +63,7 @@ jobs:
             --comment "Update running containers" \
             --parameters '{
                 "commands": [
+                  "source ~/.bash_profile",
                   "git pull -r",
                   "docker compose pull",
                   "'"$command"'",
