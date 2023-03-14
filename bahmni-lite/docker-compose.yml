@@ -19,9 +19,8 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    volumes:
+    #volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
-      - 'bahmni-patient-images:/home/bahmni/patient_images'
     ports:
       - '80:80'
       - '443:443'
@@ -182,7 +181,7 @@ services:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
-      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
       MART_DB_HOST: ${MART_DB_HOST:?}
       MART_DB_NAME: ${MART_DB_NAME:?}
       MART_DB_USERNAME: ${MART_DB_USERNAME:?}
@@ -201,8 +200,8 @@ services:
       - 'mart-data:/var/lib/postgresql/data'
     ports:
      - 5435:5432
-  
-  mart: 
+
+  mart:
     image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
     environment:
