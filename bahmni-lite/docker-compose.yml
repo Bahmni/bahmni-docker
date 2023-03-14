@@ -35,9 +35,6 @@ services:
   bahmni-lab:
     profiles: ["lab-lite","emr","bahmni-lite"]
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
-    ports:
-      - '8090:80'
-      - '8443:443'
     logging: *log-config
 
   openmrs:
@@ -92,8 +89,6 @@ services:
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
-    ports:
-      - '3306:3306'
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
       - 'configuration_checksums:/configuration_checksums'
@@ -148,8 +143,7 @@ services:
       MYSQL_PASSWORD: ${CRATER_DB_PASSWORD:?}
       MYSQL_DATABASE: ${CRATER_DB_DATABASE:?}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
-    ports:
-      - '33006:3306'
+
 
   metabasedb:
     image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
@@ -161,8 +155,7 @@ services:
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
     volumes:
       - 'metabase-data:/var/lib/postgresql/data'
-    ports:
-     - 5430:5432
+
 
   metabase:
     image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
@@ -198,8 +191,7 @@ services:
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
     volumes:
       - 'mart-data:/var/lib/postgresql/data'
-    ports:
-     - 5435:5432
+
 
   mart:
     image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
@@ -274,8 +266,6 @@ services:
 
   patient-documents:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
-    ports:
-      - '8099:80'
     profiles: ["emr","bahmni-lite"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
