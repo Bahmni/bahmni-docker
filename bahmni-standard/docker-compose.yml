@@ -157,8 +157,7 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-    ports:
-      - '8080:8080'
+    #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
