@@ -4,10 +4,8 @@ on:
     branches:
       - master
     paths:
-      - 'bahmni-proxy/**'
       - 'bahmni-standard/**'
       - '.github/workflows/bahmni_standard_docker_env.yaml'
-      - '.github/workflows/proxy_image_build_publish.yml'
   repository_dispatch:
     types:
       - bahmni-helm-publish-event
@@ -16,6 +14,7 @@ on:
       - odoo-publish-event
       - odoo-connect-publish-event
       - dcm4chee-pacs-publish-event
+      - bahmni-proxy-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
