@@ -4,14 +4,13 @@ on:
     branches:
       - master
     paths:
-      - 'bahmni-proxy/**'
       - 'bahmni-lite/**'
       - '.github/workflows/bahmni_lite_docker_env.yaml'
-      - '.github/workflows/proxy_image_build_publish.yml'
   repository_dispatch:
     types:
       - bahmni-helm-publish-event
       - openmrs-db-publish-event
+      - bahmni-proxy-publish-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
