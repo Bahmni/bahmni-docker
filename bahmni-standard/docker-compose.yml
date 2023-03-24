@@ -22,7 +22,7 @@ services:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
     volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
-      - 'bahmni-patient-images:/home/bahmni/patient_images'
+      - 'bahmni-lab-results:/usr/local/apache2/htdocs/uploaded_results'
     ports:
       - '80:80'
       - '443:443'
@@ -37,10 +37,10 @@ services:
   openelis:
     profiles: ["openelis","bahmni-standard"]
     image: 'bahmni/openelis:${OPENELIS_IMAGE_TAG:?[ERROR]}'
-    ports:
-      - '8052:8052'
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-lab-files:/home/bahmni/uploaded-files/elis"
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
@@ -55,8 +55,6 @@ services:
   openelisdb:
     profiles: ["openelis","bahmni-standard"]
     image: 'bahmni/openelis-db:${OPENELIS_DB_IMAGE_TAG:?[ERROR]}'
-    ports:
-      - '5432:5432'
     volumes:
       - '${OPENELIS_DB_DUMP_PATH}:/resources/db-dump'
       - 'openelisdbdata:/var/lib/postgresql/data'
@@ -93,8 +91,6 @@ services:
   odoodb:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-10-db:${ODOO_DB_IMAGE_TAG:?[ERROR]}'
-    ports:
-      - '5431:5432'
     volumes:
       - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoodbdata:/var/lib/postgresql/data'
@@ -161,11 +157,9 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-    ports:
-      - '8080:8080'
+    #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
-      - 'openmrs-data:/openmrs/data/modules'
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
@@ -184,8 +178,6 @@ services:
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
-    ports:
-      - '3306:3306'
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
     logging: *log-config
@@ -200,8 +192,6 @@ services:
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
     volumes:
       - 'metabase-data:/var/lib/postgresql/data'
-    ports:
-     - 5430:5432
 
   metabase:
     image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
@@ -220,7 +210,7 @@ services:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
-      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}  
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
       MART_DB_HOST: ${MART_DB_HOST:?}
       MART_DB_NAME: ${MART_DB_NAME:?}
       MART_DB_USERNAME: ${MART_DB_USERNAME:?}
@@ -237,10 +227,8 @@ services:
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
     volumes:
       - 'mart-data:/var/lib/postgresql/data'
-    ports:
-     - 5435:5432
-  
-  mart: 
+
+  mart:
     image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
     environment:
@@ -262,7 +250,7 @@ services:
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
-    profiles: ["emr","bahmni-standard"]
+    profiles: ["emr","bahmni-standard","bahmni-mart"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
@@ -317,8 +305,6 @@ services:
 
   patient-documents:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
-    ports:
-      - '8099:80'
     profiles: ["emr","bahmni-standard"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
@@ -429,3 +415,5 @@ volumes:
   bahmni-clinical-forms:
   dcm4chee-archive:
   bahmni-config:
+  bahmni-lab-results:
+  bahmni-lab-files:
