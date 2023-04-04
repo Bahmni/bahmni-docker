@@ -281,7 +281,7 @@ services:
 
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
-    profiles: [ "emr" ]
+    profiles: ["sms"]
     environment:
       SMS_TOKEN: ${SMS_TOKEN:?}
 
