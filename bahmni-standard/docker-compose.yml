@@ -402,6 +402,12 @@ services:
       PACS_INTEGRATION_DB_USERNAME: ${PACS_INTEGRATION_DB_USERNAME}
       PACS_INTEGRATION_DB_PASSWORD: ${PACS_INTEGRATION_DB_PASSWORD}
 
+  sms-service:
+    image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
+    profiles: ["sms"]
+    environment:
+      SMS_TOKEN: ${SMS_TOKEN:?}
+
 volumes:
   openelisdbdata:
   odoodbdata:
