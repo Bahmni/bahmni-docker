@@ -279,6 +279,12 @@ services:
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
+  sms-service:
+    image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
+    profiles: [ "emr" ]
+    environment:
+      SMS_TOKEN: ${SMS_TOKEN:?}
+
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
