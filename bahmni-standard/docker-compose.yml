@@ -407,6 +407,7 @@ services:
     profiles: ["sms"]
     environment:
       SMS_TOKEN: ${SMS_TOKEN:?}
+      SMS_ORIGINATOR: ${SMS_ORIGINATOR:?}
 
 volumes:
   openelisdbdata:

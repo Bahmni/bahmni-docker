@@ -284,6 +284,7 @@ services:
     profiles: ["sms"]
     environment:
       SMS_TOKEN: ${SMS_TOKEN:?}
+      SMS_ORIGINATOR: ${SMS_ORIGINATOR:?}
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
