@@ -283,8 +283,8 @@ services:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
     environment:
-      SMS_TOKEN: ${SMS_TOKEN:?}
-      SMS_ORIGINATOR: ${SMS_ORIGINATOR:?}
+      SMS_TOKEN: ${SMS_TOKEN}
+      SMS_ORIGINATOR: ${SMS_ORIGINATOR}
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
 
