@@ -19,9 +19,8 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    volumes:
+    #volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
-        - 'bahmni-lab-results:/usr/local/apache2/htdocs/uploaded_results'
     ports:
       - '80:80'
       - '443:443'
@@ -269,6 +268,7 @@ services:
     profiles: ["emr","bahmni-lite"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
+      - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
       - OPENMRS_HOST=${OPENMRS_HOST:?}
     depends_on:
