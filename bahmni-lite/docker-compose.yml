@@ -67,6 +67,7 @@ services:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-lab-results:/home/bahmni/uploaded_results"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
@@ -267,6 +268,7 @@ services:
     profiles: ["emr","bahmni-lite"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
+      - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
       - OPENMRS_HOST=${OPENMRS_HOST:?}
     depends_on:
@@ -336,3 +338,4 @@ volumes:
   configuration_checksums:
   mart-data:
   metabase-data:
+  bahmni-lab-results:
