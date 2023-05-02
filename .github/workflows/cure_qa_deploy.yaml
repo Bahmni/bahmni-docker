@@ -44,6 +44,7 @@ jobs:
           user: '${{ secrets.CURE_EMR_DEPLOYMENTS_USERNAME }}'
           ssh_private_key: '${{ secrets.CURE_EMR_DEPLOYMENTS_SSH_PRIVATE_KEY }}'
           command: |
+            . ~/.bash_profile
             cd cure-bahmni-docker/bahmni
             git pull -r
             docker compose pull
