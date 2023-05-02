@@ -44,7 +44,12 @@ jobs:
           user: '${{ secrets.CURE_EMR_DEPLOYMENTS_USERNAME }}'
           ssh_private_key: '${{ secrets.CURE_EMR_DEPLOYMENTS_SSH_PRIVATE_KEY }}'
           command: |
-            echo "hello GCP!"
+            cd cure-bahmni-docker/bahmni
+            git pull -r
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+            
       - id: 'test'
         name: Print the command outputs
         run: |-
