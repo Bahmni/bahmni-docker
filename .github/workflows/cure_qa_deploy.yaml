@@ -25,9 +25,21 @@ on:
 #   UPDATE_BAHMNI_OPTION: ${{ github.event.inputs.update_bahmni_option || 'update_without_removing_volumes'}}
 
 jobs:
+  trivy-scan:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Trivy Scan
+        run: |
+          wget -q https://raw.githubusercontent.com/Bahmni/bahmni-infra-utils/main/trivy_scan.sh && chmod +x trivy_scan.sh
+          ./trivy_scan.sh
+          rm trivy_scan.sh
   deploy:
     name: Deploy to QA Instance
     runs-on: ubuntu-latest
+    needs: trivy-scan
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
