@@ -12,17 +12,17 @@ on:
   #     - openmrs-db-publish-event
   #     - bahmni-proxy-publish-event
   workflow_dispatch:
-    # inputs:
-    #   update_bahmni_option:
-    #     description: 'Choose the option to update Bahmni. "Update without removing volumes" or "Update and remove volumes"'
-    #     required: true
-    #     type: choice
-    #     default: update_without_removing_volumes
-    #     options:
-    #       - update_without_removing_volumes
-    #       - update_and_remove_volumes
-# env:
-#   UPDATE_BAHMNI_OPTION: ${{ github.event.inputs.update_bahmni_option || 'update_without_removing_volumes'}}
+    inputs:
+      update_bahmni_option:
+        description: 'Choose the option to update Bahmni. "Update without removing volumes" or "Update and remove volumes"'
+        required: true
+        type: choice
+        default: update_without_removing_volumes
+        options:
+          - update_without_removing_volumes
+          - update_and_remove_volumes
+env:
+  UPDATE_BAHMNI_OPTION: ${{ github.event.inputs.update_bahmni_option || 'update_without_removing_volumes'}}
 
 jobs:
   trivy-scan:
@@ -47,6 +47,17 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.CURE_EMR_DEPLOYMENTS_SERVICE_ACCOUNT_KEY }}
+      - id: 'set-command-value'
+        name: Set command value based on options chosen
+        run: |
+          if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
+           the_command="docker compose up -d"
+           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+          elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
+           the_command="docker compose down -v && docker compose up -d"
+           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+          fi
+      
       - id: 'compute-ssh'
         name: Send commands via SSH
         uses: 'google-github-actions/ssh-compute@v0'
@@ -60,10 +71,10 @@ jobs:
             cd cure-bahmni-docker/bahmni
             git pull -r
             docker compose pull
-            docker compose up -d
+            ${{ steps.set-command-value.outputs.command }}
             docker image prune -f
-            
-      - id: 'test'
+    
+      - id: 'print'
         name: Print the command outputs
         run: |-
           echo '${{ steps.compute-ssh.outputs.stdout }}'
