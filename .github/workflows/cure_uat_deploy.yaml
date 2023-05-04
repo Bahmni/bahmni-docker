@@ -1,12 +1,5 @@
 name: Deploy to Cure UAT Env
 on:
-  push:
-    branches:
-      - cure-master
-    paths:
-      - 'bahmni/**'
-      - '.github/workflows/cure_uat_deploy.yaml'
-
   workflow_dispatch:
     inputs:
       update_bahmni_option:
