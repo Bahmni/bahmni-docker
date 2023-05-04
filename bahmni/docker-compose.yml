@@ -13,7 +13,7 @@ x-loki-logging: &loki
 
 x-log-config: &log-config
   # update this value to *loki if needed to see logs in grafana dashboard.
-  <<: *default
+  <<: *loki
 
 services:
 
