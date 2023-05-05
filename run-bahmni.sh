@@ -36,10 +36,10 @@ function checkIfDirectoryIsCorrect {
     current_subdir=$(basename $(pwd))
     echo "$current_subdir"
 
-    if [ "$current_subdir" == "bahmni-lite" ] || [ "$current_subdir" == "bahmni-standard" ] ; then
+    if [ "$current_subdir" == "bahmni" ] ; then
         return
     else
-        echo "Error: This script should be run from either 'bahmni-lite' or 'bahmni-standard' subfolder. Please cd to the appropriate sub-folder and then execute the run-bahmni.sh command."
+        echo "Error: This script should be run from 'bahmni' subfolder. Please cd to bahmni and then execute the run-bahmni.sh command."
         exit 1
     fi
 }

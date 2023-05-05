@@ -38,14 +38,28 @@ jobs:
           credentials_json: ${{ secrets.CURE_EMR_DEPLOYMENTS_SERVICE_ACCOUNT_KEY }}
       - id: 'set-command-value'
         name: Set command value based on options chosen
-        run: |
+        run: | 
           if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
-           the_command="docker compose up -d"
-           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+              the_command="docker compose \
+                  --env-file config/.env.uat \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml up -d"
+              echo "command=$the_command" >> "$GITHUB_OUTPUT"
           elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
-           the_command="docker compose down -v && docker compose up -d"
-           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+              the_command="docker compose \
+                  --env-file config/.env.uat \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml down -v \
+                  && docker compose \
+                  --env-file config/.env.uat \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml up -d"
+              echo "command=$the_command" >> "$GITHUB_OUTPUT"
           fi
+
       
       - id: 'compute-ssh'
         name: Send commands via SSH

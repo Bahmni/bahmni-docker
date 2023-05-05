@@ -94,56 +94,6 @@ services:
 
     logging: *log-config
 
-  crater-php:
-    image: bahmni/crater-php:${CRATER_PHP_IMAGE_TAG:?}
-    profiles: ["crater","bahmni-lite"]
-    restart: unless-stopped
-    working_dir: /var/www/
-    volumes:
-     - 'crater-app-data:/var/www/storage/app/public'
-    environment:
-      APP_URL: ${CRATER_APP_URL:?}
-      DB_HOST: ${CRATER_DB_HOST:?}
-      DB_PORT: ${CRATER_DB_PORT:?}
-      DB_DATABASE: ${CRATER_DB_DATABASE:?}
-      DB_USERNAME: ${CRATER_DB_USERNAME:?}
-      DB_PASSWORD: ${CRATER_DB_PASSWORD:?}
-      SANCTUM_STATEFUL_DOMAINS: ${CRATER_SANCTUM_STATEFUL_DOMAINS:?}
-      SESSION_DOMAIN: ${CRATER_SESSION_DOMAIN:?}
-      AUTO_INSTALL: ${CRATER_AUTO_INSTALL:?}
-      ADMIN_NAME: ${CRATER_ADMIN_NAME:?}
-      ADMIN_EMAIL: ${CRATER_ADMIN_EMAIL:?}
-      ADMIN_PASSWORD: ${CRATER_ADMIN_PASSWORD:?}
-      COMPANY_NAME: ${CRATER_COMPANY_NAME:?}
-      COMPANY_SLUG: ${CRATER_COMPANY_SLUG:?}
-      COUNTRY_ID: ${CRATER_COUNTRY_ID:?}
-      APP_DEBUG: ${CRATER_APP_DEBUG:?}
-
-  crater-nginx:
-    image: bahmni/crater-nginx:${CRATER_NGINX_IMAGE_TAG:?}
-    profiles: ["crater","bahmni-lite"]
-    restart: unless-stopped
-    volumes:
-     - 'crater-app-data:/var/www/public/storage'
-    ports:
-      - 444:443
-
-  craterdb:
-    image: mysql:5.7
-    profiles: ["crater","bahmni-lite"]
-    restart: always
-    volumes:
-      - craterdb:/var/lib/mysql
-      # # If you want to persist data on the host, comment the line above this one...
-      # # and uncomment the line under this one.
-      # - ./docker-compose/db/data:/var/lib/mysql:rw,delegated
-    environment:
-      MYSQL_USER: ${CRATER_DB_USERNAME:?}
-      MYSQL_PASSWORD: ${CRATER_DB_PASSWORD:?}
-      MYSQL_DATABASE: ${CRATER_DB_DATABASE:?}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
-
-
   metabasedb:
     image: postgres:${METABASE_POSTGRES_IMAGE_TAG:?}
     restart: on-failure:[3]
@@ -281,15 +231,6 @@ services:
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
-  sms-service:
-    image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
-    profiles: ["sms"]
-    environment:
-      SMS_TOKEN: ${SMS_TOKEN}
-      SMS_ORIGINATOR: ${SMS_ORIGINATOR}
-      SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
-      SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
-
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
@@ -299,41 +240,12 @@ services:
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
 
-  crater-atomfeed:
-    image: bahmni/crater-atomfeed:${CRATER_ATOMFEED_IMAGE_TAG:?}
-    profiles: ["crater","bahmni-lite"]
-    environment:
-      OPENMRS_HOST: ${OPENMRS_HOST:?}
-      OPENMRS_PORT: ${OPENMRS_PORT:?}
-      OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER}
-      OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD}
-      CRATER_ATOMFEED_DB_HOST: ${CRATER_ATOMFEED_DB_HOST:?}
-      CRATER_ATOMFEED_DB_PORT: ${CRATER_ATOMFEED_DB_PORT:?}
-      CRATER_USERNAME: ${CRATER_USERNAME}
-      CRATER_PASSWORD: ${CRATER_PASSWORD}
-      CRATER_ATOMFEED_DB_USERNAME: ${CRATER_ATOMFEED_DB_USERNAME}
-      CRATER_ATOMFEED_DB_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD}
-      CRATER_ATOMFEED_DB_NAME: ${CRATER_ATOMFEED_DB_NAME}
-      CRATER_URL: ${CRATER_URL}
-
-  crater-atomfeed-db:
-    platform: linux/amd64
-    image: mysql:5.7
-    profiles: ["crater","bahmni-lite"]
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${CRATER_ATOMFEED_DB_NAME:?}
-      MYSQL_USER: ${CRATER_ATOMFEED_DB_USERNAME:?}
-      MYSQL_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD:?}
-
 volumes:
   openmrs-data:
   openmrsdbdata:
-  craterdb:
   bahmni-patient-images:
   bahmni-document-images:
   bahmni-clinical-forms:
-  crater-app-data:
   bahmni-config:
   configuration_checksums:
   mart-data:

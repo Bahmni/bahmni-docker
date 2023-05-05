@@ -6,11 +6,11 @@ on:
     paths:
       - 'bahmni/**'
       - '.github/workflows/cure_qa_deploy.yaml'
-  # repository_dispatch:
-  #   types:
-  #     - bahmni-helm-publish-event
-  #     - openmrs-db-publish-event
-  #     - bahmni-proxy-publish-event
+  repository_dispatch:
+    types:
+      - bahmni-ipd-appointments-event
+      - openmrs-ipd-openmrs-event
+      - bahmni-ipd-event-router-service-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
@@ -51,11 +51,24 @@ jobs:
         name: Set command value based on options chosen
         run: |
           if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
-           the_command="docker compose up -d"
-           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+              the_command="docker compose \
+                  --env-file config/.env.qa \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml up -d"
+              echo "command=$the_command" >> "$GITHUB_OUTPUT"
           elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
-           the_command="docker compose down -v && docker compose up -d"
-           echo "command=$the_command" >> "$GITHUB_OUTPUT"
+              the_command="docker compose \
+                  --env-file config/.env.qa \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml down -v \
+                  && docker compose \
+                  --env-file config/.env.qa \
+                  -f docker-compose.yml \
+                  -f docker-compose.override.yml \
+                  -f ../logging/docker-compose.yml up -d"
+              echo "command=$the_command" >> "$GITHUB_OUTPUT"
           fi
       
       - id: 'compute-ssh'
