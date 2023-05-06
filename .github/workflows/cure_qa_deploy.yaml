@@ -76,7 +76,7 @@ jobs:
         uses: 'google-github-actions/ssh-compute@v0'
         with:
           instance_name: '${{ secrets.CURE_EMR_QA_INSTANCE_NAME }}'
-          zone: 'us-central1-a'
+          zone: 'us-east1-b'
           user: '${{ secrets.CURE_EMR_DEPLOYMENTS_USERNAME }}'
           ssh_private_key: '${{ secrets.CURE_EMR_DEPLOYMENTS_SSH_PRIVATE_KEY }}'
           command: |
