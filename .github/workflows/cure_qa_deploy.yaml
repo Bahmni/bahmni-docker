@@ -1,4 +1,4 @@
-name: Deploy to Cure QA Env
+name: Deploy to CURE QA Env
 on:
   push:
     branches:

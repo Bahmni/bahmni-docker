@@ -1,4 +1,4 @@
-name: Deploy to Cure UAT Env
+name: Deploy to CURE UAT Env
 on:
   workflow_dispatch:
     inputs:
