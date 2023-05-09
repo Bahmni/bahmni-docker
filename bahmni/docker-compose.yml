@@ -27,7 +27,7 @@ services:
     logging: *log-config
 
   bahmni-config:
-    image: 'bahmni/clinic-config:${CONFIG_IMAGE_TAG:?}'
+    image: '${CONFIG_IMAGE_NAME:?}:${CONFIG_IMAGE_TAG:?}'
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
