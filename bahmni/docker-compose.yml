@@ -24,17 +24,24 @@ services:
     ports:
       - '80:80'
       - '443:443'
+    environment:
+      TZ: ${TIMEZONE}
     logging: *log-config
+
 
   bahmni-config:
     image: '${CONFIG_IMAGE_NAME:?}:${CONFIG_IMAGE_TAG:?}'
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
+    environment:
+      TZ: ${TIMEZONE}
     logging: *log-config
 
   bahmni-lab:
     profiles: ["lab-lite","emr","bahmni-lite"]
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
+    environment:
+      TZ: ${TIMEZONE}
     logging: *log-config
 
   openmrs:
@@ -63,6 +70,7 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       OMRS_DOCKER_ENV: ${OPENMRS_DOCKER_ENV}
+      TZ: ${TIMEZONE}
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
@@ -88,10 +96,11 @@ services:
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
       - 'configuration_checksums:/configuration_checksums'
-
+    
     logging: *log-config
 
   metabasedb:
@@ -102,6 +111,7 @@ services:
       POSTGRES_DB: ${METABASE_DB_NAME:?}
       POSTGRES_USER: ${METABASE_DB_USER:?}
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     volumes:
       - 'metabase-data:/var/lib/postgresql/data'
 
@@ -128,6 +138,7 @@ services:
       MART_DB_NAME: ${MART_DB_NAME:?}
       MART_DB_USERNAME: ${MART_DB_USERNAME:?}
       MART_DB_PASSWORD: ${MART_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     depends_on:
      - metabasedb
 
@@ -138,6 +149,7 @@ services:
       POSTGRES_DB: ${MART_DB_NAME:?}
       POSTGRES_USER: ${MART_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     volumes:
       - 'mart-data:/var/lib/postgresql/data'
 
@@ -155,6 +167,7 @@ services:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     depends_on:
      - martdb
      - openmrsdb
@@ -169,6 +182,8 @@ services:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
+    environment:
+      TZ: ${TIMEZONE}
     logging: *log-config
 
   implementer-interface:
@@ -178,6 +193,8 @@ services:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer-interface"
     depends_on:
       - openmrs
+    environment:
+      TZ: ${TIMEZONE}
     logging: *log-config
 
   reports:
@@ -194,6 +211,7 @@ services:
       REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
     depends_on:
@@ -211,6 +229,7 @@ services:
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
       MYSQL_USER: ${REPORTS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+      TZ: ${TIMEZONE}
     logging: *log-config
 
   patient-documents:
@@ -220,7 +239,8 @@ services:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
-      - OPENMRS_HOST=${OPENMRS_HOST:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      TZ: ${TIMEZONE}
     depends_on:
       - openmrs
     logging: *log-config
@@ -228,6 +248,8 @@ services:
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
     profiles: ["emr","bahmni-lite"]
+    environment:
+      TZ: ${TIMEZONE}
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
@@ -239,6 +261,7 @@ services:
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
+      TZ: ${TIMEZONE}
 
 volumes:
   openmrs-data:
