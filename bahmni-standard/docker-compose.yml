@@ -307,7 +307,7 @@ services:
     profiles: ["emr","bahmni-standard"]
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
-      - 'bahmni-lab-results:/usr/local/apache2/htdocs/uploaded_results'
+      - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
       - OPENMRS_HOST=${OPENMRS_HOST:?}
     depends_on:
