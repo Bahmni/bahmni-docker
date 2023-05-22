@@ -84,7 +84,12 @@ jobs:
             . ~/.bash_profile
             cd cure-bahmni-docker/bahmni
             git pull -r
-            docker compose pull
+            docker compose \
+              --env-file config/.env.qa \
+              -f docker-compose.yml \
+              -f docker-compose.override.yml \
+              -f ../logging/docker-compose.yml \
+              pull
             ${{ steps.set-command-value.outputs.command }}
             docker image prune -f
     
