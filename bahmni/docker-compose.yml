@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 
 x-default-logging: &default
   {}
@@ -262,7 +262,48 @@ services:
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
       TZ: ${TIMEZONE}
+  event-router-serivce:
+    image: bahmni/event-router-service:${EVENT_ROUTER_SERVICE_TAG:?}
+    profiles: [ "event-router-service" ]
+    environment:
+      GCP_PUB_SUB_ENABLED: ${EVENT_ROUTER_GCP_PUB_SUB_ENABLED:?}
+      GCP_PROJECT_ID: ${EVENT_ROUTER_GCP_PROJECT_ID:?}
+      GCP_CREDENTIALS_FILE_LOCATION: ${EVENT_ROUTER_GCP_CREDENTIALS_FILE_LOCATION:?}
+      PUBLISHER_CONFIGURATION_FILE_LOCATION: ${EVENT_ROUTER_PUBLISHER_CONFIGURATION_FILE_LOCATION:?}
+      SUBSCRIBER_CONFIGURATION_FILE_LOCATION: ${EVENT_ROUTER_SUBSCRIBER_CONFIGURATION_FILE_LOCATION:?}
+      SUBSCRIBER_SCHEDULE_CONFIGURATION_FILE_LOCATION: ${EVENT_ROUTER_SUBSCRIBER_SCHEDULE_CONFIGURATION_FILE_LOCATION:?}
+      EVENT_ROUTER_DB_HOST: ${EVENT_ROUTER_DB_HOST:?}
+      EVENT_ROUTER_DB_PORT: ${EVENT_ROUTER_DB_PORT:?}
+      EVENT_ROUTER_DB_USERNAME: ${EVENT_ROUTER_DB_USERNAME}
+      EVENT_ROUTER_DB_PASSWORD: ${EVENT_ROUTER_DB_PASSWORD}
+      EVENT_ROUTER_DB_NAME: ${EVENT_ROUTER_DB_NAME}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER}
+      OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD}
+      MAX_FAILED_EVENTS: 1
+      CONNECTION_TIMEOUT_IN_MILLISECONDS: 30000
+      REPLY_TIMEOUT_IN_MILLISECONDS: 30000
+      LOGGING_LEVEL: ${EVENT_ROUTER_LOGGING_LEVEL}
+    depends_on:
+      event-router-db:
+        condition: service_healthy
+    volumes:
+      - '${EVENT_ROUTER_VOLUME:?}:/usr/local/resources'
 
+  event-router-db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    profiles: [ "event-router-service" ]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${EVENT_ROUTER_DB_NAME:?}
+      MYSQL_USER: ${EVENT_ROUTER_DB_USERNAME:?}
+      MYSQL_PASSWORD: ${EVENT_ROUTER_DB_PASSWORD:?}
+    healthcheck:
+      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u$$EVENT_ROUTER_DB_USERNAME', '-p$$EVENT_ROUTER_DB_PASSWORD' ]
+      timeout: 10s
+      retries: 1
 volumes:
   openmrs-data:
   openmrsdbdata:
