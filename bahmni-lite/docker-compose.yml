@@ -19,7 +19,9 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    #volumes:
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
       # - ${CERTIFICATE_PATH}:/etc/tls
     ports:
       - '80:80'
@@ -30,12 +32,17 @@ services:
     image: 'bahmni/clinic-config:${CONFIG_IMAGE_TAG:?}'
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     logging: *log-config
 
   bahmni-lab:
     profiles: ["lab-lite","emr","bahmni-lite"]
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
     logging: *log-config
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
 
   openmrs:
     profiles: ["emr","bahmni-lite", "bahmni-mart"]
@@ -66,6 +73,8 @@ services:
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
@@ -89,6 +98,8 @@ services:
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - 'openmrsdbdata:/var/lib/mysql'
       - 'configuration_checksums:/configuration_checksums'
 
@@ -100,6 +111,8 @@ services:
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
+     - '/etc/timezone:/etc/timezone:ro'
+     - '/etc/localtime:/etc/localtime:ro'
      - 'crater-app-data:/var/www/storage/app/public'
     environment:
       APP_URL: ${CRATER_APP_URL:?}
@@ -125,6 +138,8 @@ services:
     restart: unless-stopped
     volumes:
      - 'crater-app-data:/var/www/public/storage'
+     - '/etc/timezone:/etc/timezone:ro'
+     - '/etc/localtime:/etc/localtime:ro'
     ports:
       - 444:443
 
@@ -133,6 +148,8 @@ services:
     profiles: ["crater","bahmni-lite"]
     restart: always
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - craterdb:/var/lib/mysql
       # # If you want to persist data on the host, comment the line above this one...
       # # and uncomment the line under this one.
@@ -153,6 +170,8 @@ services:
       POSTGRES_USER: ${METABASE_DB_USER:?}
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - 'metabase-data:/var/lib/postgresql/data'
 
 
@@ -160,6 +179,9 @@ services:
     image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
     profiles: ["metabase", "bahmni-mart"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
@@ -189,6 +211,8 @@ services:
       POSTGRES_USER: ${MART_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - 'mart-data:/var/lib/postgresql/data'
 
 
@@ -210,6 +234,8 @@ services:
      - openmrsdb
      - openmrs
     volumes:
+     - '/etc/timezone:/etc/timezone:ro'
+     - '/etc/localtime:/etc/localtime:ro'
      - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
   bahmni-web:
@@ -217,6 +243,8 @@ services:
     profiles: ["emr","bahmni-lite","bahmni-mart"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
     logging: *log-config
@@ -224,7 +252,9 @@ services:
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
     profiles: ["implementer-interface","emr","bahmni-lite"]
-    #volumes:
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer-interface"
     depends_on:
       - openmrs
@@ -245,6 +275,8 @@ services:
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
     depends_on:
       - reportsdb
@@ -256,6 +288,9 @@ services:
     platform: linux/amd64
     image: mysql:5.7
     profiles: ["reports","bahmni-lite"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
@@ -267,6 +302,8 @@ services:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
     profiles: ["emr","bahmni-lite"]
     volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
@@ -278,12 +315,17 @@ services:
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
     profiles: ["emr","bahmni-lite"]
-    # volumes:
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
@@ -293,6 +335,9 @@ services:
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
@@ -302,6 +347,9 @@ services:
   crater-atomfeed:
     image: bahmni/crater-atomfeed:latest
     profiles: ["crater","bahmni-lite"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST:?}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
@@ -320,6 +368,9 @@ services:
     platform: linux/amd64
     image: mysql:5.7
     profiles: ["crater","bahmni-lite"]
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${CRATER_ATOMFEED_DB_NAME:?}
