@@ -12,6 +12,7 @@ on:
       - openmrs-ipd-openmrs-event
       - bahmni-ipd-event-router-service-event
       - cure-bahmni-emr-event
+      - openmrs-module-bahmniapps-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
