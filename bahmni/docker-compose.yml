@@ -262,7 +262,7 @@ services:
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME}
       OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD}
       TZ: ${TIMEZONE}
-  event-router-serivce:
+  event-router-service:
     image: bahmni/event-router-service:${EVENT_ROUTER_SERVICE_TAG:?}
     profiles: [ "event-router-service" ]
     environment:
