@@ -20,9 +20,7 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
+    #volumes:
       # - ${CERTIFICATE_PATH}:/etc/tls
     ports:
       - '80:80'
@@ -32,8 +30,6 @@ services:
   bahmni-config:
     image: 'bahmni/default-config:${CONFIG_IMAGE_TAG:?}'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
 
@@ -41,8 +37,6 @@ services:
     profiles: ["openelis","bahmni-standard"]
     image: 'bahmni/openelis:${OPENELIS_IMAGE_TAG:?[ERROR]}'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
       - "bahmni-lab-files:/home/bahmni/uploaded-files/elis"
@@ -61,8 +55,6 @@ services:
     profiles: ["openelis","bahmni-standard"]
     image: 'bahmni/openelis-db:${OPENELIS_DB_IMAGE_TAG:?[ERROR]}'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - '${OPENELIS_DB_DUMP_PATH}:/resources/db-dump'
       - 'openelisdbdata:/var/lib/postgresql/data'
     healthcheck:
@@ -82,8 +74,6 @@ services:
     ports:
       - '8069:8069'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - odooappdata:/var/lib/odoo
       - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
       # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with odoo-modules github repo cloned path.
@@ -101,8 +91,6 @@ services:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-10-db:${ODOO_DB_IMAGE_TAG:?[ERROR]}'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoodbdata:/var/lib/postgresql/data'
     healthcheck:
@@ -118,9 +106,6 @@ services:
   odoo-connect:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       ODOO_DB_SERVER: odoodb
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
@@ -174,8 +159,6 @@ services:
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
@@ -195,8 +178,6 @@ services:
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - 'openmrsdbdata:/var/lib/mysql'
     logging: *log-config
 
@@ -209,17 +190,12 @@ services:
       POSTGRES_USER: ${METABASE_DB_USER:?}
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - 'metabase-data:/var/lib/postgresql/data'
 
   metabase:
     image: bahmni/bahmni-metabase:${METABASE_IMAGE_TAG:?}
     restart: on-failure:[3]
     profiles: ["metabase", "bahmni-mart"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
@@ -249,8 +225,6 @@ services:
       POSTGRES_USER: ${MART_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - 'mart-data:/var/lib/postgresql/data'
 
   mart:
@@ -271,16 +245,12 @@ services:
      - openmrsdb
      - openmrs
     volumes:
-     - "/etc/timezone:/etc/timezone:ro"
-     - "/etc/localtime:/etc/localtime:ro"
      - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
   bahmni-web:
     image: bahmni/bahmni-web:${BAHMNI_WEB_IMAGE_TAG:?}
     profiles: ["emr","bahmni-standard","bahmni-mart"]
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
@@ -289,9 +259,7 @@ services:
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
     profiles: ["implementer-interface","emr","bahmni-standard"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
+    #volumes:
     #  - "${IMPLEMENTER_INTERFACE_CODE_PATH:?}/dist:/usr/local/apache2/htdocs/implementer_interface"
     depends_on:
       - openmrs
@@ -316,8 +284,6 @@ services:
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
     depends_on:
       - reportsdb
@@ -329,9 +295,6 @@ services:
     platform: linux/amd64
     image: mysql:5.6
     profiles: ["reports","bahmni-standard"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
@@ -343,8 +306,6 @@ services:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
     profiles: ["emr","bahmni-standard"]
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
     environment:
@@ -356,9 +317,7 @@ services:
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
     profiles: ["emr","bahmni-standard"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
+    # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
   dcm4chee:
@@ -374,17 +333,12 @@ services:
       - '8055:8055'
       - '11112:11112'
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - 'dcm4chee-archive:/var/lib/bahmni/dcm4chee/server/default/archive'
     logging: *log-config
 
   pacs-integration:
     image: bahmni/pacs-integration:${PACS_INTEGRATION_IMAGE_TAG:?}
     profiles: ["pacs","bahmni-standard"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       DB_HOST: ${PACS_DB_HOST:?}
       DB_PORT: ${PACS_DB_PORT:?}
@@ -409,17 +363,12 @@ services:
       PACS_INTEGRATION_DB_USERNAME: ${PACS_INTEGRATION_DB_USERNAME:?}
       PACS_INTEGRATION_DB_PASSWORD: ${PACS_INTEGRATION_DB_PASSWORD:?}
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
       - '${PWD}/init_pacs_dbs.sh:/docker-entrypoint-initdb.d/init_pacs_dbs.sh'
     logging: *log-config
 
   pacs-simulator:
     image: bahmni/pacs-simulator:${PACS_SIMULATOR_IMAGE_TAG:?}
     profiles: ["pacs-simulator"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       PACS_SIMULATOR_TIMEOUT: ${PACS_SIMULATOR_TIMEOUT:?}
       PACS_SERVER_TYPE: ${PACS_SERVER_TYPE:?}
@@ -436,9 +385,6 @@ services:
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
@@ -459,9 +405,6 @@ services:
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
-    volumes:
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
