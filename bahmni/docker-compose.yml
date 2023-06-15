@@ -254,7 +254,7 @@ services:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
   atomfeed-console:
-    image: bahmni/atomfeed-console:latest
+    image: bahmni/atomfeed-console:1.0.0-18
     profiles: ["atomfeed-console"]
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
