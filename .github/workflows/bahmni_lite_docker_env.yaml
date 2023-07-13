@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - BAH-3068
     paths:
       - 'bahmni-lite/**'
       - '.github/workflows/bahmni_lite_docker_env.yaml'
@@ -42,9 +43,9 @@ jobs:
       - name: Create/Update Containers
         run: |
           if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
-            command="docker compose up -d"
+            command="docker compose --env-file .env.dev up -d"
           elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
-            command="docker compose down -v && docker compose up -d"
+            command="docker compose down -v && docker compose --env-file .env.dev up -d"
           fi
           
           INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-lite-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
