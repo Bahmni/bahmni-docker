@@ -42,9 +42,9 @@ jobs:
       - name: Create/Update Containers
         run: |
           if [ "$UPDATE_BAHMNI_OPTION" == "update_without_removing_volumes" ]; then
-            command="docker compose up -d"
+            command="docker compose --env-file .env.dev up -d"
           elif [ "$UPDATE_BAHMNI_OPTION" == "update_and_remove_volumes" ]; then
-            command="docker compose down -v && docker compose up -d"
+            command="docker compose --env-file .env.dev down -v && docker compose --env-file .env.dev up -d"
           fi
           
           INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-lite-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
@@ -60,7 +60,7 @@ jobs:
                 "commands": [
                   ". /home/ubuntu/.bash_profile",
                   "git pull -r",
-                  "docker compose pull",
+                  "docker compose --env-file .env.dev pull",
                   "'"$command"'",
                   "docker image prune -f"
                 ],
