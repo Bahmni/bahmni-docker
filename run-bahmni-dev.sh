@@ -39,14 +39,14 @@ function checkIfDirectoryIsCorrect {
     if [ "$current_subdir" == "bahmni-lite" ] || [ "$current_subdir" == "bahmni-standard" ] ; then
         return
     else
-        echo "Error: This script should be run from either 'bahmni-lite' or 'bahmni-standard' subfolder. Please cd to the appropriate sub-folder and then execute the run-bahmni.sh command."
+        echo "Error: This script should be run from either 'bahmni-lite' or 'bahmni-standard' subfolder. Please cd to the appropriate sub-folder and then execute the run-bahmni-dev.sh command."
         exit 1
     fi
 }
 
 function start {
     echo "Executing command: 'docker compose up -d' with latest images"
-    echo "Starting Bahmni with default profile from .env file"
+    echo "Starting Bahmni with default profile from .env.dev file"
     docker compose --env-file .env.dev up -d
 }
 
@@ -157,7 +157,7 @@ function resetAndEraseALLVolumes {
 
 function restartService {
     # One can ONLY restart services in current profile (limitation of docker compose restart command). 
-    echo "Listing the running services from current profile (.env file) that can be restarted..."
+    echo "Listing the running services from current profile (.env.dev file) that can be restarted..."
     docker compose ps
 
     echo "Enter the name of the SERVICE to restart:"
