@@ -10,9 +10,9 @@ Refer this [Wiki Page](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/299630
 ## Environment Variable Configuration For Bahmni Lite
 The `.env` and `.env.dev` files are used for configuring environment variables for the Bahmni Lite Docker setup. The `.env` file points to the `1.0.0` image tag, while `.env.dev` points to the `latest` image.
 
-- If you wish to use the `1.0.0` images, run the `run-bahmni.sh` script with the argument `.env`
+By default `run-bahmni.sh` script runs with the `.env`, that uses the `1.0.0` images
 ```shell
-run-bahmni.sh .env
+run-bahmni.sh
 ```
 
 - Instead if you wish to use the `latest` images, run the `run-bahmni.sh` script with the argument `.env.dev`

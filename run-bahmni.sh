@@ -45,40 +45,38 @@ function checkIfDirectoryIsCorrect {
 }
 
 function start {
-    if [ "$1" == ".env" ]; then
-        echo "Executing command: 'docker compose up -d' with 1.0.0 images"
-        echo "Starting Bahmni with default profile from .env file"
-    elif [ "$1" == ".env.dev" ]; then
+    if [ "$file" == ".env.dev" ]; then
         echo "Executing command: 'docker compose up -d' with latest images"
         echo "Starting Bahmni with default profile from .env.dev file"
+        docker compose --env-file "$file" up -d
     else
-        echo "[ERROR] Incorrect Environment Variable file path. Please provide either .env or .env.dev file as argument."
-        exit 1
+        echo "Executing command: 'docker compose up -d' with 1.0.0 images"
+        echo "Starting Bahmni with default profile from .env file"
+        docker compose up -d
     fi
-    docker compose --env-file "$1" up -d
 }
 
 
 function stop {
     echo "Executing command: 'docker compose down' with all profiles"
-    docker compose --env-file "$1" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
 }
 
 function sshIntoService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --env-file "$1" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
     
-    docker compose --env-file "$1" exec $serviceName /bin/sh
+    docker compose --env-file "$file" exec $serviceName /bin/sh
 }
 
 function showLogsOfService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --env-file "$1" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
@@ -94,32 +92,30 @@ function showOpenMRSlogs {
 
 function startMart {
     echo "Starting services with profile 'bahmni-mart'..."
-    docker compose --env-file "$1" --profile bahmni-mart up -d
+    docker compose --env-file "$file" --profile bahmni-mart up -d
 }
 
 function pullLatestImages {
-    if [ "$1" == ".env" ]; then
-        echo "Pulling all 1.0.0 images..."
-    elif [ "$1" == ".env.dev" ]; then
+    if [ "$file" == ".env.dev" ]; then
         echo "Pulling all latest images..."
+        docker compose --env-file "$file" pull
     else
-        echo "[ERROR] Incorrect Environment Variable file path. Please provide either .env or .env.dev file as argument."
-        exit 1
+        echo "Pulling all 1.0.0 images..."
+        docker compose pull
     fi
-    docker compose --env-file "$1" pull
 }
 
 function showStatus {
     echo "Listing status of running Services with command: 'docker compose ps'"
     # Using all profiles, so that we can status of all services
-    docker compose --env-file "$1" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
 }
 
 
 # Function to prompt the user for a "Yes" or "No" answer
 confirm() {
-    read -p "$1 [y/n]: " response
+    read -p "$file [y/n]: " response
     case $response in
         [yY][eE][sS]|[yY])
             return 0
@@ -142,12 +138,12 @@ function resetAndEraseALLVolumes {
     echo "Proceeding with a DELETE.... "
     
     echo "1. Stopping all services, using all profiles.."
-    docker compose --env-file "$1" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
     
     docker compose ps
     
     echo "2. Deleting all volumes (-v) .."
-    docker compose --env-file "$1" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         echo "Volumes deleted successfully."
@@ -172,13 +168,10 @@ function resetAndEraseALLVolumes {
 
 function restartService {
     # One can ONLY restart services in current profile (limitation of docker compose restart command). 
-    if [ "$1" == ".env" ]; then
-        echo "Listing the running services from current profile (.env file) that can be restarted..."
-    elif [ "$1" == ".env.dev" ]; then
+    if [ "$file" == ".env.dev" ]; then
         echo "Listing the running services from current profile (.env.dev file) that can be restarted..."
     else
-        echo "[ERROR] Incorrect Environment Variable file path. Please provide either .env or .env.dev file as argument."
-        exit 1
+        echo "Listing the running services from current profile (.env file) that can be restarted..."
     fi
     docker compose ps
 
@@ -186,7 +179,7 @@ function restartService {
     read serviceName
     
     echo "Restarting SERVICE: $serviceName"
-    docker compose --env-file "$1" restart $serviceName
+    docker compose --env-file "$file" restart $serviceName
 
     if confirm "Do you want to see the service logs?"; then
         docker compose logs $serviceName -f
@@ -219,16 +212,21 @@ echo "0) STATUS of all services"
 echo "-------------------------"
 read option
 
+file=".env"
+if [ "$1" == ".env.dev" ]; then
+    file=".env.dev"
+fi
+
 case $option in
-    1) start $1;;
-    2) stop $1;;
+    1) start $file;;
+    2) stop $file;;
     3) showOpenMRSlogs;;
-    4) showLogsOfService $1;;
-    5) sshIntoService $1;;
-    6) startMart $1;;
-    7) pullLatestImages $1;;
-    8) resetAndEraseALLVolumes $1;;
-    9) restartService $1;;
-    0) showStatus $1;;
+    4) showLogsOfService $file;;
+    5) sshIntoService $file;;
+    6) startMart $file;;
+    7) pullLatestImages $file;;
+    8) resetAndEraseALLVolumes $file;;
+    9) restartService $file;;
+    0) showStatus $file;;
     *) echo "Invalid option selected";;
 esac
