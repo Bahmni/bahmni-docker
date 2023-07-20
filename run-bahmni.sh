@@ -45,15 +45,9 @@ function checkIfDirectoryIsCorrect {
 }
 
 function start {
-    if [ "$file" == ".env.dev" ]; then
-        echo "Executing command: 'docker compose up -d' with latest images"
-        echo "Starting Bahmni with default profile from .env.dev file"
-        docker compose --env-file "$file" up -d
-    else
-        echo "Executing command: 'docker compose up -d' with 1.0.0 images"
-        echo "Starting Bahmni with default profile from .env file"
-        docker compose up -d
-    fi
+    echo "Executing command: 'docker compose up -d' with the images specified in the $file file"
+    echo "Starting Bahmni with default profile from $file file"
+    docker compose --env-file "$file" up -d
 }
 
 
@@ -96,13 +90,8 @@ function startMart {
 }
 
 function pullLatestImages {
-    if [ "$file" == ".env.dev" ]; then
-        echo "Pulling all latest images..."
-        docker compose --env-file "$file" pull
-    else
-        echo "Pulling all 1.0.0 images..."
-        docker compose pull
-    fi
+    echo "Pulling all the images specified in the $file file..."
+    docker compose --env-file "$file" pull
 }
 
 function showStatus {
@@ -168,11 +157,7 @@ function resetAndEraseALLVolumes {
 
 function restartService {
     # One can ONLY restart services in current profile (limitation of docker compose restart command). 
-    if [ "$file" == ".env.dev" ]; then
-        echo "Listing the running services from current profile (.env.dev file) that can be restarted..."
-    else
-        echo "Listing the running services from current profile (.env file) that can be restarted..."
-    fi
+    echo "Listing the running services from current profile ($file file) that can be restarted..."
     docker compose ps
 
     echo "Enter the name of the SERVICE to restart:"
@@ -213,8 +198,8 @@ echo "-------------------------"
 read option
 
 file=".env"
-if [ "$1" == ".env.dev" ]; then
-    file=".env.dev"
+if ! [ "$1" == "" ]; then
+    file="$1"
 fi
 
 case $option in
