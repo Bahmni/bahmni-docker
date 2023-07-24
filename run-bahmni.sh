@@ -75,7 +75,7 @@ function showLogsOfService {
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
     
-    docker compose logs $serviceName -f
+    docker compose --env-file "$file" logs $serviceName -f
 }
 
 
@@ -104,7 +104,7 @@ function showStatus {
 
 # Function to prompt the user for a "Yes" or "No" answer
 confirm() {
-    read -p "$file [y/n]: " response
+    read -p "$1 [y/n]: " response
     case $response in
         [yY][eE][sS]|[yY])
             return 0
@@ -129,7 +129,7 @@ function resetAndEraseALLVolumes {
     echo "1. Stopping all services, using all profiles.."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
     
-    docker compose ps
+    docker compose --env-file "$file" ps
     
     echo "2. Deleting all volumes (-v) .."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
@@ -158,7 +158,7 @@ function resetAndEraseALLVolumes {
 function restartService {
     # One can ONLY restart services in current profile (limitation of docker compose restart command). 
     echo "Listing the running services from current profile ($file file) that can be restarted..."
-    docker compose ps
+    docker compose --env-file "$file" ps
 
     echo "Enter the name of the SERVICE to restart:"
     read serviceName
@@ -167,7 +167,7 @@ function restartService {
     docker compose --env-file "$file" restart $serviceName
 
     if confirm "Do you want to see the service logs?"; then
-        docker compose logs $serviceName -f
+        docker compose --env-file "$file" logs $serviceName -f
     fi
 }
 
