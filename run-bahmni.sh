@@ -45,37 +45,37 @@ function checkIfDirectoryIsCorrect {
 }
 
 function start {
-    echo "Executing command: 'docker compose up -d'"
-    echo "Starting Bahmni with default profile from .env file"
-    docker compose up -d
+    echo "Executing command: 'docker compose up -d' with the images specified in the $file file"
+    echo "Starting Bahmni with default profile from $file file"
+    docker compose --env-file "$file" up -d
 }
 
 
 function stop {
     echo "Executing command: 'docker compose down' with all profiles"
-    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
 }
 
 function sshIntoService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
     
-    docker compose exec $serviceName /bin/sh
+    docker compose --env-file "$file" exec $serviceName /bin/sh
 }
 
 function showLogsOfService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
     
-    docker compose logs $serviceName -f
+    docker compose --env-file "$file" logs $serviceName -f
 }
 
 
@@ -86,18 +86,18 @@ function showOpenMRSlogs {
 
 function startMart {
     echo "Starting services with profile 'bahmni-mart'..."
-    docker compose --profile bahmni-mart up -d
+    docker compose --env-file "$file" --profile bahmni-mart up -d
 }
 
 function pullLatestImages {
-    echo "Pulling all latest images..."
-    docker compose pull
+    echo "Pulling all the images specified in the $file file..."
+    docker compose --env-file "$file" pull
 }
 
 function showStatus {
     echo "Listing status of running Services with command: 'docker compose ps'"
     # Using all profiles, so that we can status of all services
-    docker compose --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
 
 }
 
@@ -127,12 +127,12 @@ function resetAndEraseALLVolumes {
     echo "Proceeding with a DELETE.... "
     
     echo "1. Stopping all services, using all profiles.."
-    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
     
-    docker compose ps
+    docker compose --env-file "$file" ps
     
     echo "2. Deleting all volumes (-v) .."
-    docker compose --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
+    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         echo "Volumes deleted successfully."
@@ -157,17 +157,17 @@ function resetAndEraseALLVolumes {
 
 function restartService {
     # One can ONLY restart services in current profile (limitation of docker compose restart command). 
-    echo "Listing the running services from current profile (.env file) that can be restarted..."
-    docker compose ps
+    echo "Listing the running services from current profile ($file file) that can be restarted..."
+    docker compose --env-file "$file" ps
 
     echo "Enter the name of the SERVICE to restart:"
     read serviceName
     
     echo "Restarting SERVICE: $serviceName"
-    docker compose restart $serviceName
+    docker compose --env-file "$file" restart $serviceName
 
     if confirm "Do you want to see the service logs?"; then
-        docker compose logs $serviceName -f
+        docker compose --env-file "$file" logs $serviceName -f
     fi
 }
 
@@ -197,16 +197,21 @@ echo "0) STATUS of all services"
 echo "-------------------------"
 read option
 
+file=".env"
+if ! [ "$1" == "" ]; then
+    file="$1"
+fi
+
 case $option in
-    1) start;;
-    2) stop;;
+    1) start $file;;
+    2) stop $file;;
     3) showOpenMRSlogs;;
-    4) showLogsOfService;;
-    5) sshIntoService;;
-    6) startMart;;
-    7) pullLatestImages;;
-    8) resetAndEraseALLVolumes;;
-    9) restartService;;
-    0) showStatus;;   
+    4) showLogsOfService $file;;
+    5) sshIntoService $file;;
+    6) startMart $file;;
+    7) pullLatestImages $file;;
+    8) resetAndEraseALLVolumes $file;;
+    9) restartService $file;;
+    0) showStatus $file;;
     *) echo "Invalid option selected";;
 esac
