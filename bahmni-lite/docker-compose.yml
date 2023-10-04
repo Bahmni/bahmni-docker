@@ -366,4 +366,3 @@ volumes:
   mart-data:
   metabase-data:
   bahmni-lab-results:
-  sms-tokens:
