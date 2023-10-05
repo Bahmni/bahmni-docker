@@ -68,8 +68,6 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       OMRS_DOCKER_ENV: ${OPENMRS_DOCKER_ENV}
-      OPENMRS_HOST: ${OPENMRS_HOST:?}
-      OPENMRS_PORT: ${OPENMRS_PORT:?}
       OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE}
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
@@ -81,7 +79,7 @@ services:
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
-      - '/tmp/tokens:/tmp/sms-tokens'
+      - '/tmp/tokens:/openmrs/data/sms-tokens'
 
     depends_on:
       - openmrsdb
@@ -312,7 +310,7 @@ services:
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
     volumes:
-      - '/tmp/public_key.crt:/tmp/public_key.crt'
+      - '/tmp/public_key.crt:/home/public_key.crt'
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
