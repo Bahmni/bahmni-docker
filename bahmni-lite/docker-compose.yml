@@ -81,7 +81,7 @@ services:
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
-      - 'sms-tokens:/openmrs/data/sms-tokens'
+      - 'sms-token:/openmrs/data/sms-token'
 
     depends_on:
       - openmrsdb
@@ -312,7 +312,7 @@ services:
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
     volumes:
-      - 'sms-tokens:/tmp/tokens'
+      - 'sms-token:/opt/tokens'
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
@@ -367,3 +367,4 @@ volumes:
   metabase-data:
   bahmni-lab-results:
   sms-tokens:
+  sms-token:
