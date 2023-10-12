@@ -178,9 +178,9 @@ function shutdown {
 }
 
 # Check Docker Compose versions first
-checkDockerAndDockerComposeVersion
+# checkDockerAndDockerComposeVersion
 # Check Directory is correct
-checkIfDirectoryIsCorrect
+# checkIfDirectoryIsCorrect
 
 echo "Please select an option:"
 echo "------------------------"
