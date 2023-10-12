@@ -12,6 +12,15 @@ x-log-config: &log-config
   <<: *default
 services:
 
+  proxy:
+    image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
+    #volumes:
+      # - ${CERTIFICATE_PATH}:/etc/tls
+    ports:
+      - '80:80'
+      - '443:443'
+    logging: *log-config
+
   odoo-16:
     profiles: ["odoo-16"]
     image: 'bahmni/odoo-16:${ODOO_IMAGE_TAG:?[ERROR]}'
@@ -34,9 +43,33 @@ services:
       interval: 10s
       timeout: 5s
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: odoo
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
+    logging: *log-config
+
+  odoo-connect:
+    profiles: ["odoo-16"]
+    image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
+    environment:
+      ODOO_DB_SERVER: odoodb
+      ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
+      ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
+      OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD:?}
+      OPENELIS_HOST: ${OPENELIS_HOST:?}
+      OPENELIS_PORT: ${OPENELIS_PORT:?}
+      OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
+      OPENELIS_ATOMFEED_PASSWORD: ${OPENELIS_ATOMFEED_PASSWORD:?}
+      ODOO_HOST: ${ODOO_HOST:?}
+      ODOO_PORT: ${ODOO_PORT:?}
+      ODOO_ATOMFEED_USER: ${ODOO_ATOMFEED_USER:?}
+      ODOO_ATOMFEED_PASSWORD: ${ODOO_ATOMFEED_PASSWORD:?}
+    depends_on:
+      odoodb:
+        condition: service_healthy
     logging: *log-config
     
 volumes:
