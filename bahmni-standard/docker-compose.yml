@@ -42,6 +42,8 @@ services:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
       interval: 10s
       timeout: 5s
+    ports:
+      - '5432:5432'
     environment:
       POSTGRES_DB: odoo
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
