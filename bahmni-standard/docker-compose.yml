@@ -134,7 +134,7 @@ services:
       OMRS_CREATE_TABLES: ${OPENMRS_DB_CREATE_TABLES}
       OMRS_AUTO_UPDATE_DATABASE: ${OPENMRS_DB_AUTO_UPDATE}
       OMRS_MODULE_WEB_ADMIN: ${OPENMRS_MODULE_WEB_ADMIN}
-      OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
+      # OMRS_DEV_DEBUG_PORT: ${OMRS_DEV_DEBUG_PORT}
       OMRS_JAVA_SERVER_OPTS: ${OMRS_JAVA_SERVER_OPTS}
       OMRS_JAVA_MEMORY_OPTS: ${OMRS_JAVA_MEMORY_OPTS}
       OPENELIS_HOST: ${OPENELIS_HOST:?}
@@ -153,8 +153,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE}
-    ports:
-      - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
+    # ports:
+      # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
@@ -249,8 +249,8 @@ services:
     profiles: ["emr","bahmni-standard","bahmni-mart"]
     volumes:
       - "${CONFIG_VOLUME:?}:/usr/local/apache2/htdocs/bahmni_config/:ro"
-      - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
-      - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
+      # - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
+      # - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
     logging: *log-config
 
   implementer-interface:
