@@ -430,3 +430,4 @@ volumes:
   bahmni-config:
   bahmni-lab-results:
   bahmni-lab-files:
+  configuration_checksums:
