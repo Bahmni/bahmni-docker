@@ -290,6 +290,7 @@ services:
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
     depends_on:
       - reportsdb
       - openmrsdb
@@ -432,3 +433,4 @@ volumes:
   bahmni-lab-results:
   bahmni-lab-files:
   configuration_checksums:
+  bahmni-queued-reports:
