@@ -311,9 +311,6 @@ services:
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
       SMS_COUNTRY_CODE: ${SMS_COUNTRY_CODE}
-    ports:
-      - 8081:8081
-      - 8080:8082
     volumes:
       - 'sms-token:/opt/tokens'
 
