@@ -168,6 +168,7 @@ services:
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
+      - 'sms-token:/openmrs/data/sms-token'
     depends_on:
       - openmrsdb
     logging: *log-config
@@ -414,8 +415,12 @@ services:
     environment:
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
+      SMS_PROVIDER_API: ${SMS_PROVIDER_API}
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
+      SMS_COUNTRY_CODE: ${SMS_COUNTRY_CODE}
+    volumes:
+      - 'sms-token:/opt/tokens'
 
 volumes:
   openelisdbdata:
@@ -433,4 +438,5 @@ volumes:
   bahmni-lab-results:
   bahmni-lab-files:
   configuration_checksums:
+  sms-token:
   bahmni-queued-reports:

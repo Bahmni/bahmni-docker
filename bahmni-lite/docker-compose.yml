@@ -307,9 +307,11 @@ services:
     environment:
       TZ: ${TZ}
       SMS_TOKEN: ${SMS_TOKEN}
+      SMS_PROVIDER_API: ${SMS_PROVIDER_API}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
+      SMS_COUNTRY_CODE: ${SMS_COUNTRY_CODE}
     volumes:
       - 'sms-token:/opt/tokens'
 
