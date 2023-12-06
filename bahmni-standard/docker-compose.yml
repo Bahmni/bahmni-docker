@@ -307,6 +307,8 @@ services:
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
       MYSQL_USER: ${REPORTS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+    volumes:
+      - 'reportsdbdata:/var/lib/mysql'
     logging: *log-config
 
   patient-documents:
@@ -440,3 +442,4 @@ volumes:
   configuration_checksums:
   sms-token:
   bahmni-queued-reports:
+  reportsdbdata:
