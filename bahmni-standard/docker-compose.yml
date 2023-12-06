@@ -90,7 +90,7 @@ services:
       interval: 10s
       timeout: 5s
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${ODOO_DB_NAME}
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
     logging: *log-config
@@ -98,7 +98,6 @@ services:
   odoo-connect:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
-    restart: always
     environment:
       IS_ODOO_16: true
       ODOO_DB_SERVER: odoodb
