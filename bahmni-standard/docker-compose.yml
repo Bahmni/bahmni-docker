@@ -285,11 +285,13 @@ services:
       REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
-      ODOO_DB_SERVER: odoodb
+      ODOO_DB_SERVER: ${ODOO_DB_HOST:?}
+      ODOO_DB_NAME: ${ODOO_DB_NAME:?}
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
     depends_on:
       - reportsdb
       - openmrsdb
@@ -437,3 +439,4 @@ volumes:
   bahmni-lab-files:
   configuration_checksums:
   sms-token:
+  bahmni-queued-reports:

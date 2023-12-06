@@ -263,6 +263,7 @@ services:
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
     depends_on:
       - reportsdb
       - openmrsdb
@@ -367,3 +368,4 @@ volumes:
   metabase-data:
   bahmni-lab-results:
   sms-token:
+  bahmni-queued-reports:
