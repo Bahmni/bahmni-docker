@@ -424,6 +424,22 @@ services:
     volumes:
       - 'sms-token:/opt/tokens'
 
+  restore_volumes:
+    image: bash:5.2.15
+    profiles: ["restore"]
+    command: "bash /restore_docker_volumes.sh"
+    volumes:
+        - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
+        - '../backup_restore/restore_docker_volumes.sh:/restore_docker_volumes.sh'
+        - 'bahmni-patient-images:/mounts/bahmni-patient-images'
+        - 'bahmni-document-images:/mounts/bahmni-document-images'
+        - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
+        - 'bahmni-lab-results:/mounts/bahmni-lab-results'
+        - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
+        - 'bahmni-lab-files:/mounts/bahmni-lab-files'
+        - 'dcm4chee-archive:/mounts/dcm4chee-archive'
+        - 'configuration_checksums:/mounts/configuration_checksums'
+
 volumes:
   openelisdbdata:
   odoodbdata:
