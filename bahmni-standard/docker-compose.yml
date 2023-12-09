@@ -53,7 +53,7 @@ services:
 
   openelisdb:
     profiles: ["openelis","bahmni-standard"]
-    image: 'bahmni/openelis-db:${OPENELIS_DB_IMAGE_TAG:?[ERROR]}'
+    image: '${OPENELIS_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
       - '${OPENELIS_DB_DUMP_PATH}:/resources/db-dump'
       - 'openelisdbdata:/var/lib/postgresql/data'
@@ -63,9 +63,9 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${OPENELIS_DB_USER:?}
+      POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD:?}
+      POSTGRES_DB: ${OPENELIS_DB_NAME:?}
     logging: *log-config
 
   odoo:
@@ -89,7 +89,7 @@ services:
 
   odoodb:
     profiles: ["odoo","bahmni-standard"]
-    image: 'bahmni/odoo-10-db:${ODOO_DB_IMAGE_TAG:?[ERROR]}'
+    image: '${ODOO_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
       - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoodbdata:/var/lib/postgresql/data'
@@ -98,7 +98,7 @@ services:
       interval: 10s
       timeout: 5s
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${ODOO_DB_NAME:?}
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
     logging: *log-config
