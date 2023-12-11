@@ -49,6 +49,9 @@ backup_container_file_system $openmrs_service_name "/home/bahmni/document_images
 log_info "Taking backup for Uploaded-Results"
 backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded_results" "$backup_root_folder"
 
+log_info "Taking backup for Uploaded-Files"
+backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded-files" "$backup_root_folder"
+
 log_info "Taking backup for Patient-Images"
 backup_container_file_system $openmrs_service_name "/home/bahmni/patient_images" "$backup_root_folder"
 
