@@ -43,7 +43,7 @@ log_info "Taking backup for Reports Database"
 backup_db "mysql" $REPORTS_DB_NAME $REPORTS_DB_USERNAME $REPORTS_DB_PASSWORD $reports_db_service_name $reports_db_backup_file_path
 
 log_info "Taking backup for OpenELIS Database"
-backup_db "postgres" $OPENELIS_DB_NAME $OPENELIS_DB_USER $OPENELIS_DB_PASSWORD $openelis_db_service_name $openelis_db_backup_file_path
+backup_db "postgres" "clinlims" $OPENELIS_DB_USER $OPENELIS_DB_PASSWORD $openelis_db_service_name $openelis_db_backup_file_path
 
 log_info "Taking backup for Odoo Database"
 backup_db "postgres" $ODOO_DB_NAME $ODOO_DB_USER $ODOO_DB_PASSWORD $odoo_db_service_name $odoo_db_backup_file_path
