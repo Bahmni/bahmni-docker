@@ -22,8 +22,8 @@ openmrs_db_backup_file_path=$backup_subfolder_path/openmrsdb_backup.sql
 reports_db_backup_file_path=$backup_subfolder_path/reportsdb_backup.sql
 openelis_db_backup_file_path=$backup_subfolder_path/openelisdb_backup.sql
 odoo_db_backup_file_path=$backup_subfolder_path/odoodb_backup.sql
-dcm4chee_db_backup_file_path="${RESTORE_ARTIFACTS_PATH}/dcm4cheedb_backup.sql"
-pacs_integration_db_backup_file_path="${RESTORE_ARTIFACTS_PATH}/pacs_integrationdb_backup.sql"
+dcm4chee_db_backup_file_path=$backup_subfolder_path/dcm4cheedb_backup.sql
+pacs_integration_db_backup_file_path=$backup_subfolder_path/pacs_integrationdb_backup.sql
 
 
 openmrs_service_name="openmrs"
