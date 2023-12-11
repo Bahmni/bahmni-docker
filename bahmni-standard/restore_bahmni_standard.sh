@@ -12,7 +12,7 @@ echo "Usage: ./restore_bahmni_standard.sh <restore-artifacts-path>"
 exit 1
 fi
 
-if ! is_directory_exists "$source" || is_directory_empty "$source" ; then
+if ! is_directory_exists "$1" || is_directory_empty "$1" ; then
 log_error "Invalid restore-artifacts-path: $1 Directory does not exist or is empty."   
 exit 1
 fi
