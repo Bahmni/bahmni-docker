@@ -2,7 +2,7 @@
 
 source "../backup_restore/restore_utils.sh"
 
-BAHMNI_DOCKER_ENV_FILE=.env.dev
+BAHMNI_DOCKER_ENV_FILE=.env
 source ${BAHMNI_DOCKER_ENV_FILE}
 
 if [ $# -ne 1 ]
