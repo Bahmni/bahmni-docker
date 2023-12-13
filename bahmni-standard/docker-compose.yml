@@ -39,7 +39,7 @@ services:
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
-      - "bahmni-lab-files:/home/bahmni/uploaded-files/elis"
+      - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
     environment:
       OPENMRS_HOST: ${OPENMRS_HOST}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
@@ -53,7 +53,7 @@ services:
 
   openelisdb:
     profiles: ["openelis","bahmni-standard"]
-    image: 'bahmni/openelis-db:${OPENELIS_DB_IMAGE_TAG:?[ERROR]}'
+    image: '${OPENELIS_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
       - '${OPENELIS_DB_DUMP_PATH}:/resources/db-dump'
       - 'openelisdbdata:/var/lib/postgresql/data'
@@ -63,9 +63,9 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${OPENELIS_DB_USER:?}
+      POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD:?}
+      POSTGRES_DB: ${OPENELIS_DB_NAME:?}
     logging: *log-config
 
   odoo:
@@ -89,7 +89,7 @@ services:
 
   odoodb:
     profiles: ["odoo","bahmni-standard"]
-    image: 'bahmni/odoo-10-db:${ODOO_DB_IMAGE_TAG:?[ERROR]}'
+    image: '${ODOO_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
       - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoodbdata:/var/lib/postgresql/data'
@@ -98,7 +98,7 @@ services:
       interval: 10s
       timeout: 5s
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${ODOO_DB_NAME:?}
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
     logging: *log-config
@@ -163,6 +163,7 @@ services:
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
@@ -317,6 +318,7 @@ services:
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
+      - "bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files"
     environment:
       - OPENMRS_HOST=${OPENMRS_HOST:?}
     depends_on:
@@ -424,6 +426,22 @@ services:
     volumes:
       - 'sms-token:/opt/tokens'
 
+  restore_volumes:
+    image: bash:5.2.15
+    profiles: ["restore"]
+    command: "bash /restore_docker_volumes.sh"
+    volumes:
+        - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
+        - '../backup_restore/restore_docker_volumes.sh:/restore_docker_volumes.sh'
+        - 'bahmni-patient-images:/mounts/bahmni-patient-images'
+        - 'bahmni-document-images:/mounts/bahmni-document-images'
+        - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
+        - 'bahmni-lab-results:/mounts/bahmni-lab-results'
+        - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
+        - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
+        - 'dcm4chee-archive:/mounts/dcm4chee-archive'
+        - 'configuration_checksums:/mounts/configuration_checksums'
+
 volumes:
   openelisdbdata:
   odoodbdata:
@@ -438,7 +456,7 @@ volumes:
   dcm4chee-archive:
   bahmni-config:
   bahmni-lab-results:
-  bahmni-lab-files:
+  bahmni-uploaded-files:
   configuration_checksums:
   sms-token:
   bahmni-queued-reports:

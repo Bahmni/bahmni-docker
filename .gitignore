@@ -1,2 +1,4 @@
 .idea/
 .cache/
+**/backup-artifacts/*
+**/restore-artifacts/*

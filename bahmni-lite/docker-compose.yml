@@ -74,6 +74,7 @@ services:
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
@@ -290,6 +291,7 @@ services:
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
+      - 'bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files'
     environment:
       TZ: ${TZ}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
@@ -356,6 +358,21 @@ services:
       MYSQL_USER: ${CRATER_ATOMFEED_DB_USERNAME:?}
       MYSQL_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD:?}
 
+  restore_volumes:
+    image: bash:5.2.15
+    profiles: ["restore"]
+    command: "bash /restore_docker_volumes.sh"
+    volumes:
+        - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
+        - '../backup_restore/restore_docker_volumes.sh:/restore_docker_volumes.sh'
+        - 'bahmni-patient-images:/mounts/bahmni-patient-images'
+        - 'bahmni-document-images:/mounts/bahmni-document-images'
+        - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
+        - 'bahmni-lab-results:/mounts/bahmni-lab-results'
+        - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
+        - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
+        - 'configuration_checksums:/mounts/configuration_checksums'
+
 volumes:
   openmrs-data:
   openmrsdbdata:
@@ -369,6 +386,7 @@ volumes:
   mart-data:
   metabase-data:
   bahmni-lab-results:
+  bahmni-uploaded-files:
   sms-token:
   bahmni-queued-reports:
   reportsdbdata:
