@@ -73,6 +73,9 @@ services:
     image: 'bahmni/odoo-16:${ODOO_IMAGE_TAG:?[ERROR]}'
     ports:
       - '8069:8069'
+    volumes:
+      - odooappdata:/var/lib/odoo
+      - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
     depends_on:
       odoodb:
         condition: service_healthy
