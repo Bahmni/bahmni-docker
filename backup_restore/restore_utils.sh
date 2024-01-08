@@ -58,8 +58,13 @@ function is_psql_db_empty() {
     local db_username=$2
     local db_password=$3
     local db_service_name=$4
+    local schema_name="public"
 
-    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name psql -U $db_username -d $db_name -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'")
+    if [ $db_service_name == "openelisdb" ]; then
+        schema_name="clinlims"
+    fi
+
+    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name psql -U $db_username -d $db_name -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${schema_name}'")
     if [ $table_count -eq 0 ]; then
         echo 1
     else
