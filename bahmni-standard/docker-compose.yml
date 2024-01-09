@@ -375,6 +375,7 @@ services:
       PACS_INTEGRATION_DB_PASSWORD: ${PACS_INTEGRATION_DB_PASSWORD:?}
     volumes:
       - '${PWD}/init_pacs_dbs.sh:/docker-entrypoint-initdb.d/init_pacs_dbs.sh'
+      - 'pacsdbdata:/var/lib/postgresql/data'
     logging: *log-config
 
   pacs-simulator:
@@ -461,3 +462,4 @@ volumes:
   sms-token:
   bahmni-queued-reports:
   reportsdbdata:
+  pacsdbdata:
