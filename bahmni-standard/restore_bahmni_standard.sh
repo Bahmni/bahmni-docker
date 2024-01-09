@@ -39,9 +39,9 @@ pacs_integration_db_backup_file_path="${RESTORE_ARTIFACTS_PATH}/pacs_integration
 
 log_info "Starting Database Restore..."
 
-restore_db "mysql" $OPENMRS_DB_NAME $OPENMRS_DB_USERNAME $OPENMRS_DB_PASSWORD $openmrs_db_service_name $openmrs_db_backup_file_path
+restore_db "mysql" $OPENMRS_DB_NAME root $MYSQL_ROOT_PASSWORD $openmrs_db_service_name $openmrs_db_backup_file_path
 
-restore_db "mysql" $REPORTS_DB_NAME $REPORTS_DB_USERNAME $REPORTS_DB_PASSWORD $reports_db_service_name $reports_db_backup_file_path
+restore_db "mysql" $REPORTS_DB_NAME root $MYSQL_ROOT_PASSWORD $reports_db_service_name $reports_db_backup_file_path
 
 restore_db "postgres" "clinlims" $OPENELIS_DB_USER $OPENELIS_DB_PASSWORD $openelis_db_service_name $openelis_db_backup_file_path
 
