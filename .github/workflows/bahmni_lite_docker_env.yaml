@@ -62,6 +62,7 @@ jobs:
                   "git pull -r",
                   "docker compose --env-file .env.dev pull",
                   "'"$command"'",
+                  "docker compose --env-file .env.dev restart proxy",
                   "docker image prune -f"
                 ],
                 "workingDirectory": [
