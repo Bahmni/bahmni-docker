@@ -26,12 +26,14 @@ services:
       - '80:80'
       - '443:443'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   bahmni-config:
     image: 'bahmni/default-config:${CONFIG_IMAGE_TAG:?}'
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openelis:
     profiles: ["openelis","bahmni-standard"]
@@ -50,6 +52,7 @@ services:
       openelisdb:
         condition: service_healthy
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openelisdb:
     profiles: ["openelis","bahmni-standard"]
@@ -67,6 +70,7 @@ services:
       POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD:?}
       POSTGRES_DB: ${OPENELIS_DB_NAME:?}
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   odoo:
     profiles: ["odoo","bahmni-standard"]
@@ -86,6 +90,7 @@ services:
       USER: ${ODOO_DB_USER}
       PASSWORD: ${ODOO_DB_PASSWORD}
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   odoodb:
     profiles: ["odoo","bahmni-standard"]
@@ -102,6 +107,7 @@ services:
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   odoo-connect:
     profiles: ["odoo","bahmni-standard"]
@@ -126,6 +132,7 @@ services:
       odoodb:
         condition: service_healthy
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openmrs:
     profiles: ["emr","bahmni-standard", "bahmni-mart"]
@@ -175,6 +182,7 @@ services:
     depends_on:
       - openmrsdb
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
@@ -228,6 +236,7 @@ services:
   martdb:
     image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
+    restart: ${RESTART_POLICY}
     environment:
       POSTGRES_DB: ${MART_DB_NAME:?}
       POSTGRES_USER: ${MART_DB_USERNAME:?}
@@ -238,6 +247,7 @@ services:
   mart:
     image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
+    restart: ${RESTART_POLICY}
     environment:
       CRON_TIME: ${MART_CRON_TIME:?}
       MART_DB_HOST: ${MART_DB_HOST:?}
@@ -263,6 +273,7 @@ services:
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
@@ -272,6 +283,7 @@ services:
     depends_on:
       - openmrs
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   reports:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
@@ -300,6 +312,7 @@ services:
       - openmrsdb
       - bahmni-web
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   reportsdb:
     platform: linux/amd64
@@ -313,6 +326,7 @@ services:
     volumes:
       - 'reportsdbdata:/var/lib/mysql'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   patient-documents:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
@@ -326,10 +340,12 @@ services:
     depends_on:
       - openmrs
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
     profiles: ["emr","bahmni-standard"]
+    restart: ${RESTART_POLICY}
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
@@ -348,6 +364,7 @@ services:
     volumes:
       - 'dcm4chee-archive:/var/lib/bahmni/dcm4chee/server/default/archive'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   pacs-integration:
     image: bahmni/pacs-integration:${PACS_INTEGRATION_IMAGE_TAG:?}
@@ -363,6 +380,7 @@ services:
       OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
       OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD:?}
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   pacsdb:
     image: postgres:9.6
@@ -379,6 +397,7 @@ services:
       - '${PWD}/init_pacs_dbs.sh:/docker-entrypoint-initdb.d/init_pacs_dbs.sh'
       - 'pacsdbdata:/var/lib/postgresql/data'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   pacs-simulator:
     image: bahmni/pacs-simulator:${PACS_SIMULATOR_IMAGE_TAG:?}
@@ -394,11 +413,13 @@ services:
       PACS_INTEGRATION_DB_USERNAME: ${PACS_INTEGRATION_DB_USERNAME:?}
       PACS_INTEGRATION_DB_PASSWORD: ${PACS_INTEGRATION_DB_PASSWORD:?}
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
+    restart: ${RESTART_POLICY}
     environment:
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
@@ -419,6 +440,7 @@ services:
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
+    restart: ${RESTART_POLICY}
     environment:
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
@@ -432,6 +454,7 @@ services:
   restore_volumes:
     image: bash:5.2.15
     profiles: ["restore"]
+    restart: ${RESTART_POLICY}
     command: "bash /restore_docker_volumes.sh"
     volumes:
         - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
