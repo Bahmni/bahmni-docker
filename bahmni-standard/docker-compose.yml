@@ -454,7 +454,6 @@ services:
   restore_volumes:
     image: bash:5.2.15
     profiles: ["restore"]
-    restart: ${RESTART_POLICY}
     command: "bash /restore_docker_volumes.sh"
     volumes:
         - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
