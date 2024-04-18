@@ -25,6 +25,7 @@ services:
       - '80:80'
       - '443:443'
     logging: *log-config
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
 
@@ -33,11 +34,13 @@ services:
     volumes:
       - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   bahmni-lab:
     profiles: ["lab-lite","emr","bahmni-lite"]
     image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
     logging: *log-config
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
 
@@ -71,20 +74,26 @@ services:
       OMRS_C3P0_MAX_SIZE: ${OMRS_C3P0_MAX_SIZE}
       WEIGHT_CONCEPT_UUID: ${WEIGHT_CONCEPT_UUID}
       HEIGHT_CONCEPT_UUID: ${HEIGHT_CONCEPT_UUID}
+      OMRS_DB_EXTRA_ARGS: ${OMRS_DB_EXTRA_ARGS}
+      LUCENE_MATCH_TYPE: ${LUCENE_MATCH_TYPE}
+      DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
+      - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
       # - "${BAHMNI_OPENMRS_MODULES_PATH:?}/:/openmrs/data/modules/"
       - 'bahmni-patient-images:/home/bahmni/patient_images'
       - 'bahmni-document-images:/home/bahmni/document_images'
       - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
       - 'configuration_checksums:/openmrs/data/configuration_checksums'
+      - 'sms-token:/openmrs/data/sms-token'
 
     depends_on:
       - openmrsdb
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openmrsdb:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
@@ -127,6 +136,7 @@ services:
       COMPANY_NAME: ${CRATER_COMPANY_NAME:?}
       COMPANY_SLUG: ${CRATER_COMPANY_SLUG:?}
       COUNTRY_ID: ${CRATER_COUNTRY_ID:?}
+      CRATER_DEFAULT_CURRENCY: ${CRATER_DEFAULT_CURRENCY:?}
       APP_DEBUG: ${CRATER_APP_DEBUG:?}
 
   crater-nginx:
@@ -199,6 +209,7 @@ services:
   martdb:
     image: postgres:${BAHMNI_MART_DB_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       POSTGRES_DB: ${MART_DB_NAME:?}
@@ -211,6 +222,7 @@ services:
   mart:
     image: bahmni/bahmni-mart:${BAHMNI_MART_IMAGE_TAG:?}
     profiles: ["bahmni-mart"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       CRON_TIME: ${MART_CRON_TIME:?}
@@ -226,6 +238,8 @@ services:
      - martdb
      - openmrsdb
      - openmrs
+     - reportsdb
+     - reports
     volumes:
      - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
@@ -237,6 +251,7 @@ services:
     #   - "${BAHMNI_APPS_PATH:?}/ui/app/:/usr/local/apache2/htdocs/bahmni"
     #   - "${BAHMNI_APPS_PATH:?}/ui/node_modules/@bower_components/:/usr/local/apache2/htdocs/bahmni/components"
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
@@ -246,10 +261,11 @@ services:
     depends_on:
       - openmrs
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   reports:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
-    profiles: ["reports","bahmni-lite"]
+    profiles: ["reports","bahmni-lite","bahmni-mart"]
     environment:
       TZ: ${TZ}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
@@ -264,23 +280,28 @@ services:
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
     depends_on:
       - reportsdb
       - openmrsdb
       - bahmni-web
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   reportsdb:
     platform: linux/amd64
     image: mysql:5.7
-    profiles: ["reports","bahmni-lite"]
+    profiles: ["reports","bahmni-lite","bahmni-mart"]
     environment:
       TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
       MYSQL_USER: ${REPORTS_DB_USERNAME:?}
       MYSQL_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+    volumes:
+      - 'reportsdbdata:/var/lib/mysql'
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   patient-documents:
     image: 'bahmni/patient-documents:${PATIENT_DOCUMENTS_TAG:?}'
@@ -288,32 +309,41 @@ services:
     volumes:
       - 'bahmni-document-images:/usr/share/nginx/html/document_images'
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
+      - 'bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files'
     environment:
       TZ: ${TZ}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
     depends_on:
       - openmrs
     logging: *log-config
+    restart: ${RESTART_POLICY}
 
   appointments:
     image: bahmni/appointments:${APPOINTMENTS_IMAGE_TAG:?}
     profiles: ["emr","bahmni-lite"]
+    restart: ${RESTART_POLICY}
     # volumes:
     # - "${APPOINTMENTS_PATH:?}/dist/:/usr/local/apache2/htdocs/appointments"
 
   sms-service:
     image: bahmni/sms-service:${SMS_SERVICE_IMAGE_TAG:?}
     profiles: ["sms"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       SMS_TOKEN: ${SMS_TOKEN}
+      SMS_PROVIDER_API: ${SMS_PROVIDER_API}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
       SMS_OPENMRS_HOST: ${OPENMRS_HOST:?}
       SMS_OPENMRS_PORT: ${OPENMRS_PORT:?}
+      SMS_COUNTRY_CODE: ${SMS_COUNTRY_CODE}
+    volumes:
+      - 'sms-token:/opt/tokens'
 
   atomfeed-console:
     image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
@@ -324,6 +354,7 @@ services:
   crater-atomfeed:
     image: bahmni/crater-atomfeed:${CRATER_ATOMFEED_IMAGE_TAG:?}
     profiles: ["crater","bahmni-lite"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
@@ -343,12 +374,28 @@ services:
     platform: linux/amd64
     image: mysql:5.7
     profiles: ["crater","bahmni-lite"]
+    restart: ${RESTART_POLICY}
     environment:
       TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${CRATER_ATOMFEED_DB_NAME:?}
       MYSQL_USER: ${CRATER_ATOMFEED_DB_USERNAME:?}
       MYSQL_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD:?}
+
+  restore_volumes:
+    image: bash:5.2.15
+    profiles: ["restore"]
+    command: "bash /restore_docker_volumes.sh"
+    volumes:
+        - "${RESTORE_ARTIFACTS_PATH}:/restore-artifacts"
+        - '../backup_restore/restore_docker_volumes.sh:/restore_docker_volumes.sh'
+        - 'bahmni-patient-images:/mounts/bahmni-patient-images'
+        - 'bahmni-document-images:/mounts/bahmni-document-images'
+        - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
+        - 'bahmni-lab-results:/mounts/bahmni-lab-results'
+        - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
+        - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
+        - 'configuration_checksums:/mounts/configuration_checksums'
 
 volumes:
   openmrs-data:
@@ -363,3 +410,7 @@ volumes:
   mart-data:
   metabase-data:
   bahmni-lab-results:
+  bahmni-uploaded-files:
+  sms-token:
+  bahmni-queued-reports:
+  reportsdbdata:

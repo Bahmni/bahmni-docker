@@ -1,17 +1,17 @@
-name: Deploy to Bahmni Standard Docker Env
+name: Deploy to Odoo Upgrade Docker Env
 on:
   push:
     branches:
       - master
     paths:
       - 'bahmni-standard/**'
-      - '.github/workflows/bahmni_standard_docker_env.yaml'
+      - '.github/workflows/odoo_upgrade_docker_env.yaml'
   repository_dispatch:
     types:
       - bahmni-helm-publish-event
       - openmrs-db-publish-event
       - openelis-publish-event
-      - odoo-publish-event
+      - odoo16-publish-event
       - odoo-connect-publish-event
       - dcm4chee-pacs-publish-event
       - bahmni-proxy-publish-event
@@ -51,7 +51,7 @@ jobs:
             command="docker compose --env-file .env.dev down -v && docker compose --env-file .env.dev up -d"
           fi
           
-          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-standard-docker" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-standard-odoo-upgrade" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
           
           if [ -z "$INSTANCE_ID" ]; then
             echo "Instance not running"

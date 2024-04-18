@@ -1,2 +1,5 @@
 .idea/
 .cache/
+**/backup-artifacts/*
+**/restore-artifacts/*
+.DS_Store
