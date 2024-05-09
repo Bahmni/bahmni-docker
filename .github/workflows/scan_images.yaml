@@ -11,8 +11,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout security-private repo
         uses: actions/checkout@v4
+        with:
+          repository: Bahmni/security-reports
+          token: ${{ secrets.BAHMNI_PAT }}
       - name: Get current date
         id: date
         run: |
@@ -25,33 +28,7 @@ jobs:
           curl -o html.tpl https://raw.githubusercontent.com/Bahmni/bahmni-infra-utils/main/html.tpl
       - name: Scan Images In Bahmni Namespace
         run: |
-          ./image-scanner.sh
-      - name: Upload Report Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: image-scan-summary
-          path: container-scanner-reports/bahmni-${{ steps.date.outputs.date }}
-
-  save-scan-summary:
-    name: Save Scan Summary
-    needs: scan-images
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout security-private repo
-        uses: actions/checkout@v4
-        with:
-          repository: Bahmni/security-reports
-          token: ${{ secrets.BAHMNI_PAT }}
-      - name: Get current date
-        id: date
-        run: |
-          date=$(date +'%d-%m-%Y')
-          echo "date=$date" >> $GITHUB_OUTPUT
-      - name: Download Cluster Summary
-        uses: actions/download-artifact@v4
-        with:
-          name: image-scan-summary
-          path: image-scan-report/${{ steps.date.outputs.date }}
+          ./image-scanner.sh bahmni
       - name: Commit and push changes
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
