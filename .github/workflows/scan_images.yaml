@@ -34,7 +34,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "[Bahmni Infra] | Add. Image Scan Report ${{ steps.date.outputs.date }}"
-          file_pattern: '*.html'
+          file_pattern: '*.html *.txt'
           repository: .
           commit_user_name: Bahmni Infra
           commit_user_email: infrastructure@bahmni.org
