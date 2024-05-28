@@ -23,17 +23,18 @@ jobs:
           echo "date=$date" >> $GITHUB_OUTPUT
       - name: Get Scanner Script and Template File
         run: |
-          curl -o image-scanner.sh https://raw.githubusercontent.com/Bahmni/bahmni-infra-utils/main/trivy_scan_bahmni_standard.sh
-          chmod +x trivy_scan_bahmni_standard.sh
+          curl -o image-scanner.sh https://raw.githubusercontent.com/Bahmni/bahmni-infra-utils/main/image-scanner.sh
+          chmod +x image-scanner.sh
+          curl -o html.tpl https://raw.githubusercontent.com/Bahmni/bahmni-infra-utils/main/html.tpl
       - name: Scan Images In Bahmni Namespace
         run: |
-          ./trivy_scan_bahmni_standard.sh bahmni
+          ./image-scanner.sh bahmni
       - name: Commit and push changes
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "[Bahmni Infra] | Add. Image Scan Report ${{ steps.date.outputs.date }}"
-          file_pattern: '*.txt'
+          file_pattern: '*.html *.txt'
           repository: .
           commit_user_name: Bahmni Infra
           commit_user_email: infrastructure@bahmni.org
