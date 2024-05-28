@@ -80,7 +80,7 @@ services:
     volumes:
       - odooappdata:/var/lib/odoo
       - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
-      # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with odoo-modules github repo cloned path.
+      # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with bahmni-odoo-modules github repo cloned path.
       # - ${BAHMNI_ODOO_MODULES_PATH}:/opt/bahmni-erp/bahmni-addons
     depends_on:
       odoodb:
@@ -142,7 +142,7 @@ services:
       - '8070:8069'
     volumes:
       - odoo10appdata:/var/lib/odoo
-      - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
+      - ${EXTRA_ODOO_10_ADDONS_PATH}:/mnt/extra-addons
       # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with odoo-modules github repo cloned path.
       # - ${BAHMNI_ODOO_10_MODULES_PATH}:/opt/bahmni-erp/bahmni-addons
     depends_on:
