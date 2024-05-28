@@ -159,7 +159,7 @@ services:
     profiles: ["odoo-10"]
     image: '${ODOO_10_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
-      - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
+      - '${ODOO_10_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoo10dbdata:/var/lib/postgresql/data'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
