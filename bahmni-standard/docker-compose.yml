@@ -74,19 +74,19 @@ services:
 
   odoo:
     profiles: ["odoo","bahmni-standard"]
-    image: 'bahmni/odoo-10:${ODOO_IMAGE_TAG:?[ERROR]}'
+    image: 'bahmni/odoo-16:${ODOO_IMAGE_TAG:?[ERROR]}'
     ports:
       - '8069:8069'
     volumes:
       - odooappdata:/var/lib/odoo
       - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
-      # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with odoo-modules github repo cloned path.
+      # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with bahmni-odoo-modules github repo cloned path.
       # - ${BAHMNI_ODOO_MODULES_PATH}:/opt/bahmni-erp/bahmni-addons
     depends_on:
       odoodb:
         condition: service_healthy
     environment:
-      HOST: odoodb
+      HOST: ${ODOO_DB_HOST}
       USER: ${ODOO_DB_USER}
       PASSWORD: ${ODOO_DB_PASSWORD}
     logging: *log-config
@@ -96,7 +96,6 @@ services:
     profiles: ["odoo","bahmni-standard"]
     image: '${ODOO_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
-      - '${ODOO_DB_DUMP_PATH}:/resources/db-dump'
       - 'odoodbdata:/var/lib/postgresql/data'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
@@ -113,7 +112,8 @@ services:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
     environment:
-      ODOO_DB_SERVER: odoodb
+      IS_ODOO_16: true
+      ODOO_DB_SERVER: ${ODOO_DB_HOST}
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
       ODOO_DB_PASSWORD: ${ODOO_DB_PASSWORD:?}
       OPENMRS_HOST: ${OPENMRS_HOST:?}
@@ -130,6 +130,69 @@ services:
       ODOO_ATOMFEED_PASSWORD: ${ODOO_ATOMFEED_PASSWORD:?}
     depends_on:
       odoodb:
+        condition: service_healthy
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
+#Serivces for odoo-10. These services are used for backward compatibility with bahmni 0.93
+  odoo-10:
+    profiles: ["odoo-10"]
+    image: 'bahmni/odoo-10:${ODOO_IMAGE_TAG:?[ERROR]}'
+    ports:
+      - '8070:8069'
+    volumes:
+      - odoo10appdata:/var/lib/odoo
+      - ${EXTRA_ODOO_10_ADDONS_PATH}:/mnt/extra-addons
+      # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with odoo-modules github repo cloned path.
+      # - ${BAHMNI_ODOO_10_MODULES_PATH}:/opt/bahmni-erp/bahmni-addons
+    depends_on:
+      odoo-10-db:
+        condition: service_healthy
+    environment:
+      HOST: ${ODOO_10_DB_HOST}
+      USER: ${ODOO_10_DB_USER}
+      PASSWORD: ${ODOO_10_DB_PASSWORD}
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
+  odoo-10-db:
+    profiles: ["odoo-10"]
+    image: '${ODOO_10_DB_IMAGE_NAME:?[ERROR]}'
+    volumes:
+      - '${ODOO_10_DB_DUMP_PATH}:/resources/db-dump'
+      - 'odoo10dbdata:/var/lib/postgresql/data'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
+      interval: 10s
+      timeout: 5s
+    environment:
+      POSTGRES_DB: ${ODOO_10_DB_NAME:?}
+      POSTGRES_PASSWORD: ${ODOO_10_DB_PASSWORD}
+      POSTGRES_USER: ${ODOO_10_DB_USER}
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
+  odoo-10-connect:
+    profiles: ["odoo-10"]
+    image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
+    environment:
+      ODOO_DB_SERVER: odoo-10-db
+      ODOO_DB_USERNAME: ${ODOO_10_DB_USER:?}
+      ODOO_DB_PASSWORD: ${ODOO_10_DB_PASSWORD:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
+      OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD:?}
+      OPENELIS_HOST: ${OPENELIS_HOST:?}
+      OPENELIS_PORT: ${OPENELIS_PORT:?}
+      OPENELIS_ATOMFEED_USER: ${OPENELIS_ATOMFEED_USER:?}
+      OPENELIS_ATOMFEED_PASSWORD: ${OPENELIS_ATOMFEED_PASSWORD:?}
+      ODOO_HOST: ${ODOO_10_HOST:?}
+      ODOO_PORT: ${ODOO_10_PORT:?}
+      ODOO_ATOMFEED_USER: ${ODOO_10_ATOMFEED_USER:?}
+      ODOO_ATOMFEED_PASSWORD: ${ODOO_10_ATOMFEED_PASSWORD:?}
+    depends_on:
+      odoo-10-db:
         condition: service_healthy
     logging: *log-config
     restart: ${RESTART_POLICY}
@@ -474,6 +537,8 @@ volumes:
   openelisdbdata:
   odoodbdata:
   odooappdata:
+  odoo10dbdata:
+  odoo10appdata:
   openmrs-data:
   openmrsdbdata:
   metabase-data:
