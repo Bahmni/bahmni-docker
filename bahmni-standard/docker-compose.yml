@@ -28,12 +28,12 @@ services:
     logging: *log-config
     restart: ${RESTART_POLICY}
 
-  # bahmni-config:
-  #   image: 'bahmni/clinic-config:${CONFIG_IMAGE_TAG:?}'
-  #   volumes:
-  #     - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
-  #   logging: *log-config
-  #   restart: ${RESTART_POLICY}
+  bahmni-config:
+    image: 'bahmni/standard-config:${CONFIG_IMAGE_TAG:?}'
+    volumes:
+      - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
+    logging: *log-config
+    restart: ${RESTART_POLICY}
 
   openelis:
     profiles: ["openelis","bahmni-standard"]
