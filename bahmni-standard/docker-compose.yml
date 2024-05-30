@@ -28,12 +28,12 @@ services:
     logging: *log-config
     restart: ${RESTART_POLICY}
 
-  bahmni-config:
-    image: 'bahmni/default-config:${CONFIG_IMAGE_TAG:?}'
-    volumes:
-      - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
-    logging: *log-config
-    restart: ${RESTART_POLICY}
+  # bahmni-config:
+  #   image: 'bahmni/clinic-config:${CONFIG_IMAGE_TAG:?}'
+  #   volumes:
+  #     - '${CONFIG_VOLUME:?}:/usr/local/bahmni_config'
+  #   logging: *log-config
+  #   restart: ${RESTART_POLICY}
 
   openelis:
     profiles: ["openelis","bahmni-standard"]
@@ -254,6 +254,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci --sql_mode="NO_ENGINE_SUBSTITUTION"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
