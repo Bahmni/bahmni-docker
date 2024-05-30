@@ -262,6 +262,7 @@ services:
       MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
     volumes:
       - 'openmrsdbdata:/var/lib/mysql'
+      - 'configuration_checksums:/configuration_checksums'
     logging: *log-config
 
   metabasedb:
