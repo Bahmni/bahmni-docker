@@ -80,6 +80,7 @@ services:
     volumes:
       - odooappdata:/var/lib/odoo
       - ${EXTRA_ADDONS_PATH}:/mnt/extra-addons
+      - odoofilestore:/var/lib/odoo/filestore
       # # Uncomment the below volume only when you need to modify existing bahmni-addons. Also make sure to update the .env file variable with bahmni-odoo-modules github repo cloned path.
       # - ${BAHMNI_ODOO_MODULES_PATH}:/opt/bahmni-erp/bahmni-addons
     depends_on:
@@ -97,6 +98,7 @@ services:
     image: '${ODOO_DB_IMAGE_NAME:?[ERROR]}'
     volumes:
       - 'odoodbdata:/var/lib/postgresql/data'
+      - 'odoofilestore:/filestore:ro'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
       interval: 10s
@@ -539,6 +541,7 @@ volumes:
   openelisdbdata:
   odoodbdata:
   odooappdata:
+  odoofilestore:
   odoo10dbdata:
   odoo10appdata:
   openmrs-data:
