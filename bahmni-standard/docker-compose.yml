@@ -533,6 +533,15 @@ services:
         - 'dcm4chee-archive:/mounts/dcm4chee-archive'
         - 'configuration_checksums:/mounts/configuration_checksums'
 
+  ipd:
+    image: bahmni/microfrontend-ipd:${IPD_TAG:?}
+    container_name: ipd
+    profiles: ["emr","bahmni-standard","bahmni-mart"]
+    restart: ${RESTART_POLICY}
+    # volumes:
+    #   - "${IPD_PATH:?}/dist/federation/:/usr/local/apache2/htdocs/ipd"
+    logging: *log-config
+
 volumes:
   openelisdbdata:
   odoodbdata:
