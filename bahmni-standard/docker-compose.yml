@@ -382,7 +382,7 @@ services:
 
   reportsdb:
     platform: linux/amd64
-    image: mysql:5.6
+    image: ${REPORTS_DB_IMAGE_NAME:?}
     profiles: ["reports","bahmni-standard"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
