@@ -290,7 +290,7 @@ services:
 
   reportsdb:
     platform: linux/amd64
-    image: mysql:5.7
+    image: ${REPORTS_DB_IMAGE_NAME:?}
     profiles: ["reports","bahmni-lite","bahmni-mart"]
     environment:
       TZ: ${TZ}
