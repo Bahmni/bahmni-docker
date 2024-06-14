@@ -254,6 +254,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
+    command: "--sql-mode=${OPENMRS_DB_SQL_MODES:?}"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
