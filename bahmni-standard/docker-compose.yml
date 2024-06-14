@@ -256,7 +256,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
-    command: --character-set-server=utf8 --collation-server=utf8_general_ci --sql_mode="NO_ENGINE_SUBSTITUTION"
+    command: "--sql-mode=${OPENMRS_DB_SQL_MODES:?}"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
@@ -386,7 +386,7 @@ services:
 
   reportsdb:
     platform: linux/amd64
-    image: mysql:5.6
+    image: ${REPORTS_DB_IMAGE_NAME:?}
     profiles: ["reports","bahmni-standard"]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
@@ -536,6 +536,15 @@ services:
         - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
         - 'dcm4chee-archive:/mounts/dcm4chee-archive'
         - 'configuration_checksums:/mounts/configuration_checksums'
+
+  ipd:
+    image: bahmni/microfrontend-ipd:${IPD_TAG:?}
+    container_name: ipd
+    profiles: ["emr","bahmni-standard","bahmni-mart"]
+    restart: ${RESTART_POLICY}
+    # volumes:
+    #   - "${IPD_PATH:?}/dist/federation/:/usr/local/apache2/htdocs/ipd"
+    logging: *log-config
 
 volumes:
   openelisdbdata:
