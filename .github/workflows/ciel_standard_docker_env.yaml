@@ -1,11 +1,11 @@
-name: Deploy to Odoo Upgrade Docker Env
+name: Deploy to CIEL Standard Env
 on:
   push:
     branches:
       - master
     paths:
       - 'bahmni-standard/**'
-      - '.github/workflows/odoo_upgrade_docker_env.yaml'
+      - '.github/workflows/ciel_standard_docker_env.yaml'
   repository_dispatch:
     types:
       - bahmni-helm-publish-event
@@ -51,7 +51,7 @@ jobs:
             command="docker compose --env-file .env.dev down -v && docker compose --env-file .env.dev up -d"
           fi
           
-          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-standard-odoo-upgrade" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=bahmni-standard-ciel" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
           
           if [ -z "$INSTANCE_ID" ]; then
             echo "Instance not running"
