@@ -430,6 +430,7 @@ services:
       - '11112:11112'
     volumes:
       - 'dcm4chee-archive:/var/lib/bahmni/dcm4chee/server/default/archive'
+      - 'dcm4chee-config:/var/lib/bahmni/dcm4chee/server/default/data/xmbean-attrs'
     logging: *log-config
     restart: ${RESTART_POLICY}
 
@@ -565,3 +566,4 @@ volumes:
   bahmni-queued-reports:
   reportsdbdata:
   pacsdbdata:
+  dcm4chee-config:
