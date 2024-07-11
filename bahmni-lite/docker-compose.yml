@@ -278,9 +278,11 @@ services:
       REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
       REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
       REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+      ICD10_LITE_INDICATOR: ${ICD10_LITE_INDICATOR}
     volumes:
       - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
       - "bahmni-queued-reports:/home/bahmni/reports"
+    # - "../snomed-resources/icd10-extensions-1.0.0-SNAPSHOT.jar:/var/run/bahmni-reports/bahmni-reports/WEB-INF/lib/icd10-extensions-1.0.0-SNAPSHOT.jar:ro"
     depends_on:
       - reportsdb
       - openmrsdb
@@ -396,6 +398,36 @@ services:
         - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
         - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
         - 'configuration_checksums:/mounts/configuration_checksums'
+  
+  cdss:
+    profiles: [ "cdss" ]
+    image: bahmni/cdss-reference:${CDSS_IMAGE_TAG:?}
+    environment:
+      JAVA_OPTS: ${CDSS_JAVA_SERVER_OPTS}
+    logging: *log-config
+
+  snowstorm-lite:
+    profiles: [ "snowstorm-lite" ]
+    image: snomedinternational/snowstorm-lite:${SNOWSTORM_LITE_IMAGE_TAG:?}
+    environment:
+      JDK_JAVA_OPTIONS: ${SNOWSTORM_LITE_JAVA_SERVER_OPTS}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/fhir/CodeSystem"]
+      interval: 60s
+      timeout: 15s
+      retries: 10
+    logging: *log-config
+
+  load-snowstorm-lite-data:
+    profiles: [ "snowstorm-lite" ]
+    image: alpine
+    command: "sh /load-snowstorm-data.sh"
+    environment:
+      SNOWSTORM_LITE_ADMIN_PASSWORD: ${SNOWSTORM_LITE_ADMIN_PASSWORD:?}
+    logging: *log-config
+    volumes:
+      - '../snomed-resources/load-snowstorm-data.sh:/load-snowstorm-data.sh'
+    #  - "${SNOWSTORM_RF2_FILE_PATH:?}:/snowstorm-data/snomed-data.zip:ro"
 
 volumes:
   openmrs-data:
