@@ -27,6 +27,8 @@ services:
       - '443:443'
     logging: *log-config
     restart: ${RESTART_POLICY}
+    environment:
+      TZ: ${TZ}
 
   bahmni-config:
     image: 'bahmni/default-config:${CONFIG_IMAGE_TAG:?}'
@@ -43,6 +45,7 @@ services:
       - "bahmni-lab-results:/home/bahmni/uploaded_results"
       - "bahmni-uploaded-files:/home/bahmni/uploaded-files"
     environment:
+      TZ: ${TZ}
       OPENMRS_HOST: ${OPENMRS_HOST}
       OPENMRS_PORT: ${OPENMRS_PORT:?}
       OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
@@ -66,6 +69,7 @@ services:
       timeout: 5s
       retries: 5
     environment:
+      TZ: ${TZ}
       POSTGRES_USER: ${OPENELIS_DB_USER:?}
       POSTGRES_PASSWORD: ${OPENELIS_DB_PASSWORD:?}
       POSTGRES_DB: ${OPENELIS_DB_NAME:?}
@@ -86,6 +90,7 @@ services:
       odoodb:
         condition: service_healthy
     environment:
+      TZ: ${TZ}
       HOST: ${ODOO_DB_HOST}
       USER: ${ODOO_DB_USER}
       PASSWORD: ${ODOO_DB_PASSWORD}
@@ -102,6 +107,7 @@ services:
       interval: 10s
       timeout: 5s
     environment:
+      TZ: ${TZ}
       POSTGRES_DB: ${ODOO_DB_NAME:?}
       POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_DB_USER}
@@ -112,6 +118,7 @@ services:
     profiles: ["odoo","bahmni-standard"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
     environment:
+      TZ: ${TZ}
       IS_ODOO_16: true
       ODOO_DB_SERVER: ${ODOO_DB_HOST}
       ODOO_DB_USERNAME: ${ODOO_DB_USER:?}
@@ -149,6 +156,7 @@ services:
       odoo-10-db:
         condition: service_healthy
     environment:
+      TZ: ${TZ}
       HOST: ${ODOO_10_DB_HOST}
       USER: ${ODOO_10_DB_USER}
       PASSWORD: ${ODOO_10_DB_PASSWORD}
@@ -166,6 +174,7 @@ services:
       interval: 10s
       timeout: 5s
     environment:
+      TZ: ${TZ}
       POSTGRES_DB: ${ODOO_10_DB_NAME:?}
       POSTGRES_PASSWORD: ${ODOO_10_DB_PASSWORD}
       POSTGRES_USER: ${ODOO_10_DB_USER}
@@ -176,6 +185,7 @@ services:
     profiles: ["odoo-10"]
     image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
     environment:
+      TZ: ${TZ}
       ODOO_DB_SERVER: odoo-10-db
       ODOO_DB_USERNAME: ${ODOO_10_DB_USER:?}
       ODOO_DB_PASSWORD: ${ODOO_10_DB_PASSWORD:?}
@@ -201,6 +211,7 @@ services:
     profiles: ["emr","bahmni-standard", "bahmni-mart"]
     image: bahmni/openmrs:${OPENMRS_IMAGE_TAG:?}
     environment:
+      TZ: ${TZ}
       OMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OMRS_DB_HOSTNAME: ${OPENMRS_DB_HOST:?}
       OMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
@@ -256,6 +267,7 @@ services:
     profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
     command: "--sql-mode=${OPENMRS_DB_SQL_MODES:?}"
     environment:
+      TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${OPENMRS_DB_NAME:?}
       MYSQL_USER: ${OPENMRS_DB_USERNAME:?}
@@ -269,6 +281,7 @@ services:
     restart: on-failure:[3]
     profiles: ["metabase", "bahmni-mart"]
     environment:
+      TZ: ${TZ}
       POSTGRES_DB: ${METABASE_DB_NAME:?}
       POSTGRES_USER: ${METABASE_DB_USER:?}
       POSTGRES_PASSWORD: ${METABASE_DB_PASSWORD:?}
@@ -280,6 +293,7 @@ services:
     restart: on-failure:[3]
     profiles: ["metabase", "bahmni-mart"]
     environment:
+      TZ: ${TZ}
       MB_ADMIN_EMAIL: ${METABASE_ADMIN_EMAIL:?}
       MB_ADMIN_FIRST_NAME: ${METABASE_ADMIN_FIRST_NAME:?}
       MB_ADMIN_PASSWORD: ${METABASE_ADMIN_PASSWORD:?}
@@ -305,6 +319,7 @@ services:
     profiles: ["bahmni-mart"]
     restart: ${RESTART_POLICY}
     environment:
+      TZ: ${TZ}
       POSTGRES_DB: ${MART_DB_NAME:?}
       POSTGRES_USER: ${MART_DB_USERNAME:?}
       POSTGRES_PASSWORD: ${MART_DB_PASSWORD:?}
@@ -316,6 +331,7 @@ services:
     profiles: ["bahmni-mart"]
     restart: ${RESTART_POLICY}
     environment:
+      TZ: ${TZ}
       CRON_TIME: ${MART_CRON_TIME:?}
       MART_DB_HOST: ${MART_DB_HOST:?}
       MART_DB_NAME: ${MART_DB_NAME:?}
@@ -356,6 +372,7 @@ services:
     image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
     profiles: ["reports","bahmni-standard"]
     environment:
+      TZ: ${TZ}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
@@ -388,6 +405,7 @@ services:
     image: ${REPORTS_DB_IMAGE_NAME:?}
     profiles: ["reports","bahmni-standard"]
     environment:
+      TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
       MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
       MYSQL_USER: ${REPORTS_DB_USERNAME:?}
@@ -405,7 +423,8 @@ services:
       - 'bahmni-lab-results:/usr/share/nginx/html/uploaded_results'
       - "bahmni-uploaded-files:/usr/share/nginx/html/uploaded-files"
     environment:
-      - OPENMRS_HOST=${OPENMRS_HOST:?}
+      TZ: ${TZ}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
     depends_on:
       - openmrs
     logging: *log-config
@@ -422,6 +441,7 @@ services:
     image: bahmni/dcm4chee:${DCM4CHEE_IMAGE_TAG:?}
     profiles: ["pacs","bahmni-standard"]
     environment:
+      TZ: ${TZ}
       DB_HOST: ${PACS_DB_HOST:?}
       DB_PORT: ${PACS_DB_PORT:?}
       DB_NAME: ${DCM4CHEE_DB_NAME:?}
@@ -440,6 +460,7 @@ services:
     image: bahmni/pacs-integration:${PACS_INTEGRATION_IMAGE_TAG:?}
     profiles: ["pacs","bahmni-standard"]
     environment:
+      TZ: ${TZ}
       DB_HOST: ${PACS_DB_HOST:?}
       DB_PORT: ${PACS_DB_PORT:?}
       DB_NAME: ${PACS_INTEGRATION_DB_NAME:?}
@@ -456,6 +477,7 @@ services:
     image: postgres:9.6
     profiles: ["pacs","bahmni-standard"]
     environment:
+      TZ: ${TZ}
       POSTGRES_PASSWORD: ${PACS_DB_ROOT_PASSWORD}
       DCM4CHEE_DB_NAME: ${DCM4CHEE_DB_NAME:?}
       DCM4CHEE_DB_USERNAME: ${DCM4CHEE_DB_USERNAME:?}
@@ -473,6 +495,7 @@ services:
     image: bahmni/pacs-simulator:${PACS_SIMULATOR_IMAGE_TAG:?}
     profiles: ["pacs-simulator"]
     environment:
+      TZ: ${TZ}
       PACS_SIMULATOR_TIMEOUT: ${PACS_SIMULATOR_TIMEOUT:?}
       PACS_SERVER_TYPE: ${PACS_SERVER_TYPE:?}
       PACS_SERVER_URL: ${PACS_SERVER_URL:?}
@@ -491,6 +514,7 @@ services:
     profiles: ["atomfeed-console"]
     restart: ${RESTART_POLICY}
     environment:
+      TZ: ${TZ}
       OPENMRS_DB_HOST: ${OPENMRS_DB_HOST}
       OPENMRS_DB_NAME: ${OPENMRS_DB_NAME}
       OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME}
@@ -512,6 +536,7 @@ services:
     profiles: ["sms"]
     restart: ${RESTART_POLICY}
     environment:
+      TZ: ${TZ}
       SMS_TOKEN: ${SMS_TOKEN}
       SMS_ORIGINATOR: ${SMS_ORIGINATOR}
       SMS_PROVIDER_API: ${SMS_PROVIDER_API}
