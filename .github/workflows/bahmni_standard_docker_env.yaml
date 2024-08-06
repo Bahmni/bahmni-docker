@@ -15,6 +15,7 @@ on:
       - odoo-connect-publish-event
       - dcm4chee-pacs-publish-event
       - bahmni-proxy-publish-event
+      - bahmni-ipd-microfrontend-event
   workflow_dispatch:
     inputs:
       update_bahmni_option:
