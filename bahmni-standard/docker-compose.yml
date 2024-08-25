@@ -6,7 +6,7 @@ x-default-logging: &default
 x-loki-logging: &loki
   driver: loki
   options:
-    loki-url: http://localhost:3100/loki/api/v1/push
+    loki-url: ${LOKI_URL:?}
     mode: non-blocking
     max-buffer-size: 4m
     loki-retries: "3"
