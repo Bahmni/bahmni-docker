@@ -64,7 +64,7 @@ services:
       - '${OPENELIS_DB_DUMP_PATH}:/resources/db-dump'
       - 'openelisdbdata:/var/lib/postgresql/data'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h localhost -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U clinlims']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -109,6 +109,7 @@ services:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
       interval: 10s
       timeout: 5s
+      retries: 10
     environment:
       TZ: ${TZ}
       POSTGRES_DB: ${ODOO_DB_NAME:?}
