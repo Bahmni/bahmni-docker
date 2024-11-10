@@ -515,7 +515,7 @@ services:
 
 
   atomfeed-console:
-    image: bahmni/atomfeed-console:${ATOMFEED_CONSOLE_IMAGE_TAG:?}
+    image: bahmni/atomfeed-console:latest
     profiles: ["atomfeed-console"]
     restart: ${RESTART_POLICY}
     environment:
