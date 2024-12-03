@@ -2,7 +2,7 @@
 
 
 function checkDockerAndDockerComposeVersion {
-    
+
     # Check if docker is installed
     if ! [ -x "$(command -v docker)" ]; then
     echo 'Error: docker is not installed. Please install docker first!' >&2
@@ -17,7 +17,7 @@ function checkDockerAndDockerComposeVersion {
     if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ]; then
         echo 'Docker version >= 20.10.13, using Docker Compose V2'
     else
-        echo 'Docker versions < 20.x are not supported' >&2 
+        echo 'Docker versions < 20.x are not supported' >&2
         exit 1
     fi
 
@@ -63,7 +63,7 @@ function sshIntoService {
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
-    
+
     docker compose --env-file "$file" exec $serviceName /bin/sh
 }
 
@@ -74,14 +74,14 @@ function showLogsOfService {
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
-    
+
     docker compose --env-file "$file" logs $serviceName -f
 }
 
 
 function showOpenMRSlogs {
     echo "Opening OpenMRS Logs..."
-    docker compose logs openmrs -f 
+    docker compose logs openmrs -f
 }
 
 function startMart {
@@ -122,15 +122,15 @@ confirm() {
 function resetAndEraseALLVolumes {
   echo "Listing current volumes..."
   docker volume ls
-  echo "---"  
+  echo "---"
   if confirm "WARNING: Are you sure you want to DELETE all Bahmni Data and Volumes??"; then
     echo "Proceeding with a DELETE.... "
-    
+
     echo "1. Stopping all services, using all profiles.."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
-    
+
     docker compose --env-file "$file" ps
-    
+
     echo "2. Deleting all volumes (-v) .."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
     RESULT=$?
@@ -139,7 +139,7 @@ function resetAndEraseALLVolumes {
     else
         echo "[ERROR] Command threw an error! Trying stopping all services, and then retry."
     fi
-    
+
     echo "Volumes remaining on machine 'docker volume ls': "
     docker volume ls
 
@@ -152,17 +152,17 @@ function resetAndEraseALLVolumes {
 
   else
     echo "OK Aborting :)"
-  fi  
+  fi
 }
 
 function restartService {
-    # One can ONLY restart services in current profile (limitation of docker compose restart command). 
+    # One can ONLY restart services in current profile (limitation of docker compose restart command).
     echo "Listing the running services from current profile ($file file) that can be restarted..."
     docker compose --env-file "$file" ps
 
     echo "Enter the name of the SERVICE to restart:"
     read serviceName
-    
+
     echo "Restarting SERVICE: $serviceName"
     docker compose --env-file "$file" restart $serviceName
 
@@ -175,6 +175,32 @@ function restartService {
 #Function to shutdown the script
 function shutdown {
     exit 0
+}
+
+function runMart {
+    docker exec bahmni-lite-mart-1 /bin/sh -c "java -jar /bahmni-mart/app.jar --spring.config.location='/bahmni-mart/application.properties' > /proc/1/fd/1 2>/proc/1/fd/2 &"
+}
+
+function martIncrementalLoad {
+    echo "Running Mart in incremental load"
+    runMart
+}
+
+function martFullLoad {
+    echo "Running Mart in Full load"
+    source $file
+    mkdir -p log
+
+    docker exec bahmni-lite-martdb-1 psql --username=$MART_DB_USERNAME --dbname=$MART_DB_NAME -c "drop schema public CASCADE; CREATE SCHEMA public; create table markers
+        (
+        job_name        text    not null
+         constraint markers_pkey
+         primary key,
+        event_record_id integer not null,
+        category        text    not null,
+        table_name      text    not null
+        );"  > log/martFullLoad.log 2>&1
+    runMart
 }
 
 # Check Docker Compose versions first
@@ -193,6 +219,8 @@ echo "6) START Bahmni Analytics (Mart and Metabase)"
 echo "7) PULL latest images from Docker hub for Bahmni"
 echo "8) RESET and ERASE All Volumes/Databases from docker!"
 echo "9) RESTART a service"
+echo "10) Run mart in incremental load"
+echo "11) Run mart in Full load"
 echo "0) STATUS of all services"
 echo "-------------------------"
 read option
@@ -212,6 +240,8 @@ case $option in
     7) pullLatestImages $file;;
     8) resetAndEraseALLVolumes $file;;
     9) restartService $file;;
+   10) martIncrementalLoad;;
+   11) martFullLoad $file;;
     0) showStatus $file;;
     *) echo "Invalid option selected";;
 esac
