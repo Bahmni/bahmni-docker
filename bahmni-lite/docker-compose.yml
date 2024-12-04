@@ -174,6 +174,8 @@ services:
      - martdb
      - openmrsdb
      - openmrs
+     - reportsdb
+     - reports
     volumes:
      - 'bahmni-clinical-forms:/home/bahmni/clinical_forms'
 
@@ -231,8 +233,51 @@ services:
         - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
         - 'bahmni-lab-results:/mounts/bahmni-lab-results'
         - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
+        - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
         - 'configuration_checksums:/mounts/configuration_checksums'
-  
+
+  reports:
+    image: bahmni/reports:${REPORTS_IMAGE_TAG:?}
+    profiles: [ "reports","bahmni-lite","bahmni-mart" ]
+    environment:
+      TZ: ${TZ}
+      OPENMRS_DB_HOST: ${OPENMRS_DB_HOST:?}
+      OPENMRS_DB_NAME: ${OPENMRS_DB_NAME:?}
+      OPENMRS_DB_USERNAME: ${OPENMRS_DB_USERNAME:?}
+      OPENMRS_DB_PASSWORD: ${OPENMRS_DB_PASSWORD:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      REPORTS_DB_SERVER: reportsdb
+      REPORTS_DB_NAME: ${REPORTS_DB_NAME:?}
+      REPORTS_DB_USERNAME: ${REPORTS_DB_USERNAME:?}
+      REPORTS_DB_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+      ICD10_LITE_INDICATOR: ${ICD10_LITE_INDICATOR}
+    volumes:
+      - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+      - "bahmni-queued-reports:/home/bahmni/reports"
+    # - "../snomed-resources/icd10-extensions-1.0.0-SNAPSHOT.jar:/var/run/bahmni-reports/bahmni-reports/WEB-INF/lib/icd10-extensions-1.0.0-SNAPSHOT.jar:ro"
+    depends_on:
+      - reportsdb
+      - openmrsdb
+      - bahmni-web
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
+  reportsdb:
+    platform: linux/amd64
+    image: ${REPORTS_DB_IMAGE_NAME:?}
+    profiles: [ "reports","bahmni-lite","bahmni-mart" ]
+    environment:
+      TZ: ${TZ}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${REPORTS_DB_NAME:?}
+      MYSQL_USER: ${REPORTS_DB_USERNAME:?}
+      MYSQL_PASSWORD: ${REPORTS_DB_PASSWORD:?}
+    volumes:
+      - 'reportsdbdata:/var/lib/mysql'
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
 #  cdss:
 #    profiles: [ "cdss" ]
 #    image: bahmni/cdss-reference:${CDSS_IMAGE_TAG:?}
@@ -275,3 +320,5 @@ volumes:
   metabase-data:
   bahmni-lab-results:
   bahmni-uploaded-files:
+  bahmni-queued-reports:
+  reportsdbdata:
