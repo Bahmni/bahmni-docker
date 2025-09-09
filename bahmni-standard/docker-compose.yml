@@ -37,6 +37,14 @@ services:
     logging: *log-config
     restart: ${RESTART_POLICY}
 
+  bahmni-lab:
+    profiles: ["lab-lite","emr","bahmni-lite"]
+    image: 'bahmni/bahmni-lab:${BAHMNI_LAB_IMAGE_TAG:?}'
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+    environment:
+      TZ: ${TZ}
+
   openelis:
     profiles: ["openelis","bahmni-standard"]
     image: 'bahmni/openelis:${OPENELIS_IMAGE_TAG:?[ERROR]}'
