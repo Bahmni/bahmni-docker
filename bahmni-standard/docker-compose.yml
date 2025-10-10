@@ -363,6 +363,13 @@ services:
     logging: *log-config
     restart: ${RESTART_POLICY}
 
+  bahmni-apps-frontend:
+    image: bahmni/bahmni-apps-frontend:${BAHMNI_APPS_FRONTEND_IMAGE_TAG:?}
+    profiles: ["emr","bahmni-standard"]
+    # volumes:
+    #  - "${BAHMNI_APPS_FRONTEND_PATH:?}/distro/dist/:/usr/local/apache2/htdocs/bahmni-new"
+
+
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
     profiles: ["implementer-interface","emr","bahmni-standard"]
