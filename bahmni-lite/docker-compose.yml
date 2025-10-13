@@ -258,6 +258,8 @@ services:
     profiles: ["emr","bahmni-lite"]
     # volumes:
     #  - "${BAHMNI_APPS_FRONTEND_PATH:?}/distro/dist/:/usr/local/apache2/htdocs/bahmni-new"
+    logging: *log-config
+    restart: ${RESTART_POLICY}
 
 
   implementer-interface:
