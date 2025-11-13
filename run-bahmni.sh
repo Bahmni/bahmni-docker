@@ -1,8 +1,23 @@
 #!/bin/bash
 
+function setup_bahmni_odoo_modules() {
+    # Define target directory
+    local target_dir="$HOME/bahmni-odoo-modules"
+
+    # Create the directory if it doesn't exist
+    mkdir -p "$target_dir"
+
+    # Change ownership to current user
+    sudo chown -R "$(whoami):$(whoami)" "$target_dir"
+
+    # Clone the repository into the directory
+    git clone https://github.com/Lesotho-eRegister-v1/bahmni-odoo-modules.git "$target_dir"
+
+    echo "✅ Repository cloned into $target_dir and ownership set to $(whoami)"
+}
 
 function checkDockerAndDockerComposeVersion {
-    
+
     # Check if docker is installed
     if ! [ -x "$(command -v docker)" ]; then
     echo 'Error: docker is not installed. Please install docker first!' >&2
@@ -17,7 +32,7 @@ function checkDockerAndDockerComposeVersion {
     if [ "${DOCKER_SERVER_VERSION_MAJOR}" -ge 20 ]; then
         echo 'Docker version >= 20.10.13, using Docker Compose V2'
     else
-        echo 'Docker versions < 20.x are not supported' >&2 
+        echo 'Docker versions < 20.x are not supported' >&2
         exit 1
     fi
 
@@ -63,7 +78,7 @@ function sshIntoService {
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
-    
+
     docker compose --env-file "$file" exec $serviceName /bin/sh
 }
 
@@ -74,14 +89,14 @@ function showLogsOfService {
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
-    
+
     docker compose --env-file "$file" logs $serviceName -f
 }
 
 
 function showOpenMRSlogs {
     echo "Opening OpenMRS Logs..."
-    docker compose logs openmrs -f 
+    docker compose logs openmrs -f
 }
 
 function startMart {
@@ -122,15 +137,15 @@ confirm() {
 function resetAndEraseALLVolumes {
   echo "Listing current volumes..."
   docker volume ls
-  echo "---"  
+  echo "---"
   if confirm "WARNING: Are you sure you want to DELETE all Bahmni Data and Volumes??"; then
     echo "Proceeding with a DELETE.... "
-    
+
     echo "1. Stopping all services, using all profiles.."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
-    
+
     docker compose --env-file "$file" ps
-    
+
     echo "2. Deleting all volumes (-v) .."
     docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
     RESULT=$?
@@ -139,7 +154,7 @@ function resetAndEraseALLVolumes {
     else
         echo "[ERROR] Command threw an error! Trying stopping all services, and then retry."
     fi
-    
+
     echo "Volumes remaining on machine 'docker volume ls': "
     docker volume ls
 
@@ -152,17 +167,17 @@ function resetAndEraseALLVolumes {
 
   else
     echo "OK Aborting :)"
-  fi  
+  fi
 }
 
 function restartService {
-    # One can ONLY restart services in current profile (limitation of docker compose restart command). 
+    # One can ONLY restart services in current profile (limitation of docker compose restart command).
     echo "Listing the running services from current profile ($file file) that can be restarted..."
     docker compose --env-file "$file" ps
 
     echo "Enter the name of the SERVICE to restart:"
     read serviceName
-    
+
     echo "Restarting SERVICE: $serviceName"
     docker compose --env-file "$file" restart $serviceName
 
@@ -184,6 +199,7 @@ checkIfDirectoryIsCorrect
 
 echo "Please select an option:"
 echo "------------------------"
+echo "0) SET-UP Bahmni-ADDONS "
 echo "1) START Bahmni services"
 echo "2) STOP  Bahmni services"
 echo "3) LOGS: Show OpenMRS Logs"
@@ -193,7 +209,7 @@ echo "6) START Bahmni Analytics (Mart and Metabase)"
 echo "7) PULL latest images from Docker hub for Bahmni"
 echo "8) RESET and ERASE All Volumes/Databases from docker!"
 echo "9) RESTART a service"
-echo "0) STATUS of all services"
+echo "10) STATUS of all services"
 echo "-------------------------"
 read option
 
@@ -203,6 +219,7 @@ if ! [ "$1" == "" ]; then
 fi
 
 case $option in
+    0) setup_bahmni_odoo_modules;;
     1) start $file;;
     2) stop $file;;
     3) showOpenMRSlogs;;
@@ -212,6 +229,6 @@ case $option in
     7) pullLatestImages $file;;
     8) resetAndEraseALLVolumes $file;;
     9) restartService $file;;
-    0) showStatus $file;;
+    10) showStatus $file;;
     *) echo "Invalid option selected";;
 esac
