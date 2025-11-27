@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+      <record id="mrp.menu_mrp_root" model="ir.ui.menu">
+          <field name="name">Prepacking</field>
+      </record>
+
+
+
+    </data>
+</odoo>
