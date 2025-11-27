@@ -3,7 +3,7 @@
     "summary": "MOH Prepacking Customizations",
     "version": "16.0.1.0.0",
     "category": "Localization",
-    "author": "Your Name",
+    "author": "MOH Lesotho",
     "website": "",
     "license": "LGPL-3",
     "depends": [
