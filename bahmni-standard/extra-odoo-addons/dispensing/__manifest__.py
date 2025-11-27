@@ -1,0 +1,25 @@
+{
+    "name": "dispensing",
+    "summary": "MOH Dispensing Customizations",
+    "version": "16.0.1.0.0",
+    "category": "Localization",
+    "author": "Your Name",
+    "website": "",
+    "license": "LGPL-3",
+    "depends": [
+        "base",
+        "contacts",
+        "sale",
+        "account",
+        "stock",
+    ],
+    "data": [
+        "views/view_overrides.xml",
+        "views/menu_overrides.xml",
+        "views/product_template_views.xml",
+        "views/stock_location_views.xml", 
+        "views/login_template.xml",
+    ],
+    "installable": True,
+    "application": False,
+}

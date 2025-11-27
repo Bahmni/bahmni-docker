@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Change Sales → Orders → Quotations to Prescriptions -->
+        <record id="sale.sale_menu_root" model="ir.ui.menu">
+            <field name="name">Dispensing</field>
+        </record>
+
+        <record id="sale.menu_sale_quotations" model="ir.ui.menu">
+            <field name="name">New Prescriptions</field>
+        </record>
+
+        <record id="sale.sale_order_menu" model="ir.ui.menu">
+            <field name="name">Prescriptions</field>
+        </record>
+
+        <record id="sale.menu_sale_order" model="ir.ui.menu">
+            <field name="name">Served Prescriptions</field>
+        </record>
+
+        <!-- Change Customers to Patients -->
+        <record id="sale.res_partner_menu" model="ir.ui.menu">
+            <field name="name">Patients</field>
+        </record>
+
+    </data>
+</odoo>

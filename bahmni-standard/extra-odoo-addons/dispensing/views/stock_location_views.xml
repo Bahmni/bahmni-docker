@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit stock location form -->
+    <record id="view_stock_location_form_elmis" model="ir.ui.view">
+        <field name="name">stock.location.form.elmis</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <!-- Put it under the Location Name -->
+            <xpath expr="//group[@name='additional_info']" position="before">
+                <group string="eLMIS Information">
+                    <field name="elmis_facility_code"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit stock location tree -->
+    <record id="view_stock_location_tree_elmis" model="ir.ui.view">
+        <field name="name">stock.location.tree.elmis</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='complete_name']" position="after">
+                <field name="elmis_facility_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
