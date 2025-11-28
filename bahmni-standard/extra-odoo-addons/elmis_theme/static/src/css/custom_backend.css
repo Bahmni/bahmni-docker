@@ -1,0 +1,30 @@
+/* MAIN NAVBAR */
+.o_main_navbar {
+    background-color: #4950E0 !important; 
+}
+
+/* LEFT SIDEBAR MENU */
+.o_app_drawer .o_app {
+    border-radius: 10px !important;
+    background-color: #4950E0 !important;
+    color: white !important;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background-color: #4950E0 !important;
+    border-color: #4950E0 !important;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* ACTIVE MENU HIGHLIGHT */
+.o_menu_item .active {
+    background-color: #0055a5 !important;
+    color: white !important;
+}
+
+/* LOGIN PAGE BACKGROUND */
+.o_login_background {
+    background-color: #4950E0 !important;
+}

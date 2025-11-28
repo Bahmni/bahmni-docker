@@ -1,0 +1,9 @@
+/* WEBSITE HEADER LOGO */
+.navbar-brand img {
+    height: 60px !important;
+}
+
+/* WEBSITE COLORS */
+.navbar-light {
+    background-color: #4950E0 !important;
+}
