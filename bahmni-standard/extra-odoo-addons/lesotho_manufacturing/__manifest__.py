@@ -1,6 +1,6 @@
 {
-    "name": "Lesotho Manufaturing",
-    "summary": "Lesotho Manufaturing",
+    "name": "Lesotho Manufacturing",
+    "summary": "Lesotho Manufacturing",
     "version": "16.0.1.0.0",
     "category": "Localization",
     "author": "MOH Lesotho",

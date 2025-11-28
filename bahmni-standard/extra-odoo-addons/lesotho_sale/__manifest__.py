@@ -1,5 +1,5 @@
 {
-    "name": "lesotho_sale",
+    "name": "Lesotho Sale",
     "summary": "Lesotho Sale Customizations",
     "version": "16.0.1.0.0",
     "category": "Localization",
