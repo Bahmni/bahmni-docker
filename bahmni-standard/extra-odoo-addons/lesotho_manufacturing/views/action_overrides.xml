@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="stock.action_stock_scrap" model="ir.actions.act_window">
+            <field name="name">Move to Unserviceable</field>
+        </record>
+    </data>
+</odoo>
