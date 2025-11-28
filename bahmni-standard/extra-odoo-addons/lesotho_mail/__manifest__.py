@@ -1,5 +1,5 @@
 {
-    "name": "lesotho_mail",
+    "name": "Lesotho Mail",
     "summary": "Lesotho Mail Customizations",
     "version": "16.0.1.0.0",
     "category": "Localization",

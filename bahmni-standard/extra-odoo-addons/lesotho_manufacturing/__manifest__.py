@@ -1,9 +1,9 @@
 {
-    "name": "dispensing",
-    "summary": "MOH Dispensing Customizations",
+    "name": "Lesotho Manufacturing",
+    "summary": "Lesotho Manufacturing",
     "version": "16.0.1.0.0",
     "category": "Localization",
-    "author": "Your Name",
+    "author": "MOH Lesotho",
     "website": "",
     "license": "LGPL-3",
     "depends": [
@@ -12,13 +12,11 @@
         "sale",
         "account",
         "stock",
+        "mrp",
     ],
     "data": [
-        "views/view_overrides.xml",
         "views/menu_overrides.xml",
-        "views/product_template_views.xml",
-        "views/stock_location_views.xml", 
-        "views/login_template.xml",
+        "views/view_overrides.xml",
     ],
     "installable": True,
     "application": False,

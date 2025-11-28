@@ -1,5 +1,5 @@
 {
-    "name": "lesotho_sale",
+    "name": "Lesotho Sale",
     "summary": "Lesotho Sale Customizations",
     "version": "16.0.1.0.0",
     "category": "Localization",
@@ -7,11 +7,7 @@
     "website": "",
     "license": "LGPL-3",
     "depends": [
-        "base",
-        "contacts",
         "sale",
-        "account",
-        "stock",
     ],
     "data": [
         "views/menu_overrides.xml",

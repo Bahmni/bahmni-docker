@@ -7,6 +7,15 @@
       <record id="mrp.menu_mrp_production_action" model="ir.ui.menu">
           <field name="name">Prepacking Orders</field>
       </record>
+      <record id="mrp.menu_mrp_bom_form_action" model="ir.ui.menu">
+          <field name="name">Prepacking Template</field>
+      </record>
+      
+      <!-- Change Scrap to Unserviceable-->
+      <record id="mrp.menu_mrp_scrap" model="ir.ui.menu">
+          <field name="name">Move to Unserviceable</field>
+      </record>
+      
 
 
 
