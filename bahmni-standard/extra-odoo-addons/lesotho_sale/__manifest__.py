@@ -1,9 +1,9 @@
 {
-    "name": "prepacking",
-    "summary": "MOH Prepacking Customizations",
+    "name": "lesotho_sale",
+    "summary": "Lesotho Sale Customizations",
     "version": "16.0.1.0.0",
     "category": "Localization",
-    "author": "MOH Lesotho",
+    "author": "eLMIS Development Team",
     "website": "",
     "license": "LGPL-3",
     "depends": [
@@ -12,7 +12,6 @@
         "sale",
         "account",
         "stock",
-        "mrp",
     ],
     "data": [
         "views/menu_overrides.xml",
