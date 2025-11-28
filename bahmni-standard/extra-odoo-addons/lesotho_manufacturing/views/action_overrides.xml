@@ -4,5 +4,20 @@
         <record id="stock.action_stock_scrap" model="ir.actions.act_window">
             <field name="name">Move to Unserviceable</field>
         </record>
+        <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+            <field name="name">Prepacking Orders</field>
+        </record>
+        <record id="mrp.mrp_unbuild" model="ir.actions.act_window">
+            <field name="name">Reverse Orders</field>
+        </record>
+        <record id="mrp.mrp_bom_form_action" model="ir.actions.act_window">
+            <field name="name">Prepacking Templates</field>
+        </record>
+        <record id="stock.action_production_lot_form" model="ir.actions.act_window">
+            <field name="name">Batches/Serial Numbers</field>
+        </record>
+        <record id="mrp.mrp_production_report" model="ir.actions.act_window">
+            <field name="name">Prepacking Orders</field>
+        </record>
     </data>
 </odoo>
