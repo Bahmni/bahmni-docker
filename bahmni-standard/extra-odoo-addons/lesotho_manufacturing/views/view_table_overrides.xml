@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit Manufacturing Orders tree view -->
+    <record id="view_mrp_production_tree_prepack" model="ir.ui.view">
+        <field name="name">mrp.production.tree.prepack.custom</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view" />
+        <field name="arch" type="xml">
+
+            <!-- Example 1: Change 'Product' column heading to 'Prepacked Item' -->
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="string">Prepacked Item</attribute>
+            </xpath>
+
+            <!-- Example 2: Change 'Quantity To Produce' to 'Prepack Qty' -->
+            <xpath expr="//field[@name='product_qty']" position="attributes">
+                <attribute name="string">Prepack Qty</attribute>
+            </xpath>
+
+            <!-- Example 3: Change 'Deadline Start' to 'Prepack Date' -->
+            <xpath expr="//field[@name='date_planned_start']" position="attributes">
+                <attribute name="string">Prepack Date</attribute>
+            </xpath>
+
+            <!-- Change 'MO Readiness' to 'Prepack Readiness' -->
+            <xpath expr="//field[@name='reservation_state']" position="attributes">
+                <attribute name="string">PO Readiness</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

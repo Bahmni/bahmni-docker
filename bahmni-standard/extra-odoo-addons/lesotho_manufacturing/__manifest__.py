@@ -18,6 +18,7 @@
         "views/menu_overrides.xml",
         "views/view_overrides.xml",
         "views/action_overrides.xml",
+        "views/view_table_overrides.xml",
     ],
     "installable": True,
     "application": False,
