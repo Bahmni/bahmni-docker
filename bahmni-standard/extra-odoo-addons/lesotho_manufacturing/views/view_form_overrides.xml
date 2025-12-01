@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+
+        <record id="stock_scrap_form_view_unserviceable_location" model="ir.ui.view">
+            <field name="name">stock.scrap.form.unserviceable_location</field>
+            <field name="model">stock.scrap</field>
+            <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Change header of scap_location_id (Scrap Location) field string to Unserviceable Location -->
+                <xpath expr="//field[@name='scrap_location_id']" position="attributes">
+                    <attribute name="string">Unserviceable Location</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_unbuild_form_view_prepacking_template" model="ir.ui.view">
+            <field name="name">mrp.unbuild.form.prepacking_template</field>
+            <field name="model">mrp.unbuild</field>
+            <field name="inherit_id" ref="mrp.mrp_unbuild_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Change header of bom_id () string attribute to Prepacking Template -->
+                <xpath expr="//field[@name='bom_id']" position="attributes">
+                    <attribute name="string">Prepacking Template</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_unbuild_form_view_prepacking_order" model="ir.ui.view">
+            <field name="name">mrp.unbuild.form.prepacking_order</field>
+            <field name="model">mrp.unbuild</field>
+            <field name="inherit_id" ref="mrp.mrp_unbuild_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Change header of mo_id () string attribute to Prepacking order -->
+                <xpath expr="//field[@name='mo_id']" position="attributes">
+                    <attribute name="string">Prepacking Order</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_unbuild_form_view_batch" model="ir.ui.view">
+            <field name="name">mrp.unbuild.form.batch</field>
+            <field name="model">mrp.unbuild</field>
+            <field name="inherit_id" ref="mrp.mrp_unbuild_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Change lot_id () string attribute to Batch -->
+                <xpath expr="//field[@name='lot_id']" position="attributes">
+                    <attribute name="string">Batch/Serial Number</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
