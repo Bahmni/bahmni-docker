@@ -8,9 +8,9 @@
         <field name="arch" type="xml">
 
             <!-- Example 1: Change 'Product' column heading to 'Prepacked Item' -->
-            <xpath expr="//field[@name='product_id']" position="attributes">
+            <!-- <xpath expr="//field[@name='product_id']" position="attributes">
                 <attribute name="string">Prepacked Item</attribute>
-            </xpath>
+            </xpath> -->
 
             <!-- Example 2: Change 'Quantity To Produce' to 'Prepack Qty' -->
             <xpath expr="//field[@name='product_qty']" position="attributes">
@@ -27,6 +27,13 @@
                 <attribute name="string">PO Readiness</attribute>
             </xpath>
 
+        </field>
+    </record>
+
+    <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+        <field name="help" type="html">
+            <p>No prepacking order found. Let’s create one.</p>
+            <p>Consume components and build finished products using prepacking templates.</p>
         </field>
     </record>
 </odoo>
