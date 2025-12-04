@@ -7,11 +7,6 @@
         <field name="inherit_id" ref="mrp.mrp_production_tree_view" />
         <field name="arch" type="xml">
 
-            <!-- Example 1: Change 'Product' column heading to 'Prepacked Item' -->
-            <!-- <xpath expr="//field[@name='product_id']" position="attributes">
-                <attribute name="string">Prepacked Item</attribute>
-            </xpath> -->
-
             <!-- Example 2: Change 'Quantity To Produce' to 'Prepack Qty' -->
             <xpath expr="//field[@name='product_qty']" position="attributes">
                 <attribute name="string">Prepack Qty</attribute>
@@ -36,4 +31,49 @@
             <p>Consume components and build finished products using prepacking templates.</p>
         </field>
     </record>
+
+      <record id="mrp_unbuild_tree_view_prepack" model="ir.ui.view">
+            <field name="name">mrp.unbuild.tree.prepack.custom</field>
+            <field name="model">mrp.unbuild</field>
+            <field name="inherit_id" ref="mrp.mrp_unbuild_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='bom_id']" position="attributes">
+                    <attribute name="string">Prepacking Template</attribute>
+                </xpath>
+                <xpath expr="//field[@name='mo_id']" position="attributes">
+                    <attribute name="string">Prepacking Order</attribute>
+                </xpath>
+                <xpath expr="//field[@name='lot_id']" position="attributes">
+                    <attribute name="string">Batch/Serial Number</attribute>
+                </xpath>
+                
+            </field>
+    </record>
+
+
+    <record id="mrp.mrp_unbuild" model="ir.actions.act_window"> 
+        <field name="help" type="html">
+            <p>No reverse order found</p> 
+            <p>A reverse order is used to break down a prepack into its components.</p>
+        </field> 
+    </record>
+
+    <record id="stock_scrap_tree_view_lesotho_custom" model="ir.ui.view">
+            <field name="name">stock.stock_scrap_tree_view.lesotho.custom</field>
+            <field name="model">stock.scrap</field>
+            <field name="inherit_id" ref="stock.stock_scrap_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='scrap_location_id']" position="attributes">
+                    <attribute name="string">Unserviceable Location</attribute>
+                </xpath>
+            </field>
+    </record>
+
+    <record id="stock.action_stock_scrap" model="ir.actions.act_window">
+            <field name="help" type="html">
+                <p>No move to unserviceable order found</p>
+                <p>Moving a product to unserviceable will remove it from your stock.</p>
+            </field>
+    </record>
+
 </odoo>
