@@ -51,5 +51,17 @@
             </field>
         </record>
 
+        <record id="mrp_production_form_view_prepacking_template" model="ir.ui.view">
+            <field name="name">mrp.production.form.prepacking_template</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Change header of bom_id () string attribute to Prepacking Template -->
+                <xpath expr="//field[@name='bom_id']" position="attributes">
+                    <attribute name="string">Prepacking Template</attribute>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
