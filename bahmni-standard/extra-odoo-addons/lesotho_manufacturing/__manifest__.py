@@ -18,6 +18,8 @@
         "views/menu_overrides.xml",
         "views/view_overrides.xml",
         "views/action_overrides.xml",
+        # "views/sale_clinical_view.xml",
+        # "views/sale_order_line_view.xml",
     ],
     "installable": True,
     "application": False,

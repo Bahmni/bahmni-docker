@@ -1,2 +1,1 @@
-from . import product_template
-from . import stock_location
+from . import extended_order_save_service, extended_sale_order, extended_sale_order_line
