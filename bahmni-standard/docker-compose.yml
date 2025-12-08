@@ -120,7 +120,8 @@ services:
 
   odoo-connect:
     profiles: ["odoo","bahmni-standard"]
-    image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
+    # image: 'bahmni/odoo-connect:${ODOO_CONNECT_IMAGE_TAG:?[ERROR]}'
+    image: 'elmislesotho/odoo-connect:1.0.0'
     environment:
       TZ: ${TZ}
       IS_ODOO_16: true
