@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Action for dispensing view -->
+    <record id="action_view_dispensing_lines" model="ir.actions.act_window">
+        <field name="name">Dispensing Lines</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_order_line_dispensing_tree" />
+        <field
+      name="domain"
+    >[('order_id', '=', active_id), ('dispensed', '=', False)]</field>
+        <field name="context">{
+            'search_default_filter_undispensed': 1,
+            'default_order_id': active_id
+        }</field>
+    </record>
+</odoo>

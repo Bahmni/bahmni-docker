@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit product form view -->
+    <record id="view_product_template_form_elmis" model="ir.ui.view">
+        <field name="name">product.template.form.elmis</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Place eLMIS Code near Internal Reference / default_code -->
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="elmis_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit product tree view -->
+    <record id="view_product_template_tree_elmis" model="ir.ui.view">
+        <field name="name">product.template.tree.elmis</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="elmis_code"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

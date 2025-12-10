@@ -1,0 +1,30 @@
+/* LOGIN button color */
+.oe_login_form .oe_login_buttons .btn.btn-primary {
+    background-color: #4950E0;   
+    border-color:     #4950E0;
+}
+
+/* On hover/focus */
+.oe_login_form .oe_login_buttons .btn.btn-primary:hover,
+.oe_login_form .oe_login_buttons .btn.btn-primary:focus {
+    background-color: #232cdf;
+    border-color:     #232cdf;
+}
+
+/* Colour of links under the button 
+   ("Don't have an account?", "Reset Password", etc.) */
+.oe_login_form .oe_login_buttons a,
+.oe_login_form .btn-link {
+    color: #4950E0;                    
+}
+
+.oe_login_form .oe_login_buttons a:hover,
+.oe_login_form .btn-link:hover {
+    color: #232cdf;
+    text-decoration: underline;
+}
+
+/* Hide "Manage Databases" link */
+.text-center.small.mt-4.pt-3.border-top a[href="/web/database/selector"] {
+    display: none !important;
+}

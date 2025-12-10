@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Extend Sale Order Form View - Add Clinical Data Tab -->
+    <record id="view_order_form_clinical_extended" model="ir.ui.view">
+        <field name="name">sale.order.form.clinical.extended</field>
+        <field name="model">sale.order</field>
+        <field
+      name="inherit_id"
+      ref="inherit_sale_order_form"
+    />  <!-- Changed to your custom view -->
+        <field name="arch" type="xml">
+
+            <!-- Add Clinical Data Tab after "Other Info" tab -->
+            <xpath expr="//page[@name='other_information']" position="after">
+                <page
+          string="Clinical Data"
+          name="clinical_data"
+          attrs="{'invisible': [('has_clinical_data', '=', False)]}"
+        >
+                    <group string="Encounter Details">
+                        <group>
+                            <field name="encounter_uuid" />
+                            <field name="visit_uuid" />
+                            <field name="location_name" />
+                            <field name="encounter_type" />
+                        </group>
+                        <group>
+                            <field name="encounter_datetime" />
+                            <field name="provider_name" />
+                            <field name="provider_uuid" />
+                            <field name="disposition" />
+                        </group>
+                    </group>
+                    <group string="Clinical Information">
+                        <field
+              name="diagnosis"
+              nolabel="1"
+              placeholder="Diagnosis/Reason for visit..."
+            />
+                        <field
+              name="clinical_notes"
+              nolabel="1"
+              placeholder="Additional clinical notes..."
+            />
+                    </group>
+                    <group
+            string="Clinical Summary"
+            attrs="{'invisible': [('has_clinical_data', '=', False)]}"
+          >
+                        <field
+              name="clinical_data_summary"
+              widget="text"
+              readonly="1"
+              nolabel="1"
+            />
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Add Clinical Info Header - After provider_name field (which exists in your view) -->
+            <xpath expr="//field[@name='provider_name']" position="after">
+                <div
+          class="oe_title"
+          attrs="{'invisible': [('has_clinical_data', '=', False)]}"
+        >
+                    <h4>Clinical Information</h4>
+                    <span class="text-muted">
+                        <field
+              name="clinical_data_summary"
+              widget="text"
+              readonly="1"
+            />
+                    </span>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Extend Sale Order List View - Add Clinical Columns to your custom tree view -->
+    <record id="view_order_tree_clinical_extended" model="ir.ui.view">
+        <field name="name">sale.order.tree.clinical.extended</field>
+        <field name="model">sale.order</field>
+        <field
+      name="inherit_id"
+      ref="inherit_view_order_tree_bahmni"
+    />  <!-- Changed to your custom view -->
+        <field name="arch" type="xml">
+
+            <!-- Add Clinical Columns after care_setting -->
+            <xpath expr="//field[@name='care_setting']" position="after">
+                <field name="location_name" string="Location" optional="show" />
+                <field
+          name="clinical_data_summary"
+          string="Clinical Summary"
+          optional="show"
+          readonly="1"
+        />
+            </xpath>
+
+            <!-- Add Clinical Filters -->
+            <xpath expr="//field[@name='care_setting']" position="before">
+                <filter
+          name="has_clinical_data"
+          string="Has Clinical Data"
+          domain="[('has_clinical_data','=',True)]"
+        />
+                <filter
+          name="no_clinical_data"
+          string="No Clinical Data"
+          domain="[('has_clinical_data','=',False)]"
+        />
+                <filter
+          name="filter_by_provider"
+          string="By Provider"
+          context="{'group_by': 'provider_name'}"
+        />
+                <filter
+          name="filter_by_location"
+          string="By Location"
+          context="{'group_by': 'location_name'}"
+        />
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Extend Quotation Tree View - Add Clinical Columns -->
+    <record id="view_quotation_tree_clinical_extended" model="ir.ui.view">
+        <field name="name">sale.quotation.tree.clinical.extended</field>
+        <field name="model">sale.order</field>
+        <field
+      name="inherit_id"
+      ref="inherit_quotation_tree_view_shop"
+    />  <!-- Changed to your custom view -->
+        <field name="arch" type="xml">
+
+            <!-- Add Clinical Columns after care_setting -->
+            <xpath expr="//field[@name='care_setting']" position="after">
+                <field name="location_name" string="Location" optional="show" />
+                <field
+          name="clinical_data_summary"
+          string="Clinical Summary"
+          optional="show"
+          readonly="1"
+        />
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

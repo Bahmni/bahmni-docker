@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+
+        <record
+      id="stock_scrap_form_view_unserviceable_location"
+      model="ir.ui.view"
+    >
+            <field name="name">stock.scrap.form.unserviceable</field>
+            <field name="model">stock.scrap</field>
+            <field name="inherit_id" ref="stock.stock_scrap_form_view" />
+            <field name="arch" type="xml">
+                <!-- Change header of partner_id (Customer) column to Patient -->
+                <xpath
+          expr="//field[@name='scrap_location_id']"
+          position="attributes"
+        >
+                    <attribute name="string">Unserviceable Location</attribute>
+                </xpath>
+            </field>
+        </record>
+            </data>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Extend Sale Order Line Form View (in Sale Order) -->
+    <!--  -->
+    <record id="view_order_line_tree_clinical_prescription" model="ir.ui.view">
+           <field name="name">sale.order.line.tree.clinical.prescription</field>
+           <field name="model">sale.order.line</field>
+           <field name="inherit_id" ref="sale.view_order_line_tree" />
+           <field name="arch" type="xml">
+
+               <!-- Add prescription columns BEFORE the price_subtotal (same position as route_id) -->
+               <xpath expr="//field[@name='price_subtotal']" position="before">
+                   <!-- Your existing route_id field -->
+                   <field
+          name="route_id"
+          groups="stock.group_adv_location"
+          options="{'no_create': True}"
+        />
+
+                   <!-- NEW: Add prescription fields -->
+                   <field name="frequency" string="Frequency" optional="show" />
+                   <field name="route" string="Admin Route" optional="show" />
+                   <field name="dose" string="Dose" optional="show" />
+                   <field name="dose_units" string="Units" optional="show" />
+               </xpath>
+
+               <!-- Optional: Add badge for prescription lines -->
+               <xpath expr="//tree" position="attributes">
+                   <attribute
+          name="decoration-info"
+        >has_prescription_data</attribute>
+               </xpath>
+
+           </field>
+       </record>
+</odoo>

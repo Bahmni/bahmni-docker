@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+       <!-- Hide "Manage Databases" link and customize login button color -->
+        <template id="hide_manage_db_link" inherit_id="web.login_layout">
+            <xpath expr="//t[@t-if='not disable_database_manager']" position="before">
+                <t t-set="disable_database_manager" t-value="True"/>
+            </xpath>
+        </template>
+        <template id="custom_login_text_style" inherit_id="web.login_layout">
+            <xpath expr="//t[@t-call='web.frontend_layout']" position="inside">
+                <t>
+                    <style>
+                        /* Change login text color to eLMIS Blue */
+                        .text-center.small.mt-4.pt-3.border-top a {
+                            color: #4950E0 !important;
+                        }
+                         .justify-content-between.mt-2.d-flex.small a {
+                            color: #4950E0 !important;
+                       }
+                    </style>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="custom_login_logo" inherit_id="web.login_layout">
+             <xpath expr="//img[contains(@t-attf-src, 'company_logo')]" position="replace">
+                <img src="/lesotho_base/static/src/img/logo.png"
+                     style="max-height:120px; max-width:100%; width:auto;"/>
+            </xpath>
+        </template>
+        
+
+        <template id="custom_login_button_style" inherit_id="web.login">
+            <xpath expr="//t[@t-call='web.login_layout']" position="inside">
+                <t>
+                    <style>
+                        /* Change login button color to eLMIS Blue */
+                        .oe_login_form .btn-primary {
+                            background-color: #4950E0 !important;
+                            border-color: #4950E0 !important;
+                        }
+                    </style>
+                </t>
+            </xpath>
+        </template>
+
+
+    </data>
+</odoo>

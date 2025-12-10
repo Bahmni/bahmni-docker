@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+      <record id="stock.menu_stock_scrap" model="ir.ui.menu">
+          <field name="name">Move to Unserviceable</field>
+      </record>
+
+
+
+
+    </data>
+</odoo>
