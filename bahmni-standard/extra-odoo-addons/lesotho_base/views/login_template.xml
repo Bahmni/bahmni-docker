@@ -25,7 +25,7 @@
 
         <template id="custom_login_logo" inherit_id="web.login_layout">
              <xpath expr="//img[contains(@t-attf-src, 'company_logo')]" position="replace">
-                <img src="/dispensing/static/src/img/logo.png"
+                <img src="/lesotho_base/static/src/img/logo.png"
                      style="max-height:120px; max-width:100%; width:auto;"/>
             </xpath>
         </template>

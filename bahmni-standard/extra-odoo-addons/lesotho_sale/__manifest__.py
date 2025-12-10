@@ -7,6 +7,7 @@
     "website": "",
     "license": "LGPL-3",
     "depends": [
+        "base",
         "sale",
         "bahmni_sale",
     ],
@@ -16,6 +17,7 @@
         "views/view_order_overrides.xml",
         # "views/view_overrides.xml",
         # "data/migration_script.py",
+        "views/view_overrides.xml",
     ],
     "installable": True,
     "application": False,

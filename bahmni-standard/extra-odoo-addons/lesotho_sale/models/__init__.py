@@ -1,3 +1,4 @@
+from . import res_partner
 from . import (
     extended_res_partner,
     extended_order_save_service,
