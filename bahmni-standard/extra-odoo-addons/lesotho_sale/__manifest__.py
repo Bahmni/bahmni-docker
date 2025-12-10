@@ -13,6 +13,8 @@
     "data": [
         "views/menu_overrides.xml",
         "views/action_overrides.xml",
+        "views/view_order_overrides.xml",
+        # "views/view_overrides.xml",
         # "data/migration_script.py",
     ],
     "installable": True,

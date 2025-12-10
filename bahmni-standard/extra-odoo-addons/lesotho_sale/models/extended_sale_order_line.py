@@ -44,6 +44,13 @@ class ExtendedSaleOrderLine(models.Model):
         string="Duration Units", help="Units for duration (e.g., Days, Weeks, Months)"
     )
 
+    # ============ NEW FIELDS FROM JAVA SERVICE ============
+    num_refills = fields.Integer(
+        string="Number of Refills",
+        help="Number of times prescription can be refilled",
+        default=0,
+    )
+
     # ============ SPECIAL INSTRUCTIONS ============
     as_needed = fields.Boolean(
         string="PRN", help="Take as needed (Pro Re Nata)", default=False
@@ -54,27 +61,10 @@ class ExtendedSaleOrderLine(models.Model):
         help="Special instructions for administration",
     )
 
-    # ============ DATE FIELDS ============
-    start_date = fields.Datetime(
-        string="Start Date", help="When the medication should start"
-    )
-
-    stop_date = fields.Datetime(
-        string="Stop Date", help="When the medication should stop"
-    )
-
-    expire_date = fields.Datetime(
-        string="Expiry Date", help="When the prescription expires"
-    )
-
     # ============ DRUG DETAILS ============
     drug_form = fields.Char(
         string="Drug Form",
         help="Physical form of drug (e.g., Injection, Tablet, Capsule)",
-    )
-
-    drug_strength = fields.Char(
-        string="Strength", help="Drug strength (e.g., 3 mg/ml, 500 mg)"
     )
 
     drug_uuid = fields.Char(string="Drug UUID", help="Bahmni Drug UUID for reference")
@@ -86,8 +76,23 @@ class ExtendedSaleOrderLine(models.Model):
         index=True,
     )
 
+    previous_order_uuid = fields.Char(
+        string="Previous Order UUID",
+        help="UUID of previous order if this is a revision",
+        index=True,
+    )
+
     order_number = fields.Char(
         string="Order Number", help="Bahmni Order Number (e.g., ORD-11)", index=True
+    )
+
+    # ============ ADDITIONAL FIELDS ============
+    concept_name = fields.Char(string="Concept Name", help="Concept name from Bahmni")
+
+    dispensed = fields.Boolean(
+        string="Dispensed",
+        help="Whether this medication has been dispensed",
+        default=False,
     )
 
     # ============ COMPUTED FIELDS ============
@@ -114,7 +119,12 @@ class ExtendedSaleOrderLine(models.Model):
 
     # ============ COMPUTE METHODS ============
     @api.depends(
-        "frequency", "route", "dose", "duration", "administration_instructions"
+        "frequency",
+        "route",
+        "dose",
+        "duration",
+        "num_refills",
+        "administration_instructions",
     )
     def _compute_has_prescription_data(self):
         """Check if any prescription data exists"""
@@ -125,6 +135,7 @@ class ExtendedSaleOrderLine(models.Model):
                     line.route,
                     line.dose,
                     line.duration,
+                    line.num_refills,
                     line.administration_instructions,
                 ]
             )
@@ -136,44 +147,30 @@ class ExtendedSaleOrderLine(models.Model):
         "dose_units",
         "duration",
         "duration_units",
+        "num_refills",
         "as_needed",
         "administration_instructions",
         "drug_form",
-        "drug_strength",
     )
     def _compute_full_prescription_text(self):
         """Create complete prescription instruction text"""
         for line in self:
             parts = []
 
-            # Drug name and details
-            drug_parts = []
+            # Drug name
             if line.product_id:
-                drug_parts.append(line.product_id.name)
-
-            if line.drug_form:
-                drug_parts.append(f"({line.drug_form}")
-                if line.drug_strength:
-                    drug_parts.append(f"{line.drug_strength})")
-                else:
-                    drug_parts.append(")")
-
-            if drug_parts:
-                parts.append(" ".join(drug_parts))
+                parts.append(line.product_id.name)
 
             # Dosage
             if line.dose and line.dose_units:
                 parts.append(f"{line.dose} {line.dose_units}")
 
             # Frequency and route
-            freq_route = []
             if line.frequency:
-                freq_route.append(line.frequency)
-            if line.route:
-                freq_route.append(f"via {line.route}")
+                parts.append(line.frequency)
 
-            if freq_route:
-                parts.append(" ".join(freq_route))
+            if line.route:
+                parts.append(f"via {line.route}")
 
             # Duration
             if line.duration and line.duration_units:
@@ -183,18 +180,13 @@ class ExtendedSaleOrderLine(models.Model):
             if line.as_needed:
                 parts.append("(as needed)")
 
+            # Refills
+            if line.num_refills and line.num_refills > 0:
+                parts.append(f"with {line.num_refills} refill(s)")
+
             # Instructions
             if line.administration_instructions:
-                instructions = line.administration_instructions
-                # Clean JSON if present
-                if instructions.startswith('{"instructions":"'):
-                    try:
-                        instructions = json.loads(instructions).get(
-                            "instructions", instructions
-                        )
-                    except:
-                        pass
-                parts.append(f"Instructions: {instructions}")
+                parts.append(f"Instructions: {line.administration_instructions}")
 
             line.full_prescription_text = (
                 " ".join(parts) if parts else "No prescription details"
@@ -218,22 +210,6 @@ class ExtendedSaleOrderLine(models.Model):
             line.prescription_summary = " | ".join(parts) if parts else "-"
 
     # ============ UTILITY METHODS ============
-    def clean_administration_instructions(self):
-        """Clean JSON format from administration instructions"""
-        for line in self:
-            if line.administration_instructions:
-                instructions = line.administration_instructions
-                if instructions.startswith('{"instructions":"'):
-                    try:
-                        data = json.loads(instructions)
-                        line.administration_instructions = data.get(
-                            "instructions", instructions
-                        )
-                    except json.JSONDecodeError:
-                        # Leave as is if not valid JSON
-                        pass
-        return True
-
     def get_prescription_data_dict(self):
         """Return prescription data as dictionary"""
         self.ensure_one()
@@ -244,16 +220,16 @@ class ExtendedSaleOrderLine(models.Model):
             "dose_units": self.dose_units,
             "duration": self.duration,
             "duration_units": self.duration_units,
+            "num_refills": self.num_refills,
             "as_needed": self.as_needed,
             "administration_instructions": self.administration_instructions,
-            "start_date": self.start_date,
-            "stop_date": self.stop_date,
-            "expire_date": self.expire_date,
             "drug_form": self.drug_form,
-            "drug_strength": self.drug_strength,
             "drug_uuid": self.drug_uuid,
             "external_order_uuid": self.external_order_uuid,
+            "previous_order_uuid": self.previous_order_uuid,
             "order_number": self.order_number,
+            "concept_name": self.concept_name,
+            "dispensed": self.dispensed,
             "full_prescription": self.full_prescription_text,
             "prescription_summary": self.prescription_summary,
         }

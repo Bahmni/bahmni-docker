@@ -1,17 +1,164 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <data>
-        <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
+        <!-- Rename existing Sale menu actions -->
+        <record
+      id="sale.action_quotations_with_onboarding"
+      model="ir.actions.act_window"
+    >
             <field name="name">Prescriptions</field>
         </record>
         <record id="sale.action_orders" model="ir.actions.act_window">
             <field name="name">Served Prescriptions</field>
         </record>
-        <record id="account.res_partner_action_customer" model="ir.actions.act_window">
+        <record
+      id="account.res_partner_action_customer"
+      model="ir.actions.act_window"
+    >
             <field name="name">Patients</field>
         </record>
         <record id="sale.action_order_report_all" model="ir.actions.act_window">
             <field name="name">Dispensing Analysis</field>
+        </record>
+
+        <!-- Create the dispensing views FIRST -->
+        <record id="view_order_line_dispensing_tree" model="ir.ui.view">
+            <field name="name">sale.order.line.dispensing.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <tree
+          string="Items to Dispense"
+          decoration-info="dispensed==False"
+          decoration-success="dispensed==True"
+        >
+                    <field
+            name="order_id"
+            widget="many2one_avatar"
+            options="{'no_open': True, 'no_create': True}"
+          />
+                    <field name="product_id" widget="many2one_avatar" />
+                    <field name="product_uom_qty" string="Qty" />
+                    <field name="dose" string="Dose" />
+                    <field name="dose_units" string="Units" />
+                    <field name="frequency" string="Frequency" />
+                    <field name="route" string="Route" />
+                    <field name="duration" string="Duration" />
+                    <field name="duration_units" string="Dur Units" />
+                    <field name="prescription_summary" string="Prescription" />
+                    <field
+            name="dispensed"
+            string="Dispensed"
+            widget="boolean_toggle"
+          />
+                    <field name="order_number" string="Order #" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search view for dispensing -->
+        <record id="view_order_line_dispensing_search" model="ir.ui.view">
+            <field name="name">sale.order.line.dispensing.search</field>
+            <field name="model">sale.order.line</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="order_id" />
+                    <field name="product_id" />
+                    <field name="order_number" />
+                    <filter
+            name="filter_undispensed"
+            string="To Dispense"
+            domain="[('dispensed', '=', False)]"
+          />
+                    <filter
+            name="filter_dispensed"
+            string="Dispensed"
+            domain="[('dispensed', '=', True)]"
+          />
+                    <filter
+            name="filter_has_prescription"
+            string="Has Prescription"
+            domain="[('has_prescription_data', '=', True)]"
+          />
+                    <separator />
+                    <group expand="0" string="Group By">
+                        <filter
+              name="group_by_order"
+              string="Order"
+              context="{'group_by': 'order_id'}"
+            />
+                        <filter
+              name="group_by_product"
+              string="Product"
+              context="{'group_by': 'product_id'}"
+            />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for dispensing view - NOW it can reference the views above -->
+        <record id="action_view_dispensing_lines" model="ir.actions.act_window">
+            <field name="name">Dispensing Lines</field>
+            <field name="res_model">sale.order.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_order_line_dispensing_tree" />
+            <field
+        name="search_view_id"
+        ref="view_order_line_dispensing_search"
+      />
+            <field
+        name="context"
+      >{'search_default_filter_undispensed': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    All items have been dispensed.
+                </p>
+                <p>
+                    This view shows items that need to be dispensed.
+                    Click on a line to view details or mark as dispensed.
+                </p>
+            </field>
+        </record>
+
+        <!-- Action for quick dispensing report -->
+        <record id="action_dispensing_report" model="ir.actions.act_window">
+            <field name="name">Dispensing Report</field>
+            <field name="res_model">sale.order.line</field>
+            <field name="view_mode">pivot,graph,tree</field>
+            <field name="domain">[('dispensed', '=', True)]</field>
+            <field name="context">{
+                'search_default_last_30_days': 1,
+                'pivot_measures': ['product_uom_qty'],
+                'group_by': ['product_id', 'order_id', 'create_date:day']
+            }</field>
+        </record>
+
+        <!-- Server action to mark multiple lines as dispensed -->
+        <record id="action_mark_dispensed" model="ir.actions.server">
+            <field name="name">Mark as Dispensed</field>
+            <field name="model_id" ref="sale.model_sale_order_line" />
+            <field name="state">code</field>
+            <field name="code">
+# Mark selected lines as dispensed
+for line in records:
+    if not line.display_type:
+        line.write({'dispensed': True})
+            </field>
+        </record>
+
+        <!-- Server action to mark multiple lines as not dispensed -->
+        <record id="action_mark_undispensed" model="ir.actions.server">
+            <field name="name">Mark as Not Dispensed</field>
+            <field name="model_id" ref="sale.model_sale_order_line" />
+            <field name="state">code</field>
+            <field name="code">
+# Mark selected lines as not dispensed
+for line in records:
+    if not line.display_type:
+        line.write({'dispensed': False})
+            </field>
         </record>
     </data>
 </odoo>

@@ -12,6 +12,73 @@ class ExtendedSaleOrder(models.Model):
 
     _name = "sale.order"
     _inherit = "sale.order"
+    encounter_uuid = fields.Char(string="Encounter UUID", index=True)
+    location_name = fields.Char(string="Location Name", index=True)
+    dispensed_line_count = fields.Integer(
+        string="To Dispense",
+        compute="_compute_dispensed_line_count",
+        store=False,
+        help="Number of order lines that need dispensing",
+    )
+
+    @api.depends("order_line.dispensed")
+    def _compute_dispensed_line_count(self):
+        """Compute number of lines that need dispensing"""
+        for order in self:
+            undispensed_lines = order.order_line.filtered(
+                lambda l: not l.dispensed and not l.display_type
+            )
+            order.dispensed_line_count = len(undispensed_lines)
+
+    # ============ ACTION METHODS ============
+    def action_view_dispensing_lines(self):
+        """Open view for dispensing lines"""
+        self.ensure_one()
+        action = self.env.ref("lesotho_sale.action_view_dispensing_lines").read()[0]
+        action.update(
+            {
+                "domain": [("order_id", "=", self.id), ("dispensed", "=", False)],
+                "context": {
+                    "search_default_filter_undispensed": 1,
+                    "default_order_id": self.id,
+                    "create": False,
+                    "edit": False,
+                },
+            }
+        )
+        return action
+
+    def action_mark_all_dispensed(self):
+        """Mark all lines in the order as dispensed"""
+        self.ensure_one()
+        lines_to_dispense = self.order_line.filtered(
+            lambda l: not l.dispensed and not l.display_type
+        )
+        lines_to_dispense.write({"dispensed": True})
+        return True
+
+    def action_mark_all_undispensed(self):
+        """Mark all lines in the order as not dispensed"""
+        self.ensure_one()
+        lines_to_undispense = self.order_line.filtered(
+            lambda l: l.dispensed and not l.display_type
+        )
+        lines_to_undispense.write({"dispensed": False})
+        return True
+
+    # Add a method to help find orders
+
+    @api.model
+    def search_by_encounter_and_customer(self, encounter_uuid, customer_id):
+        return self.search(
+            [
+                ("encounter_uuid", "=", encounter_uuid),
+                ("partner_id", "=", customer_id),
+                ("state", "=", "draft"),
+            ],
+            order="create_date desc",
+            limit=1,
+        )
 
     # ============ ENCOUNTER/VISIT FIELDS ============
     encounter_uuid = fields.Char(

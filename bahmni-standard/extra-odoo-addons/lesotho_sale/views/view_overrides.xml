@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- OVERRIDE AND DISABLE ALL ONBOARDING TEMPLATES -->
+
+    <!-- 1. Disable the onboarding panel by overriding it with empty content -->
+    <template
+    id="sale_quotation_onboarding_panel"
+    inherit_id="sale.sale_quotation_onboarding_panel"
+  >
+        <xpath expr="." position="replace">
+            <!-- Empty template - completely removes the panel -->
+        </xpath>
+    </template>
+
+    <!-- 2. Disable individual step templates -->
+    <!-- <template
+    id="onboarding_quotation_layout_step"
+    inherit_id="sale.onboarding_quotation_layout_step"
+  >
+        <xpath expr="." position="replace" />
+    </template>
+
+    <template
+    id="sale_onboarding_order_confirmation_step"
+    inherit_id="sale.sale_onboarding_order_confirmation_step"
+  >
+        <xpath expr="." position="replace" />
+    </template>
+
+    <template
+    id="sale_onboarding_sample_quotation_step"
+    inherit_id="sale.sale_onboarding_sample_quotation_step"
+  >
+        <xpath expr="." position="replace" />
+    </template> -->
+
+    <!-- 3. Remove/disable the window action -->
+    <!-- <record
+    id="action_open_sale_payment_provider_onboarding_wizard"
+    model="ir.actions.act_window"
+  >
+        <field name="active">false</field>
+    </record> -->
+
+    <!-- 4. Remove any client actions that trigger onboarding -->
+    <!-- <delete
+    model="ir.actions.client"
+    search="[('xml_id', 'like', '%onboarding%'), ('module', '=', 'sale')]"
+  /> -->
+
+    <!-- 5. Remove onboarding from menus if they exist -->
+    <!-- <delete
+    model="ir.ui.menu"
+    search="[('name', 'ilike', '%onboarding%'), ('name', 'ilike', '%quotation%')]"
+  /> -->
+</odoo>

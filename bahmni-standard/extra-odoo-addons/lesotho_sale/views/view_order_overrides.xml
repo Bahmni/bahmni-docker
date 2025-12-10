@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Inherit the sale order form view -->
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bahmni</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <!-- Add Clinical Information tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Clinical Information" name="clinical_information">
+                    <group>
+                        <group string="Encounter Information">
+                            <field name="encounter_uuid" readonly="1" />
+                            <field name="visit_uuid" readonly="1" />
+                            <field name="location_name" readonly="1" />
+                            <field name="encounter_type" readonly="1" />
+                            <field name="encounter_datetime" readonly="1" />
+                        </group>
+                        <group string="Provider Information">
+                            <field name="provider_name" readonly="1" />
+                            <field name="provider_uuid" readonly="1" />
+                        </group>
+                        <group string="Clinical Details">
+                            <field name="diagnosis" readonly="1" nolabel="1" />
+                            <field
+                name="clinical_notes"
+                readonly="1"
+                nolabel="1"
+              />
+                            <field name="disposition" readonly="1" />
+                        </group>
+                        <group string="Summary">
+                            <field name="has_clinical_data" readonly="1" />
+                            <field name="clinical_data_summary" readonly="1" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Add prescription fields to order line form -->
+            <xpath
+        expr="//field[@name='order_line']/form/group"
+        position="inside"
+      >
+                <!-- Prescription Details Group -->
+                <group
+          string="Prescription Details"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+        >
+                    <group>
+                        <!-- Dosage Information -->
+                        <group string="Dosage">
+                            <field
+                name="dose"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="dose_units"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="frequency"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="route"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                        </group>
+
+                        <!-- Duration Information -->
+                        <group string="Duration">
+                            <field
+                name="duration"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="duration_units"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="num_refills"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                            <field
+                name="as_needed"
+                attrs="{'invisible': [('display_type', '!=', False)]}"
+              />
+                        </group>
+                    </group>
+
+                    <!-- Administration Instructions -->
+                    <field
+            name="administration_instructions"
+            attrs="{'invisible': [('display_type', '!=', False)]}"
+            colspan="4"
+          />
+
+                    <!-- Drug Form -->
+                    <field
+            name="drug_form"
+            attrs="{'invisible': [('display_type', '!=', False)]}"
+          />
+                </group>
+
+                <!-- Bahmni Information Group -->
+                <group
+          string="Bahmni Information"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+        >
+                    <group>
+                        <field
+              name="external_order_uuid"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="previous_order_uuid"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="order_number"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="drug_uuid"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="concept_name"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="dispensed"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="has_prescription_data"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                    </group>
+                </group>
+
+                <!-- Prescription Summary -->
+                <group
+          string="Prescription Summary"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+        >
+                    <field
+            name="prescription_summary"
+            readonly="1"
+            nolabel="1"
+            attrs="{'invisible': [('display_type', '!=', False)]}"
+          />
+                    <field
+            name="full_prescription_text"
+            readonly="1"
+            nolabel="1"
+            attrs="{'invisible': [('display_type', '!=', False)]}"
+          />
+                </group>
+            </xpath>
+
+            <!-- Add prescription columns to order line tree view -->
+            <xpath expr="//field[@name='order_line']/tree" position="inside">
+                <!-- Add prescription columns after product_id -->
+                <field
+          name="dose"
+          string="Dose"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="dose_units"
+          string="Units"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="frequency"
+          string="Frequency"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="route"
+          string="Route"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="duration"
+          string="Duration"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="duration_units"
+          string="Dur. Units"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="num_refills"
+          string="Refills"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+
+                <!-- Add Bahmni columns -->
+                <field
+          name="order_number"
+          string="Order #"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="dispensed"
+          string="Dispensed"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+                <field
+          name="prescription_summary"
+          string="Prescription"
+          attrs="{'invisible': [('display_type', '!=', False)]}"
+          optional="show"
+        />
+            </xpath>
+
+            <!-- Add dispensing button to header -->
+            <xpath expr="//header" position="inside">
+                <button
+          name="action_view_dispensing_lines"
+          type="object"
+          string="Dispensing"
+          class="oe_highlight"
+          icon="fa-medkit"
+          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+        />
+                <button
+          name="action_mark_all_dispensed"
+          type="object"
+          string="Mark All Dispensed"
+          class="btn-secondary"
+          icon="fa-check"
+          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+          confirm="Are you sure you want to mark all items as dispensed?"
+        />
+            </xpath>
+
+            <!-- Add dispensing stats to button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+          name="action_view_dispensing_lines"
+          type="object"
+          class="oe_stat_button"
+          icon="fa-medkit"
+          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+        >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field
+                name="dispensed_line_count"
+                widget="statinfo"
+              />
+                        </span>
+                        <span class="o_stat_text">To Dispense</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,323 +1,379 @@
-from odoo import models, api
 import json
 import logging
-from datetime import datetime
+
+from odoo import api, models
 
 _logger = logging.getLogger(__name__)
 
+
 class ExtendedOrderSaveService(models.Model):
     """
-    Extends OrderSaveService to add clinical and prescription data
+    Extends OrderSaveService to add prescription data to order lines
     """
-    _name = 'order.save.service'
-    _inherit = 'order.save.service'
+
+    _name = "order.save.service"
+    _inherit = "order.save.service"
 
     @api.model
     def create_orders(self, vals):
         """
-        Override to add clinical data after original order creation
-
-        1. Original method creates sale order and lines
-        2. We add clinical data to sale order
-        3. We add prescription data to order lines
+        Override to:
+        1. Add encounter_uuid to sale order
+        2. Add prescription data to order lines
         """
         _logger.info("ExtendedOrderSaveService.create_orders called")
 
-        # 1. Call ORIGINAL method first - let it create the basic order
-        result = super(ExtendedOrderSaveService, self).create_orders(vals)
+        # Add DEBUG logging to see what we're receiving
+        _logger.info("=== DEBUG START ===")
+        _logger.info(f"Customer ID: {vals.get('customer_id')}")
+        _logger.info(f"Encounter ID: {vals.get('encounter_id')}")
+        _logger.info(f"Location Name: {vals.get('locationName')}")
+
+        # Check orders data type
+        orders_data = vals.get("orders")
+        _logger.info(f"Orders type: {type(orders_data)}")
+        if orders_data:
+            if isinstance(orders_data, str):
+                try:
+                    parsed = json.loads(orders_data)
+                    _logger.info(
+                        f"Orders parsed successfully. Has openERPOrders: {'openERPOrders' in parsed}"
+                    )
+                except:
+                    _logger.info("Orders is string but not valid JSON")
+            elif isinstance(orders_data, dict):
+                _logger.info(
+                    f"Orders is dict. Has openERPOrders: {'openERPOrders' in orders_data}"
+                )
+        _logger.info("=== DEBUG END ===")
+
+        # 1. First, we need to modify vals to ensure the base class creates the sale order properly
+        # But since we can't modify the base class, we'll work around it
+
+        # 2. Call ORIGINAL method first
+        try:
+            result = super(ExtendedOrderSaveService, self).create_orders(vals)
+        except Exception as e:
+            _logger.error(f"Base create_orders failed: {e}")
+            raise
 
         try:
-            # 2. Add clinical data
-            self._add_clinical_data_to_sale_order(vals)
+            # 3. After base creates order, we need to:
+            #    a. Find the created sale order and set encounter_uuid
+            #    b. Add prescription data to order lines
 
-            # 3. Add prescription data to order lines
+            self._update_sale_order_with_encounter_uuid(vals)
             self._add_prescription_data_to_order_lines(vals)
 
-            _logger.info("Successfully added clinical and prescription data")
+            _logger.info(
+                "Successfully updated sale order with encounter_uuid and prescription data"
+            )
 
         except Exception as e:
             # Log error but don't fail - original order creation succeeded
             _logger.error(
-                f"Failed to add clinical data, but order was created: {str(e)}",
-                exc_info=True
+                f"Failed to add encounter_uuid or prescription data, but order was created: {str(e)}",
+                exc_info=True,
             )
 
         return result
 
     @api.model
-    def _add_clinical_data_to_sale_order(self, vals):
-        """Add clinical encounter data to the newly created sale order"""
-        _logger.debug("Adding clinical data to sale order")
+    def _update_sale_order_with_encounter_uuid(self, vals):
+        """Find the sale order created by base class and add encounter_uuid"""
+        _logger.debug("Updating sale order with encounter_uuid")
 
-        # Get customer reference
-        customer_ref = vals.get("customer_id") or vals.get("patientId")
+        customer_ref = vals.get("customer_id")
         if not customer_ref:
-            _logger.warning("No customer_id or patientId in payload")
+            _logger.warning("No customer_id in payload")
             return
 
-        # Find customer
-        customer = self.env['res.partner'].search([('ref', '=', customer_ref)], limit=1)
+        customer = self.env["res.partner"].search([("ref", "=", customer_ref)], limit=1)
         if not customer:
             _logger.warning(f"Customer not found: {customer_ref}")
             return
 
-        # Find the MOST RECENT sale order for this customer (the one just created)
-        sale_order = self.env['sale.order'].search([
-            ('partner_id', '=', customer.id),
-            ('origin', '=', 'API FEED SYNC'),
-            ('state', '=', 'draft')
-        ], order='create_date desc', limit=1)
-
-        if not sale_order:
-            _logger.warning(f"No draft sale order found for customer: {customer_ref}")
+        encounter_uuid = vals.get("encounter_id")
+        if not encounter_uuid:
+            _logger.warning("No encounter_id in payload")
             return
 
-        _logger.info(f"Found sale order to update: {sale_order.name}")
+        location_name = vals.get("locationName")
 
-        # Prepare clinical data
-        clinical_data = {}
+        # The base class creates sale orders with origin='API FEED SYNC'
+        # Find the MOST RECENT draft sale order for this customer
+        sale_orders = self.env["sale.order"].search(
+            [
+                ("partner_id", "=", customer.id),
+                ("origin", "=", "API FEED SYNC"),
+                ("state", "=", "draft"),
+            ],
+            order="create_date desc",
+            limit=5,
+        )
 
-        # Encounter/Vist data
-        if vals.get('encounterUuid'):
-            clinical_data['encounter_uuid'] = vals['encounterUuid']
+        if not sale_orders:
+            _logger.warning(f"No draft sale orders found for customer: {customer_ref}")
+            return
 
-        if vals.get('visitUuid'):
-            clinical_data['visit_uuid'] = vals['visitUuid']
+        _logger.info(
+            f"Found {len(sale_orders)} draft sale orders for customer {customer_ref}"
+        )
 
-        if vals.get('locationName'):
-            clinical_data['location_name'] = vals['locationName']
+        # Update all found sale orders with encounter_uuid
+        updated_count = 0
+        for sale_order in sale_orders:
+            # Check if this sale order has order lines from this encounter
+            # by looking for order lines with matching external_order_id from our data
 
-        if vals.get('encounterType'):
-            clinical_data['encounter_type'] = vals['encounterType']
+            # Get orders data
+            orders_data = self._get_orders_data(vals)
+            if not orders_data:
+                continue
 
-        # Provider data
-        providers = vals.get('providers', [])
-        if providers and isinstance(providers, list) and len(providers) > 0:
-            provider = providers[0]
-            if isinstance(provider, dict):
-                if provider.get('name'):
-                    clinical_data['provider_name'] = provider['name']
-                if provider.get('uuid'):
-                    clinical_data['provider_uuid'] = provider['uuid']
+            # Check if any order lines in this sale order match our order IDs
+            order_ids = [
+                order.get("orderId")
+                for order in orders_data.get("openERPOrders", [])
+                if order.get("orderId")
+            ]
+            if order_ids:
+                matching_lines = self.env["sale.order.line"].search(
+                    [
+                        ("order_id", "=", sale_order.id),
+                        ("external_order_id", "in", order_ids),
+                    ],
+                    limit=1,
+                )
 
-        # Clinical notes and diagnosis
-        if vals.get('reason'):
-            clinical_data['diagnosis'] = vals['reason']
+                if matching_lines:
+                    # This is the sale order we want to update
+                    update_data = {"encounter_uuid": encounter_uuid}
+                    if location_name:
+                        update_data["location_name"] = location_name
 
-        if vals.get('disposition'):
-            clinical_data['disposition'] = vals['disposition']
+                    sale_order.write(update_data)
+                    _logger.info(
+                        f"Updated sale order {sale_order.name} with encounter_uuid: {encounter_uuid}"
+                    )
+                    updated_count += 1
+                    break  # Found the right one, stop searching
 
-        # Extract diagnosis from observations if available
-        observations = vals.get('observations', [])
-        diagnosis_text = self._extract_diagnosis_from_observations(observations)
-        if diagnosis_text:
-            clinical_data['diagnosis'] = diagnosis_text
+        if updated_count == 0:
+            _logger.warning(
+                f"Could not find sale order with matching order lines for encounter: {encounter_uuid}"
+            )
+            # Fallback: update the most recent one
+            if sale_orders:
+                update_data = {"encounter_uuid": encounter_uuid}
+                if location_name:
+                    update_data["location_name"] = location_name
+                sale_orders[0].write(update_data)
+                _logger.info(
+                    f"Fallback: Updated most recent sale order {sale_orders[0].name} with encounter_uuid"
+                )
 
-        # Encounter date/time
-        encounter_timestamp = vals.get('encounterDateTime')
-        if encounter_timestamp:
-            encounter_date = self._parse_timestamp(encounter_timestamp)
-            if encounter_date:
-                clinical_data['encounter_datetime'] = encounter_date
+    @api.model
+    def _get_orders_data(self, vals):
+        """Parse orders data from vals"""
+        orders_data = vals.get("orders")
+        if not orders_data:
+            return None
 
-        # Only update if we have data
-        if clinical_data:
-            _logger.info(f"Updating sale order {sale_order.name} with clinical data: {clinical_data}")
-            sale_order.write(clinical_data)
+        if isinstance(orders_data, str):
+            try:
+                return json.loads(orders_data)
+            except json.JSONDecodeError as e:
+                _logger.error(f"Failed to parse orders JSON string: {e}")
+                return None
+        elif isinstance(orders_data, dict):
+            return orders_data
         else:
-            _logger.info("No clinical data to add")
+            _logger.error(f"Orders data is not dict or string: {type(orders_data)}")
+            return None
 
     @api.model
     def _add_prescription_data_to_order_lines(self, vals):
         """Add prescription details to order lines"""
         _logger.debug("Adding prescription data to order lines")
 
-        drug_orders = vals.get('drugOrders', [])
-        if not drug_orders:
-            _logger.info("No drug orders in payload")
+        # Get parsed orders data
+        orders_data = self._get_orders_data(vals)
+        if not orders_data:
+            _logger.info("No orders data found")
             return
 
-        # Get customer to find sale order
-        customer_ref = vals.get("customer_id") or vals.get("patientId")
+        # Get customer
+        customer_ref = vals.get("customer_id")
         if not customer_ref:
             return
 
-        customer = self.env['res.partner'].search([('ref', '=', customer_ref)], limit=1)
+        customer = self.env["res.partner"].search([("ref", "=", customer_ref)], limit=1)
         if not customer:
             return
 
-        # Find the sale order
-        sale_order = self.env['sale.order'].search([
-            ('partner_id', '=', customer.id),
-            ('origin', '=', 'API FEED SYNC'),
-            ('state', '=', 'draft')
-        ], order='create_date desc', limit=1)
+        # Find the sale order by encounter UUID (which we just set)
+        encounter_uuid = vals.get("encounter_id")
+        sale_orders = self.env["sale.order"].search(
+            [("partner_id", "=", customer.id), ("encounter_uuid", "=", encounter_uuid)],
+            order="create_date desc",
+        )
 
-        if not sale_order:
+        if not sale_orders:
+            _logger.warning(
+                f"No sale order found with encounter_uuid: {encounter_uuid}"
+            )
+            # Try to find by order lines instead
+            self._add_prescription_data_by_order_ids(vals, customer)
             return
 
-        _logger.info(f"Processing {len(drug_orders)} drug orders for sale order {sale_order.name}")
+        # Process each sale order (should usually be just one)
+        for sale_order in sale_orders:
+            orders_list = orders_data.get("openERPOrders", [])
+            _logger.info(
+                f"Processing {len(orders_list)} orders for sale order {sale_order.name}"
+            )
 
-        updated_count = 0
-        for drug_order in drug_orders:
-            try:
-                if self._update_order_line_with_prescription_data(sale_order, drug_order):
-                    updated_count += 1
-            except Exception as e:
-                _logger.error(f"Failed to update order line for drug order: {e}", exc_info=True)
+            updated_count = 0
+            for order_data in orders_list:
+                try:
+                    if self._update_order_line_with_prescription_data(
+                        sale_order, order_data
+                    ):
+                        updated_count += 1
+                except Exception as e:
+                    _logger.error(f"Failed to update order line: {e}", exc_info=True)
 
-        _logger.info(f"Updated {updated_count} out of {len(drug_orders)} order lines")
+            _logger.info(
+                f"Updated {updated_count} out of {len(orders_list)} order lines in sale order {sale_order.name}"
+            )
 
     @api.model
-    def _update_order_line_with_prescription_data(self, sale_order, drug_order):
-        """Update a single order line with prescription data"""
-        # Get order identifiers
-        order_uuid = drug_order.get('uuid')
-        order_number = drug_order.get('orderNumber')
+    def _add_prescription_data_by_order_ids(self, vals, customer):
+        """Alternative method: find order lines by external_order_id when we can't find sale order by encounter_uuid"""
+        orders_data = self._get_orders_data(vals)
+        if not orders_data:
+            return
 
-        if not order_uuid and not order_number:
-            _logger.warning("Drug order has no uuid or orderNumber")
+        orders_list = orders_data.get("openERPOrders", [])
+        _logger.info(
+            f"Processing {len(orders_list)} orders by order IDs for customer {customer.name}"
+        )
+
+        updated_count = 0
+        for order_data in orders_list:
+            order_uuid = order_data.get("orderId")
+            if not order_uuid:
+                continue
+
+            # Find order line by external_order_id
+            order_lines = self.env["sale.order.line"].search(
+                [("external_order_id", "=", order_uuid)], order="create_date desc"
+            )
+
+            for order_line in order_lines:
+                # Verify this order line belongs to the right customer
+                if order_line.order_id.partner_id.id == customer.id:
+                    try:
+                        if self._update_single_order_line(order_line, order_data):
+                            updated_count += 1
+                            break  # Found the right one
+                    except Exception as e:
+                        _logger.error(
+                            f"Failed to update order line {order_uuid}: {e}",
+                            exc_info=True,
+                        )
+
+        _logger.info(
+            f"Updated {updated_count} out of {len(orders_list)} order lines by order IDs"
+        )
+
+    @api.model
+    def _update_order_line_with_prescription_data(self, sale_order, order_data):
+        """Update a single order line with prescription data"""
+        order_uuid = order_data.get("orderId")
+
+        if not order_uuid:
+            _logger.warning("Order data has no orderId")
             return False
 
-        # Try to find the order line
-        order_line = None
-
-        # First try by UUID
-        if order_uuid:
-            order_line = self.env['sale.order.line'].search([
-                ('order_id', '=', sale_order.id),
-                ('external_order_id', '=', order_uuid)
-            ], limit=1)
-
-        # If not found, try by order number
-        if not order_line and order_number:
-            order_line = self.env['sale.order.line'].search([
-                ('order_id', '=', sale_order.id),
-                ('external_order_id', '=', order_number)
-            ], limit=1)
+        # Find the order line in this sale order
+        order_line = self.env["sale.order.line"].search(
+            [("order_id", "=", sale_order.id), ("external_order_id", "=", order_uuid)],
+            limit=1,
+        )
 
         if not order_line:
-            _logger.warning(f"Order line not found for drug order: uuid={order_uuid}, number={order_number}")
+            _logger.debug(
+                f"Order line not found in sale order {sale_order.name} for order: {order_uuid}"
+            )
             return False
 
+        return self._update_single_order_line(order_line, order_data)
+
+    @api.model
+    def _update_single_order_line(self, order_line, order_data):
+        """Update prescription data on a single order line"""
         # Prepare prescription data
         prescription_data = {}
 
-        # Order references
-        if order_uuid:
-            prescription_data['external_order_uuid'] = order_uuid
+        # Map fields from order data to model fields
+        field_mapping = {
+            "previousOrderId": "previous_order_uuid",
+            "conceptName": "concept_name",
+            "dose": "dose",
+            "doseUnits": "dose_units",
+            "frequency": "frequency",
+            "route": "route",
+            "administrationInstructions": "administration_instructions",
+            "duration": "duration",
+            "durationUnits": "duration_units",
+            "numRefills": "num_refills",
+            "asNeeded": "as_needed",
+            "drugForm": "drug_form",
+        }
 
-        if order_number:
-            prescription_data['order_number'] = order_number
-
-        # Dosing instructions
-        dosing = drug_order.get('dosingInstructions', {})
-        if isinstance(dosing, dict):
-            if dosing.get('frequency'):
-                prescription_data['frequency'] = dosing['frequency']
-
-            if dosing.get('route'):
-                prescription_data['route'] = dosing['route']
-
-            if dosing.get('dose') is not None:
-                prescription_data['dose'] = float(dosing['dose'])
-
-            if dosing.get('doseUnits'):
-                prescription_data['dose_units'] = dosing['doseUnits']
-
-            if dosing.get('asNeeded') is not None:
-                prescription_data['as_needed'] = bool(dosing['asNeeded'])
-
-            if dosing.get('administrationInstructions'):
-                instructions = dosing['administrationInstructions']
-                # Clean JSON format if present
-                if instructions.startswith('{"instructions":"'):
+        # Map the data
+        for json_field, model_field in field_mapping.items():
+            value = order_data.get(json_field)
+            if value is not None:
+                # Handle special conversions
+                if json_field == "asNeeded":
+                    prescription_data[model_field] = str(value).lower() == "true"
+                elif json_field == "dose" and value is not None:
                     try:
-                        instructions = json.loads(instructions).get('instructions', instructions)
-                    except:
-                        pass
-                prescription_data['administration_instructions'] = instructions
+                        prescription_data[model_field] = float(value)
+                    except (ValueError, TypeError):
+                        _logger.warning(f"Invalid dose value: {value}")
+                elif json_field in ["duration", "numRefills"] and value is not None:
+                    try:
+                        prescription_data[model_field] = int(value)
+                    except (ValueError, TypeError):
+                        _logger.warning(f"Invalid {json_field} value: {value}")
+                else:
+                    prescription_data[model_field] = value
 
-        # Duration
-        if drug_order.get('duration') is not None:
-            prescription_data['duration'] = int(drug_order['duration'])
-
-        if drug_order.get('durationUnits'):
-            prescription_data['duration_units'] = drug_order['durationUnits']
-
-        # Dates
-        for date_field, model_field in [
-            ('dateActivated', 'start_date'),
-            ('effectiveStopDate', 'stop_date'),
-            ('autoExpireDate', 'expire_date')
-        ]:
-            timestamp = drug_order.get(date_field)
-            if timestamp:
-                date_value = self._parse_timestamp(timestamp)
-                if date_value:
-                    prescription_data[model_field] = date_value
-
-        # Drug details
-        drug = drug_order.get('drug', {})
-        if isinstance(drug, dict):
-            if drug.get('uuid'):
-                prescription_data['drug_uuid'] = drug['uuid']
-
-            if drug.get('form'):
-                prescription_data['drug_form'] = drug['form']
-
-            if drug.get('strength'):
-                prescription_data['drug_strength'] = drug['strength']
+        # Clean administration instructions if it's JSON
+        admin_instructions = prescription_data.get("administration_instructions")
+        if (
+            admin_instructions
+            and isinstance(admin_instructions, str)
+            and admin_instructions.startswith('{"instructions":"')
+        ):
+            try:
+                instructions_json = json.loads(admin_instructions)
+                prescription_data["administration_instructions"] = (
+                    instructions_json.get("instructions", admin_instructions)
+                )
+            except json.JSONDecodeError:
+                pass
 
         # Only update if we have data
         if prescription_data:
-            _logger.debug(f"Updating order line {order_line.id} with prescription data")
+            _logger.debug(
+                f"Updating order line {order_line.id} with: {prescription_data}"
+            )
             order_line.write(prescription_data)
             return True
 
         return False
-
-    @api.model
-    def _extract_diagnosis_from_observations(self, observations):
-        """Extract diagnosis text from observations array"""
-        if not observations or not isinstance(observations, list):
-            return None
-
-        diagnoses = []
-        for obs in observations:
-            if isinstance(obs, dict):
-                concept = obs.get('concept', {})
-                if isinstance(concept, dict):
-                    concept_name = concept.get('name')
-                    if concept_name:
-                        value = obs.get('value')
-                        if value:
-                            diagnoses.append(f"{concept_name}: {value}")
-                        else:
-                            diagnoses.append(concept_name)
-
-        return ', '.join(diagnoses) if diagnoses else None
-
-    @api.model
-    def _parse_timestamp(self, timestamp):
-        """
-        Convert timestamp (milliseconds or seconds) to datetime
-        Handles both millisecond and second timestamps
-        """
-        if not timestamp:
-            return None
-
-        try:
-            # Convert to integer/float
-            if isinstance(timestamp, str):
-                timestamp = float(timestamp)
-
-            # Check if timestamp is in milliseconds (> year 2000 in milliseconds)
-            if timestamp > 1000000000000:  # After year 2000 in milliseconds
-                timestamp = timestamp / 1000.0
-
-            return datetime.fromtimestamp(timestamp)
-
-        except (ValueError, TypeError, OSError) as e:
-            _logger.warning(f"Failed to parse timestamp {timestamp}: {e}")
-            return None

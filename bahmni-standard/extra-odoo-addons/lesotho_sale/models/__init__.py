@@ -1,4 +1,5 @@
 from . import (
+    disable_onboarding,
     extende_res_partner,
     extended_order_save_service,
     extended_sale_order,
