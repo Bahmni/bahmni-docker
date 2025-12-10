@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_partner_form_inherit_age_sex" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.age.sex</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Insert the fields after the name field -->
+                <xpath expr="//field[@name='phone']" position="after">
+                    <group>
+                        <field name='sex'/>
+                        <field name='age'/>
+                    </group>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo> 

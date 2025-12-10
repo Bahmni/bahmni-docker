@@ -1,2 +1,1 @@
-from . import product_template
-from . import stock_location
+from . import res_partner
