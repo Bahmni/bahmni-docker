@@ -32,6 +32,13 @@ class ExtendedSaleOrder(models.Model):
         store=True,
         readonly=True,
     )
+    partner_village = fields.Many2one(
+        "village.village",
+        related="partner_id.village_id",
+        string="Patient Village",
+        store=True,
+        readonly=True,
+    )
 
     @api.depends("order_line.dispensed")
     def _compute_dispensed_line_count(self):
