@@ -12,6 +12,15 @@
                 <xpath expr="//field[@name='scrap_location_id']" position="attributes">
                     <attribute name="string">Unserviceable Location</attribute>
                 </xpath>
+
+                <xpath expr="//field[@name='lot_id']" position="attributes">
+                    <attribute name="string">Batch Number</attribute>
+                </xpath>
+
+                <!-- Hide Source Document on Scrap form -->
+                <xpath expr="//field[@name='origin']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
             </field>
         </record>
 
