@@ -15,6 +15,19 @@
             </field>
         </record>
 
+
+        <record id="view_move_line_tree_lesotho_custom" model="ir.ui.view">
+            <field name="name">stock.move.line.tree.lesotho_custom</field>
+            <field name="model">stock.move.line</field>
+            <field name="inherit_id" ref="stock.view_move_line_tree"/>
+            <field name="arch" type="xml">
+                <!-- Change header of lot_id (Lot/Serial Number) field string to Batch/Serial Number -->
+                <xpath expr="//field[@name='lot_id']" position="attributes">
+                    <attribute name="string">Batch/Serial Number</attribute>
+                </xpath>
+            </field>
+        </record>
+
         <record id="mrp_unbuild_form_view_prepacking_template" model="ir.ui.view">
             <field name="name">mrp.unbuild.form.prepacking_template</field>
             <field name="model">mrp.unbuild</field>
@@ -60,6 +73,27 @@
                 <xpath expr="//field[@name='bom_id']" position="attributes">
                     <attribute name="string">Prepacking Template</attribute>
                 </xpath>
+
+                <xpath expr="//field[@name='lot_producing_id']" position="attributes">
+                    <attribute name="string">Batch/Serial Number</attribute>
+                </xpath>
+
+                 <xpath expr="//button[@name='button_scrap']" position="attributes">
+                    <attribute name="string">Move to Unserviceable</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_toggle_is_locked']" position="attributes">
+                    <attribute name="attrs">{'invisible': True}</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_view_stock_valuation_layers']" position="attributes">
+                    <attribute name="attrs">{'invisible': True}</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='button_unbuild']" position="attributes">
+                    <attribute name="string">Reverse</attribute>
+                </xpath>
+                
             </field>
         </record>
 
