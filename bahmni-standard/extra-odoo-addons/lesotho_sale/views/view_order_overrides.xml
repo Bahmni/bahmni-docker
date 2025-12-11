@@ -26,10 +26,14 @@
             <xpath expr="//field[@name='date_order']" position="attributes">
                 <attribute name="string">Prescription Date</attribute>
             </xpath>
-            
+            <xpath expr="//group[@name='order_details']/div[@groups='base.group_no_one']/label[@for='date_order']" position="attributes">
+                <attribute name="string">Prescription Date</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='shop_id']" position="attributes">
                 <attribute name="string">Dispensary</attribute>
             </xpath>
+            
 
             <!-- Show patient demographics alongside the customer -->
             <xpath expr="//field[@name='partner_id']" position="after">
