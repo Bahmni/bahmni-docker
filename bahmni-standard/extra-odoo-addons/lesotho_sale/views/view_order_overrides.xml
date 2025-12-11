@@ -6,6 +6,20 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
+            <!-- Show patient demographics alongside the customer -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field
+                  name="patient_sex"
+                  readonly="1"
+                  attrs="{'invisible': [('partner_id', '=', False)]}"
+                />
+                <field
+                  name="patient_age"
+                  readonly="1"
+                  attrs="{'invisible': [('partner_id', '=', False)]}"
+                />
+            </xpath>
+
             <!-- Add Clinical Information tab -->
             <xpath expr="//notebook" position="inside">
                 <page string="Clinical Information" name="clinical_information">
