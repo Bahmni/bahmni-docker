@@ -20,6 +20,25 @@ class ExtendedSaleOrder(models.Model):
         store=False,
         help="Number of order lines that need dispensing",
     )
+    patient_sex = fields.Selection(
+        related="partner_id.sex",
+        string="Sex",
+        store=True,
+        readonly=True,
+    )
+    patient_age = fields.Integer(
+        related="partner_id.age",
+        string="Age",
+        store=True,
+        readonly=True,
+    )
+    partner_village = fields.Many2one(
+        "village.village",
+        related="partner_id.village_id",
+        string="Patient Village",
+        store=True,
+        readonly=True,
+    )
 
     @api.depends("order_line.dispensed")
     def _compute_dispensed_line_count(self):
