@@ -202,6 +202,7 @@ services:
       ODOO_PORT: ${ODOO_10_PORT:?}
       ODOO_ATOMFEED_USER: ${ODOO_10_ATOMFEED_USER:?}
       ODOO_ATOMFEED_PASSWORD: ${ODOO_10_ATOMFEED_PASSWORD:?}
+      REG_ENCOUNTER_TYPE_UUID: ${REG_ENCOUNTER_TYPE_UUID:?}
     depends_on:
       odoo-10-db:
         condition: service_healthy
