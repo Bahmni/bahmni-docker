@@ -23,12 +23,12 @@
             </xpath>
 
             <!-- Date and location wording -->
-            <xpath expr="//field[@name='date_order']" position="attributes">
+            <!-- <xpath expr="//field[@name='date_order']" position="attributes">
                 <attribute name="string">Prescription Date</attribute>
             </xpath>
             <xpath expr="//group[@name='order_details']/div[@groups='base.group_no_one']/label[@for='date_order']" position="attributes">
                 <attribute name="string">Prescription Date</attribute>
-            </xpath>
+            </xpath> -->
 
             <xpath expr="//field[@name='shop_id']" position="attributes">
                 <attribute name="string">Dispensary</attribute>
@@ -36,7 +36,7 @@
             
 
             <!-- Show patient demographics alongside the customer -->
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <!-- <xpath expr="//field[@name='partner_id']" position="after">
                 <field
                   name="patient_sex"
                   readonly="1"
@@ -47,12 +47,29 @@
                   readonly="1"
                   attrs="{'invisible': [('partner_id', '=', False)]}"
                 />
+            </xpath> -->
+            <!-- Patient demographics + vitals (text-only, compact, hide when empty) -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                        <field name="patient_sex" string="Sex"/>
+                        <field name="patient_age" string="Age (yrs)"/>
+                        <!-- <field name="partner_village" string="Village"/> -->
+                        <field name="weight" string="Weight (kg)"/>
+                        <field name="height" string="Height (cm)"/>
+                        <field name="bmi" string="Body Mass Index (kg/m²)"/>
+                        <field name="bp_display" string="Blood pressure (mmHg)"/>
             </xpath>
+
 
             <!-- Add Clinical Information tab -->
             <xpath expr="//notebook" position="inside">
                 <page string="Clinical Information" name="clinical_information">
                     <group>
+                        <group string="Vitals">
+                            <field name="weight" readonly="1"/>
+                            <field name="height" readonly="1"/>
+                            <field name="bmi" readonly="1"/>
+                            <field name="bp_display" readonly="1"/>
+                        </group>
                         <group string="Encounter Information">
                             <field name="encounter_uuid" readonly="1" />
                             <field name="visit_uuid" readonly="1" />
@@ -60,17 +77,17 @@
                             <field name="encounter_type" readonly="1" />
                             <field name="encounter_datetime" readonly="1" />
                         </group>
-                        <group string="Provider Information">
+                        <group string="Doctor/Nurse Information">
                             <field name="provider_name" readonly="1" />
                             <field name="provider_uuid" readonly="1" />
                         </group>
                         <group string="Clinical Details">
                             <field name="diagnosis" readonly="1" nolabel="1" />
                             <field
-                name="clinical_notes"
-                readonly="1"
-                nolabel="1"
-              />
+                                name="clinical_notes"
+                                readonly="1"
+                                nolabel="1"
+                              />
                             <field name="disposition" readonly="1" />
                         </group>
                         <group string="Summary">
@@ -88,16 +105,16 @@
       >
                 <!-- Prescription Details Group -->
                 <group
-          string="Prescription Details"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-        >
+                    string="Prescription Details"
+                    attrs="{'invisible': [('display_type', '!=', False)]}"
+                  >
                     <group>
                         <!-- Dosage Information -->
                         <group string="Dosage">
                             <field
-                name="dose"
-                attrs="{'invisible': [('display_type', '!=', False)]}"
-              />
+                            name="dose"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                          />
                             <field
                 name="dose_units"
                 attrs="{'invisible': [('display_type', '!=', False)]}"
@@ -192,21 +209,21 @@
 
                 <!-- Prescription Summary -->
                 <group
-          string="Prescription Summary"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-        >
+                    string="Prescription Summary"
+                    attrs="{'invisible': [('display_type', '!=', False)]}"
+                  >
                     <field
-            name="prescription_summary"
-            readonly="1"
-            nolabel="1"
-            attrs="{'invisible': [('display_type', '!=', False)]}"
-          />
+                      name="prescription_summary"
+                      readonly="1"
+                      nolabel="1"
+                      attrs="{'invisible': [('display_type', '!=', False)]}"
+                    />
                     <field
-            name="full_prescription_text"
-            readonly="1"
-            nolabel="1"
-            attrs="{'invisible': [('display_type', '!=', False)]}"
-          />
+                      name="full_prescription_text"
+                      readonly="1"
+                      nolabel="1"
+                      attrs="{'invisible': [('display_type', '!=', False)]}"
+                    />
                 </group>
             </xpath>
 
@@ -214,110 +231,109 @@
             <xpath expr="//field[@name='order_line']/tree" position="inside">
                 <!-- Add prescription columns after product_id -->
                 <field
-          name="dose"
-          string="Dose"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="dose"
+                  string="Dose"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="dose_units"
-          string="Units"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="dose_units"
+                  string="Units"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="frequency"
-          string="Frequency"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="frequency"
+                  string="Frequency"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="route"
-          string="Route"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="route"
+                  string="Route"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="duration"
-          string="Duration"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="duration"
+                  string="Duration"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="duration_units"
-          string="Dur. Units"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="duration_units"
+                  string="Dur. Units"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="num_refills"
-          string="Refills"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="num_refills"
+                  string="Refills"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
 
                 <!-- Add Bahmni columns -->
                 <field
-          name="order_number"
-          string="Order #"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="order_number"
+                  string="Order #"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="dispensed"
-          string="Dispensed"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="dispensed"
+                  string="Dispensed"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
                 <field
-          name="prescription_summary"
-          string="Prescription"
-          attrs="{'invisible': [('display_type', '!=', False)]}"
-          optional="show"
-        />
+                  name="prescription_summary"
+                  string="Prescription"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
             </xpath>
 
             <!-- Add dispensing button to header -->
             <xpath expr="//header" position="inside">
                 <button
-          name="action_view_dispensing_lines"
-          type="object"
-          string="Dispensing"
-          class="oe_highlight"
-          icon="fa-medkit"
-          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
-        />
+                  name="action_view_dispensing_lines"
+                  type="object"
+                  string="Dispensing"
+                  class="oe_highlight"
+                  icon="fa-medkit"
+                  attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+                />
                 <button
-          name="action_mark_all_dispensed"
-          type="object"
-          string="Mark All Dispensed"
-          class="btn-secondary"
-          icon="fa-check"
-          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
-          confirm="Are you sure you want to mark all items as dispensed?"
-        />
+                  name="action_mark_all_dispensed"
+                  type="object"
+                  string="Mark All Dispensed"
+                  class="btn-secondary"
+                  icon="fa-check"
+                  attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+                  confirm="Are you sure you want to mark all items as dispensed?"
+                />
             </xpath>
 
-            <!-- Add dispensing stats to button box -->
+            <!-- Add dispensing stats to button box-->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button
-          name="action_view_dispensing_lines"
-          type="object"
-          class="oe_stat_button"
-          icon="fa-medkit"
-          attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
-        >
+                    name="action_view_dispensing_lines"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-medkit"
+                    attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
+                >
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value">
-                            <field
-                name="dispensed_line_count"
-                widget="statinfo"
-              />
+                            <field name="dispensed_line_count" widget="statinfo"/>
                         </span>
                         <span class="o_stat_text">To Dispense</span>
                     </div>
                 </button>
+
             </xpath>
+
         </field>
     </record>
 </odoo>

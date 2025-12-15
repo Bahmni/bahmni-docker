@@ -39,6 +39,77 @@ class ExtendedSaleOrder(models.Model):
         store=True,
         readonly=True,
     )
+ 
+    # REGISTRATION VITALS FIELDS
+    systolic = fields.Integer(
+        related="partner_id.systolic",
+        string="Systolic BP",
+        help="Systolic blood pressure from registration vitals",
+        store=True,
+        readonly=True,
+    )
+    diastolic = fields.Integer(
+        related="partner_id.diastolic",
+        string="Diastolic BP",
+        help="Diastolic blood pressure from registration vitals",
+        store=True,
+        readonly=True,
+    )
+    height = fields.Float(
+        related="partner_id.height",
+        string="Height (cm)",
+        help="Height in centimeters from registration vitals",
+        store=True,
+        readonly=True,
+    )
+    weight = fields.Float(
+        related="partner_id.weight",
+        string="Weight (kg)",
+        help="Weight in kilograms from registration vitals",
+        store=True,
+        readonly=True,
+    )
+
+    bmi = fields.Float(
+        string="BMI (kg/m²)",
+        compute="_compute_bmi",
+        store=True,
+        digits=(16, 2),
+        help="Body Mass Index computed as weight(kg) / (height(m)^2).",
+    )
+
+    bp_display = fields.Char(
+        string="BP",
+        compute="_compute_bp_display",
+        store=True,
+        help="Blood pressure (e.g., 120/80 mmHg).",
+    )
+
+    @api.depends("systolic", "diastolic")
+    def _compute_bp_display(self):
+        for order in self:
+            sys = int(order.systolic or 0)
+            dia = int(order.diastolic or 0)
+
+            if sys > 0 and dia > 0:
+                order.bp_display = f"{dia}/{sys}"
+            else:
+                order.bp_display = 0.0
+
+
+    @api.depends("height", "weight")
+    def _compute_bmi(self):
+        """Compute BMI from height and weight"""
+        for order in self:
+            if order.height and order.weight:
+                height_m = order.height / 100.0  # convert cm to meters
+                if height_m > 0:
+                    order.bmi = order.weight / (height_m ** 2)
+                else:
+                    order.bmi = 0.0
+            else:
+                order.bmi = 0.0
+
 
     @api.depends("order_line.dispensed")
     def _compute_dispensed_line_count(self):
