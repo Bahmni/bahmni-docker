@@ -11,6 +11,10 @@
                     <group>
                         <field name='sex' />
                         <field name='age' />
+                        <field name='weight' />
+                        <field name='height' />
+                        <field name='diastolic' />
+                        <field name='systolic' />
                     </group>
                 </xpath>
             </field>

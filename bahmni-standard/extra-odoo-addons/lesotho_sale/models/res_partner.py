@@ -23,4 +23,28 @@ class ResPartner(models.Model):
         copy=False,
     )
 
+    systolic = fields.Integer(
+        string="Systolic BP",
+        help="Systolic blood pressure from registration vitals",
+        copy=False,
+    )
+
+    diastolic = fields.Integer(
+        string="Diastolic BP",
+        help="Diastolic blood pressure from registration vitals",
+        copy=False,
+    )
+
+    height = fields.Float(
+        string="Height (cm)",
+        help="Height in centimeters from registration vitals",
+        copy=False,
+    )
+
+    weight = fields.Float(
+        string="Weight (kg)",
+        help="Weight in kilograms from registration vitals",
+        copy=False,
+    )
+
     
