@@ -106,5 +106,53 @@
             </field>
         </record>
 
+        <record id="mrp_bom_form_hide_type" model="ir.ui.view">
+            <field name="name">mrp.bom.form.hide.type</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+
+        <!-- Hide BoM Type (Kit vs Manufacture) -->
+                <xpath expr="//field[@name='type']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_hide_overview" model="ir.ui.view">
+            <field name="name">mrp.bom.form.hide.overview</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Hide Overview stat button -->
+                <xpath expr="//div[@name='button_box']/button[@name='492']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+         <record id="mrp_bom_form_hide_manual_consumption" model="ir.ui.view">
+            <field name="name">mrp.bom.form.hide.manual.consumption</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+                <!-- Remove Manual Consumption from Components tree -->
+                <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='manual_consumption']"
+                       position="replace"/>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_hide_product_attachments_button" model="ir.ui.view">
+            <field name="name">mrp.bom.form.hide.product.attachments.button</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='bom_line_ids']/tree//button[@name='action_see_attachments']"
+                    position="replace"/>
+
+            </field>
+        </record>
+
     </data>
 </odoo>
