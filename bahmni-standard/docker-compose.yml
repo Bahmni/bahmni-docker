@@ -615,6 +615,98 @@ services:
       - '../snomed-resources/load-snowstorm-data.sh:/load-snowstorm-data.sh'
     #  - "${SNOWSTORM_RF2_FILE_PATH:?}:/snowstorm-data/snomed-data.zip:ro"
 
+  dcm4chee-ldap:
+    image: dcm4che/slapd-dcm4chee:${DCM4CHEE5_LDAP_IMAGE_TAG:?}
+    profiles: ["dcm4chee5"]
+    logging: *log-config
+    environment:
+      TZ: ${TZ}
+      STORAGE_DIR: /storage/fs1
+    volumes:
+      - 'dcm4chee5_ldap_data:/var/lib/openldap/openldap-data'
+      - 'dcm4chee5_slapd_data:/etc/openldap/slapd.d'
+  dcm4chee-db:
+    image: ${DCM4CHEE5_DB_IMAGE_NAME:?}
+    profiles: ["dcm4chee5"]
+    logging: *log-config
+    environment:
+      TZ: ${TZ}
+      POSTGRES_DB: ${DCM4CHEE5_DB_NAME:?}
+      POSTGRES_USER: ${DCM4CHEE5_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${DCM4CHEE5_DB_PASSWORD:?}
+
+    volumes:
+      # - /etc/localtime:/etc/localtime:ro
+      # - /etc/timezone:/etc/timezone:ro
+      - 'dcm4chee5_db_data:/var/lib/postgresql/data'
+  dcm4chee5:
+    image: dcm4che/dcm4chee-arc-psql:${DCM4CHEE5_IMAGE_TAG:?}
+    profiles: ["dcm4chee5"]
+    logging: *log-config
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9990:9990"
+      - "9993:9993"
+      - "11112:11112"
+      - "2762:2762"
+      - "2575:2575"
+      - "12575:12575"
+    environment:
+      TZ: ${TZ}
+      POSTGRES_HOST: ${DCM4CHEE5_DB_HOST:?}
+      POSTGRES_DB: ${DCM4CHEE5_DB_NAME:?}
+      POSTGRES_USER: ${DCM4CHEE5_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${DCM4CHEE5_DB_PASSWORD:?}
+      WILDFLY_CHOWN: /storage
+      WILDFLY_WAIT_FOR: ${DCM4CHEE5_LDAP_HOST:?}:389 ${DCM4CHEE5_DB_HOST:?}:5432
+      SSL_REQUIRED: none
+      LDAP_URL: ldap://${DCM4CHEE5_LDAP_HOST:?}:389
+    depends_on:
+      - dcm4chee-ldap
+      - dcm4chee-db
+    volumes:
+      #- /etc/localtime:/etc/localtime:ro
+      #- /etc/timezone:/etc/timezone:ro
+      - 'dcm4chee5_wildfly_data:/opt/wildfly/standalone'
+      - 'dcm4chee5_storage_data:/storage'
+  
+  pacs-integration-dcm5:
+    image: bahmni/pacs-integration:${PACS_INTEGRATION5_IMAGE_TAG:?}
+    profiles: ["dcm4chee5"]
+    environment:
+      TZ: ${TZ}
+      DB_HOST: ${PACS_INTEGRATION5_DB_HOST:?}
+      DB_PORT: ${PACS_INTEGRATION5_DB_PORT:?}
+      DB_NAME: ${PACS_INTEGRATION5_DB_NAME:?}
+      DB_USERNAME: ${PACS_INTEGRATION5_DB_USERNAME:?}
+      DB_PASSWORD: ${PACS_INTEGRATION5_DB_PASSWORD:?}
+      OPENMRS_HOST: ${OPENMRS_HOST:?}
+      OPENMRS_PORT: ${OPENMRS_PORT:?}
+      OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
+      OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD:?}
+      CONCEPT_CODE_RESOLVER_SOURCE_PRIORITY: ${PACS_CONCEPT_CODE_RESOLVER_SOURCE_PRIORITY:?}
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+
+  pacs-integration-db:
+    image: ${PACS_INTEGRATION5_DB_IMAGE_NAME:?}
+    profiles: [ "dcm4chee5"]
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      POSTGRES_DB: ${PACS_INTEGRATION5_DB_NAME:?}
+      POSTGRES_USER: ${PACS_INTEGRATION5_DB_USERNAME:?}
+      POSTGRES_PASSWORD: ${PACS_INTEGRATION5_DB_PASSWORD:?}
+    volumes:
+      - pacs_integration_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PACS_INTEGRATION5_DB_USERNAME} -d ${PACS_INTEGRATION5_DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 
 volumes:
   openelisdbdata:
