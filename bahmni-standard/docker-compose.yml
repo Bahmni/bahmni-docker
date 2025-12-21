@@ -733,3 +733,9 @@ volumes:
   reportsdbdata:
   pacsdbdata:
   dcm4chee-config:
+  dcm4chee5_db_data:
+  dcm4chee5_wildfly_data:
+  dcm4chee5_ldap_data:
+  dcm4chee5_slapd_data:
+  dcm4chee5_storage_data:
+  pacs_integration_postgres_data:
