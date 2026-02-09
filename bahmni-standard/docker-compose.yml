@@ -617,6 +617,13 @@ services:
     volumes:
       - '../snomed-resources/load-snowstorm-data.sh:/load-snowstorm-data.sh'
     #  - "${SNOWSTORM_RF2_FILE_PATH:?}:/snowstorm-data/snomed-data.zip:ro"
+  ohif-viewer:
+    image: bahmni/ohif:${OHIF_IMAGE_TAG:?}
+    profiles: ["ohif"]
+    volumes:
+      - ./ohif-config/app-config.js:/usr/share/nginx/html/ohif/app-config.js:ro
+    logging: *log-config
+    restart: ${RESTART_POLICY}
 
 
 volumes:
