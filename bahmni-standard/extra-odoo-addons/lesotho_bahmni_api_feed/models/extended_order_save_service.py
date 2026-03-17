@@ -20,35 +20,50 @@ class ExtendedOrderSaveService(models.Model):
         Override to:
         1. Add encounter_uuid to sale order
         2. Add prescription data to order lines
+        3. Process Patient Allergies from Bahmni payload
         """
         _logger.info("ExtendedOrderSaveService.create_orders called")
 
         # Add DEBUG logging to see what we're receiving
         _logger.info("=== DEBUG START ===")
         _logger.info("Running from Lesotho Bahmni API Feed extended order save service")
-        # _logger.info(f"Customer ID: {vals.get('customer_id')}")
-        # _logger.info(f"Encounter ID: {vals.get('encounter_id')}")
-        # _logger.info(f"Location Name: {vals.get('locationName')}")
-        _logger.info("Lesotho Bahmni API Feed: Entering create_orders with payload: %s", vals)
+        _logger.info(
+            "Lesotho Bahmni API Feed: Entering create_orders with payload: %s", vals
+        )
 
         # Pre-process REG vitals
-        reg_vitals_raw = vals.get('reg_vitals') or "{}"
+        reg_vitals_raw = vals.get("reg_vitals") or "{}"
         try:
-            reg_vitals = json.loads(reg_vitals_raw) if isinstance(reg_vitals_raw, str) else (reg_vitals_raw or {})
+            reg_vitals = (
+                json.loads(reg_vitals_raw)
+                if isinstance(reg_vitals_raw, str)
+                else (reg_vitals_raw or {})
+            )
         except Exception:
             reg_vitals = {}
             _logger.warning("Could not parse reg_vitals: %s", reg_vitals_raw)
 
-        systolic = reg_vitals.get('systolic')
-        diastolic = reg_vitals.get('diastolic')
-        height = reg_vitals.get('height')
-        weight = reg_vitals.get('weight')
+        systolic = reg_vitals.get("systolic")
+        diastolic = reg_vitals.get("diastolic")
+        height = reg_vitals.get("height")
+        weight = reg_vitals.get("weight")
         _logger.debug("REG vitals: %s", reg_vitals)
 
+        # ========================================================
+        # STEP 1: EXTRACT THE CUSTOM ALLERGIES PAYLOAD HERE
+        # We use .pop() so it doesn't cause errors down the line
+        allergies_payload = vals.pop("patient_allergies_payload", None)
+        # ========================================================
+
         # You can stash them on vals for downstream use or write to a context key
-        vals = dict(vals, reg_vitals=reg_vitals,
-                    systolic=systolic, diastolic=diastolic,
-                    height=height, weight=weight)
+        vals = dict(
+            vals,
+            reg_vitals=reg_vitals,
+            systolic=systolic,
+            diastolic=diastolic,
+            height=height,
+            weight=weight,
+        )
 
         # Check orders data type
         orders_data = vals.get("orders")
@@ -68,9 +83,6 @@ class ExtendedOrderSaveService(models.Model):
                 )
         _logger.info("=== DEBUG END ===")
 
-        # 1. First, we need to modify vals to ensure the base class creates the sale order properly
-        # But since we can't modify the base class, we'll work around it
-
         # 2. Call ORIGINAL method first
         try:
             result = super(ExtendedOrderSaveService, self).create_orders(vals)
@@ -82,22 +94,251 @@ class ExtendedOrderSaveService(models.Model):
             # 3. After base creates order, we need to:
             #    a. Find the created sale order and set encounter_uuid
             #    b. Add prescription data to order lines
-
-            self._update_sale_order_with_encounter_uuid(vals) #this call also adds vitals
+            self._update_sale_order_with_encounter_uuid(
+                vals
+            )  # this call also adds vitals
             self._add_prescription_data_to_order_lines(vals)
 
             _logger.info(
                 "Successfully updated sale order with encounter_uuid and prescription data"
             )
 
+            # ========================================================
+            # STEP 4: PROCESS THE EXTRACTED ALLERGIES
+            # ========================================================
+            if allergies_payload and vals.get("customer_id"):
+                _logger.info(
+                    "--> Found allergies payload for customer %s",
+                    vals.get("customer_id"),
+                )
+                try:
+                    import json
+
+                    # Parse the payload if it came in as a string
+                    allergies_data = (
+                        json.loads(allergies_payload)
+                        if isinstance(allergies_payload, str)
+                        else allergies_payload
+                    )
+
+                    allergy_model = self.env["patient.allergy"].sudo()
+                    customer_ref = vals.get("customer_id")
+
+                    # Loop through the array and feed it to your custom method
+                    for allergy_dict in allergies_data:
+                        # FORCE the Odoo Customer Ref (ABC...) instead of the OpenMRS UUID
+                        allergy_dict["patient_uuid"] = customer_ref
+
+                        _logger.info(
+                            "--> Saving allergy to DB: %s (Severity: %s)",
+                            allergy_dict.get("allergen_name"),
+                            allergy_dict.get("severity"),
+                        )
+
+                        allergy_model.create_or_update_allergy(allergy_dict)
+
+                    _logger.info(
+                        f"Successfully processed {len(allergies_data)} allergies for {customer_ref}"
+                    )
+                except Exception as e:
+                    _logger.error(
+                        "Failed to process patient allergies from Bahmni: %s",
+                        str(e),
+                        exc_info=True,
+                    )
+            # ========================================================
+
         except Exception as e:
             # Log error but don't fail - original order creation succeeded
             _logger.error(
-                f"Failed to add encounter_uuid or prescription data, but order was created: {str(e)}",
+                f"Failed to add encounter_uuid, prescription data, or allergies: {str(e)}",
                 exc_info=True,
             )
 
         return result
+
+    # @api.model
+    # def create_orders(self, vals):
+    #     """
+    #     Override to:
+    #     1. Add encounter_uuid to sale order
+    #     2. Add prescription data to order lines
+    #     """
+    #     _logger.info("ExtendedOrderSaveService.create_orders called")
+
+    #     # Add DEBUG logging to see what we're receiving
+    #     _logger.info("=== DEBUG START ===")
+    #     _logger.info("Running from Lesotho Bahmni API Feed extended order save service")
+    #     # _logger.info(f"Customer ID: {vals.get('customer_id')}")
+    #     # _logger.info(f"Encounter ID: {vals.get('encounter_id')}")
+    #     # _logger.info(f"Location Name: {vals.get('locationName')}")
+    #     _logger.info(
+    #         "Lesotho Bahmni API Feed: Entering create_orders with payload: %s", vals
+    #     )
+
+    #     # Pre-process REG vitals
+    #     reg_vitals_raw = vals.get("reg_vitals") or "{}"
+    #     try:
+    #         reg_vitals = (
+    #             json.loads(reg_vitals_raw)
+    #             if isinstance(reg_vitals_raw, str)
+    #             else (reg_vitals_raw or {})
+    #         )
+    #     except Exception:
+    #         reg_vitals = {}
+    #         _logger.warning("Could not parse reg_vitals: %s", reg_vitals_raw)
+
+    #     systolic = reg_vitals.get("systolic")
+    #     diastolic = reg_vitals.get("diastolic")
+    #     height = reg_vitals.get("height")
+    #     weight = reg_vitals.get("weight")
+    #     _logger.debug("REG vitals: %s", reg_vitals)
+
+    #     # You can stash them on vals for downstream use or write to a context key
+    #     vals = dict(
+    #         vals,
+    #         reg_vitals=reg_vitals,
+    #         systolic=systolic,
+    #         diastolic=diastolic,
+    #         height=height,
+    #         weight=weight,
+    #     )
+
+    #     # Check orders data type
+    #     orders_data = vals.get("orders")
+    #     _logger.info(f"Orders type: {type(orders_data)}")
+    #     if orders_data:
+    #         if isinstance(orders_data, str):
+    #             try:
+    #                 parsed = json.loads(orders_data)
+    #                 _logger.info(
+    #                     f"Orders parsed successfully. Has openERPOrders: {'openERPOrders' in parsed}"
+    #                 )
+    #             except:
+    #                 _logger.info("Orders is string but not valid JSON")
+    #         elif isinstance(orders_data, dict):
+    #             _logger.info(
+    #                 f"Orders is dict. Has openERPOrders: {'openERPOrders' in orders_data}"
+    #             )
+    #     _logger.info("=== DEBUG END ===")
+
+    #     # 1. First, we need to modify vals to ensure the base class creates the sale order properly
+    #     # But since we can't modify the base class, we'll work around it
+
+    #     # 2. Call ORIGINAL method first
+    #     try:
+    #         result = super(ExtendedOrderSaveService, self).create_orders(vals)
+    #     except Exception as e:
+    #         _logger.error(f"Base create_orders failed: {e}")
+    #         raise
+
+    #     try:
+    #         # 3. After base creates order, we need to:
+    #         #    a. Find the created sale order and set encounter_uuid
+    #         #    b. Add prescription data to order lines
+
+    #         self._update_sale_order_with_encounter_uuid(
+    #             vals
+    #         )  # this call also adds vitals
+    #         self._add_prescription_data_to_order_lines(vals)
+
+    #         _logger.info(
+    #             "Successfully updated sale order with encounter_uuid and prescription data"
+    #         )
+
+    #     except Exception as e:
+    #         # Log error but don't fail - original order creation succeeded
+    #         _logger.error(
+    #             f"Failed to add encounter_uuid or prescription data, but order was created: {str(e)}",
+    #             exc_info=True,
+    #         )
+
+    #     return result
+
+    # @api.model
+    # def create_orders(self, vals):
+    #     """
+    #     Override to:
+    #     1. Add encounter_uuid to sale order
+    #     2. Add prescription data to order lines
+    #     """
+    #     _logger.info("ExtendedOrderSaveService.create_orders called")
+
+    #     # Add DEBUG logging to see what we're receiving
+    #     _logger.info("=== DEBUG START ===")
+    #     _logger.info("Running from Lesotho Bahmni API Feed extended order save service")
+    #     # _logger.info(f"Customer ID: {vals.get('customer_id')}")
+    #     # _logger.info(f"Encounter ID: {vals.get('encounter_id')}")
+    #     # _logger.info(f"Location Name: {vals.get('locationName')}")
+    #     _logger.info("Lesotho Bahmni API Feed: Entering create_orders with payload: %s", vals)
+
+    #     # Pre-process REG vitals
+    #     reg_vitals_raw = vals.get('reg_vitals') or "{}"
+    #     try:
+    #         reg_vitals = json.loads(reg_vitals_raw) if isinstance(reg_vitals_raw, str) else (reg_vitals_raw or {})
+    #     except Exception:
+    #         reg_vitals = {}
+    #         _logger.warning("Could not parse reg_vitals: %s", reg_vitals_raw)
+
+    #     systolic = reg_vitals.get('systolic')
+    #     diastolic = reg_vitals.get('diastolic')
+    #     height = reg_vitals.get('height')
+    #     weight = reg_vitals.get('weight')
+    #     _logger.debug("REG vitals: %s", reg_vitals)
+
+    #     # You can stash them on vals for downstream use or write to a context key
+    #     vals = dict(vals, reg_vitals=reg_vitals,
+    #                 systolic=systolic, diastolic=diastolic,
+    #                 height=height, weight=weight)
+
+    #     # Check orders data type
+    #     orders_data = vals.get("orders")
+    #     _logger.info(f"Orders type: {type(orders_data)}")
+    #     if orders_data:
+    #         if isinstance(orders_data, str):
+    #             try:
+    #                 parsed = json.loads(orders_data)
+    #                 _logger.info(
+    #                     f"Orders parsed successfully. Has openERPOrders: {'openERPOrders' in parsed}"
+    #                 )
+    #             except:
+    #                 _logger.info("Orders is string but not valid JSON")
+    #         elif isinstance(orders_data, dict):
+    #             _logger.info(
+    #                 f"Orders is dict. Has openERPOrders: {'openERPOrders' in orders_data}"
+    #             )
+    #     _logger.info("=== DEBUG END ===")
+
+    #     # 1. First, we need to modify vals to ensure the base class creates the sale order properly
+    #     # But since we can't modify the base class, we'll work around it
+
+    #     # 2. Call ORIGINAL method first
+    #     try:
+    #         result = super(ExtendedOrderSaveService, self).create_orders(vals)
+    #     except Exception as e:
+    #         _logger.error(f"Base create_orders failed: {e}")
+    #         raise
+
+    #     try:
+    #         # 3. After base creates order, we need to:
+    #         #    a. Find the created sale order and set encounter_uuid
+    #         #    b. Add prescription data to order lines
+
+    #         self._update_sale_order_with_encounter_uuid(vals) #this call also adds vitals
+    #         self._add_prescription_data_to_order_lines(vals)
+
+    #         _logger.info(
+    #             "Successfully updated sale order with encounter_uuid and prescription data"
+    #         )
+
+    #     except Exception as e:
+    #         # Log error but don't fail - original order creation succeeded
+    #         _logger.error(
+    #             f"Failed to add encounter_uuid or prescription data, but order was created: {str(e)}",
+    #             exc_info=True,
+    #         )
+
+    #     return result
 
     @api.model
     def _to_int(self, val):
@@ -194,15 +435,21 @@ class ExtendedOrderSaveService(models.Model):
                     updated_count += 1
                     # Insert patient vitals on the partner (source of truth)
                     vitals_vals = {
-                        'systolic': self._to_int(vals.get('systolic')),
-                        'diastolic': self._to_int(vals.get('diastolic')),
-                        'weight': self._to_float(vals.get('weight')),
-                        'height': self._to_float(vals.get('height')),
+                        "systolic": self._to_int(vals.get("systolic")),
+                        "diastolic": self._to_int(vals.get("diastolic")),
+                        "weight": self._to_float(vals.get("weight")),
+                        "height": self._to_float(vals.get("height")),
                     }
-                    clean_vitals = {k: v for k, v in vitals_vals.items() if v is not None}
+                    clean_vitals = {
+                        k: v for k, v in vitals_vals.items() if v is not None
+                    }
                     if clean_vitals:
                         customer.write(clean_vitals)
-                        _logger.info("Updated partner %s with vitals %s", customer_ref, clean_vitals)
+                        _logger.info(
+                            "Updated partner %s with vitals %s",
+                            customer_ref,
+                            clean_vitals,
+                        )
 
                     break  # Found the right one, stop searching
 
@@ -219,7 +466,6 @@ class ExtendedOrderSaveService(models.Model):
                 _logger.info(
                     f"Fallback: Updated most recent sale order {sale_orders[0].name} with encounter_uuid"
                 )
-
 
     @api.model
     def _get_orders_data(self, vals):
