@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bahmni_prepack_batch_user,bahmni.prepack.batch user,model_bahmni_prepack_batch,base.group_user,1,1,1,1
+access_bahmni_prepack_batch_line_user,bahmni.prepack.batch.line user,model_bahmni_prepack_batch_line,base.group_user,1,1,1,1

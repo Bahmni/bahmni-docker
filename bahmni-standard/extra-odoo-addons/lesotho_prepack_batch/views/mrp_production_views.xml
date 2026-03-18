@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_mrp_production_form_prepack_batch_links" model="ir.ui.view">
+        <field name="name">mrp.production.form.prepack.batch.links</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group string="Prepack Batch" attrs="{'invisible': [('prepack_batch_id', '=', False)]}">
+                    <group>
+                        <field name="prepack_batch_id" readonly="1"/>
+                        <field name="prepack_batch_line_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="prepack_source_lot_id" readonly="1"/>
+                        <field name="prepack_finished_lot_id" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
