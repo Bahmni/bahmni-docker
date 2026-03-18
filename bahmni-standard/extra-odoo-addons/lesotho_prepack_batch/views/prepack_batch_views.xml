@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_bahmni_prepack_batch_tree" model="ir.ui.view">
+        <field name="name">bahmni.prepack.batch.tree</field>
+        <field name="model">bahmni.prepack.batch</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="planned_date"/>
+                <field name="responsible_id"/>
+                <field name="line_count"/>
+                <field name="mrp_production_count"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bahmni_prepack_batch_form" model="ir.ui.view">
+        <field name="name">bahmni.prepack.batch.form</field>
+        <field name="model">bahmni.prepack.batch</field>
+        <field name="arch" type="xml">
+            <form string="Prepack Batch">
+                <header>
+                    <button name="action_generate_orders" string="Generate Orders" type="object" class="btn-primary" states="draft"/>
+                    <button name="action_confirm_batch" string="Confirm Batch" type="object" class="btn-primary" states="generated"/>
+                    <button name="action_mark_done" string="Mark Done" type="object" class="btn-primary" states="in_progress"/>
+                    <button name="action_cancel" string="Cancel" type="object" states="draft,generated,in_progress"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" states="cancel"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,in_progress,done,cancel"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            name="action_view_manufacturing_orders"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-cogs"
+                        >
+                            <field name="mrp_production_count" widget="statinfo" string="Orders"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="planned_date"/>
+                            <field name="responsible_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="picking_type_id"/>
+                            <field name="location_src_id"/>
+                            <field name="location_dest_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids" attrs="{'readonly': [('state', 'in', ['done', 'cancel'])]}">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="product_tmpl_id" column_invisible="1"/>
+                                    <field name="available_bulk_lot_ids" column_invisible="1"/>
+                                    <field name="bom_id"/>
+                                    <field name="bulk_lot_id" placeholder="Select source bulk lot to resolve component quantity when needed"/>
+                                    <field name="bulk_product_id" optional="show"/>
+                                    <field name="package_qty"/>
+                                    <field name="component_qty_per_pack" string="Units per Pack (from BoM / selected bulk lot)" readonly="1"/>
+                                    <field name="component_required_qty" string="Bulk Units Required (packs x units per pack)" readonly="1"/>
+                                    <field name="bulk_qty_available" readonly="1"/>
+                                    <field name="has_sufficient_bulk_stock" optional="show" readonly="1"/>
+                                    <field name="finished_lot_id" readonly="1"/>
+                                    <field name="mrp_production_id" readonly="1"/>
+                                    <field name="state" readonly="1"/>
+                                    <field name="note"/>
+                                </tree>
+                                <form string="Prepack Batch Line">
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="product_tmpl_id" invisible="1"/>
+                                            <field name="available_bulk_lot_ids" invisible="1"/>
+                                            <field name="bom_id"/>
+                                            <field name="package_qty"/>
+                                            <field name="bulk_lot_id" placeholder="Select source bulk lot to resolve component quantity when needed"/>
+                                        </group>
+                                        <group>
+                                            <field name="bulk_product_id" readonly="1"/>
+                                            <field name="component_qty_per_pack" string="Units per Pack (from BoM / selected bulk lot)" readonly="1"/>
+                                            <field name="component_required_qty" string="Bulk Units Required (packs x units per pack)" readonly="1"/>
+                                            <field name="bulk_qty_available" readonly="1"/>
+                                            <field name="has_sufficient_bulk_stock" readonly="1"/>
+                                            <field name="finished_lot_id" readonly="1"/>
+                                            <field name="mrp_production_id" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="note"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="note" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bahmni_prepack_batch_search" model="ir.ui.view">
+        <field name="name">bahmni.prepack.batch.search</field>
+        <field name="model">bahmni.prepack.batch</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <field name="state"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="in_progress" string="In Progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bahmni_prepack_batch" model="ir.actions.act_window">
+        <field name="name">Prepack Batches</field>
+        <field name="res_model">bahmni.prepack.batch</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_bahmni_prepack_batch_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p>No prepack batch found.</p>
+            <p>Create one batch, add multiple prepack lines, and let the system generate one manufacturing order per line.</p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_bahmni_prepack_batch"
+        name="Prepack Batches"
+        parent="mrp.menu_mrp_root"
+        action="action_bahmni_prepack_batch"
+        sequence="15"
+    />
+</odoo>

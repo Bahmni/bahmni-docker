@@ -78,7 +78,7 @@
             <template id="report_header_rename_lot_to_batch"
                 inherit_id="stock.report_stock_body_print">
                 <xpath
-                    expr="//thead//tr[contains(@class,'o_report_header')]//th[normalize-space()='Lot/Serial #']"
+                    expr="//thead//tr[hasclass('o_report_header')]//th[normalize-space()='Lot/Serial #']"
                     position="replace">
                     <th class="o_report_line_header">Batch Number</th>
                 </xpath>
@@ -89,7 +89,7 @@
             <template id="report_header_rename_lot_to_batch"
                 inherit_id="stock.report_stock_inventory">
                 <xpath
-                    expr="//thead//tr[contains(@class,'o_report_header')]//th[normalize-space()='Lot/Serial #']"
+                    expr="//thead//tr[hasclass('o_report_header')]//th[normalize-space()='Lot/Serial #']"
                     position="replace">
                     <th class="o_report_line_header">Batch Number</th>
                 </xpath>
@@ -171,7 +171,7 @@
             <field name="arch" type="xml">
                 <!-- Hide Overview stat button -->
                 <xpath
-                    expr="//div[@name='button_box']/button[@type='action' and contains(@class, 'oe_stat_button')]"
+                    expr="//div[@name='button_box']/button[@type='action' and hasclass('oe_stat_button')]"
                     position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
