@@ -287,6 +287,12 @@
                   optional="show"
                 />
                 <field
+                  name="out_of_stock"
+                  string="Out of Stock"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+                <field
                   name="prescription_summary"
                   string="Prescription"
                   attrs="{'invisible': [('display_type', '!=', False)]}"
