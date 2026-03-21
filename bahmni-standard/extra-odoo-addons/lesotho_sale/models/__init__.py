@@ -3,4 +3,5 @@ from . import (
     extended_sale_order,
     extended_sale_order_line,
     res_partner,
+    stock_move,
 )

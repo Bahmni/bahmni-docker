@@ -30,6 +30,31 @@
                        attrs="{'invisible': [('is_prepack', '=', False)],
                                'required': [('is_prepack', '=', True)]}"/>
             </xpath>
+            <xpath expr="//field[@name='bulk_product_id']" position="after">
+                <field name="is_dispensing_pack"/>
+                <field
+                    name="dispensing_pack_enabled"
+                    attrs="{'invisible': [('is_dispensing_pack', '=', False)]}"
+                />
+                <field
+                    name="dispensing_base_product_id"
+                    attrs="{'invisible': [('is_dispensing_pack', '=', False)],
+                            'required': [('is_dispensing_pack', '=', True)]}"
+                />
+                <field
+                    name="pack_unit_qty"
+                    attrs="{'invisible': [('is_dispensing_pack', '=', False)],
+                            'required': [('is_dispensing_pack', '=', True)]}"
+                />
+                <field
+                    name="pack_bom_id"
+                    attrs="{'invisible': [('is_dispensing_pack', '=', False)]}"
+                />
+                <field
+                    name="substitution_priority"
+                    attrs="{'invisible': [('is_dispensing_pack', '=', False)]}"
+                />
+            </xpath>
         </field>
     </record>
 
