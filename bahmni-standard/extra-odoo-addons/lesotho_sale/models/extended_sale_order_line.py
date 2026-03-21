@@ -174,6 +174,12 @@ class ExtendedSaleOrderLine(models.Model):
     )
 
     # ============ COMPUTED FIELDS ============
+    out_of_stock = fields.Boolean(
+        string="Out of Stock",
+        compute="_compute_out_of_stock",
+        store=True
+    )
+
     has_prescription_data = fields.Boolean(
         string="Has Prescription Data",
         compute="_compute_has_prescription_data",
@@ -330,6 +336,14 @@ class ExtendedSaleOrderLine(models.Model):
                 parts.append(line.route)
 
             line.prescription_summary = " | ".join(parts) if parts else "-"
+    
+    @api.depends('product_id', 'product_uom_qty')
+    def _compute_out_of_stock(self):
+        for line in self:
+            if line.product_id:
+                line.out_of_stock = line.product_id.qty_available < line.product_uom_qty
+            else:
+                line.out_of_stock = False
 
     @api.depends(
         "display_type",

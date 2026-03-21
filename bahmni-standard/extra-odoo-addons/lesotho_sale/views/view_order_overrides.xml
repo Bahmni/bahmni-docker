@@ -400,6 +400,8 @@
                 <field
                   name="is_pack_substituted"
                   string="Substituted"
+                  name="out_of_stock"
+                  string="Out of Stock"
                   attrs="{'invisible': [('display_type', '!=', False)]}"
                   optional="show"
                 />
