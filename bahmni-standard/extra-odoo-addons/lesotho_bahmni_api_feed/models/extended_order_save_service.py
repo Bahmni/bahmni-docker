@@ -54,6 +54,32 @@ class ExtendedOrderSaveService(models.Model):
         # We use .pop() so it doesn't cause errors down the line
         allergies_payload = vals.pop("patient_allergies_payload", None)
         # ========================================================
+        # ========================================================
+        # NEW: MERGE EXTENDED PRESCRIPTION DETAILS
+        # ========================================================
+        extended_prescriptions = vals.pop("extended_prescription_details", {})
+        if extended_prescriptions:
+            orders_data = vals.get("orders")
+            if orders_data:
+                # 1. Open the default orders data
+                if isinstance(orders_data, str):
+                    try:
+                        orders_dict = json.loads(orders_data)
+                    except Exception:
+                        orders_dict = {}
+                else:
+                    orders_dict = dict(orders_data)
+
+                # 2. Inject the clinical details right into the array!
+                if "openERPOrders" in orders_dict:
+                    for order in orders_dict["openERPOrders"]:
+                        order_uuid = order.get("orderId")
+                        if order_uuid and order_uuid in extended_prescriptions:
+                            order.update(extended_prescriptions[order_uuid])
+
+                # 3. Save the enriched array back into the payload
+                vals["orders"] = orders_dict
+        # ========================================================
 
         # You can stash them on vals for downstream use or write to a context key
         vals = dict(
