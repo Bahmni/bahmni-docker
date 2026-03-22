@@ -434,11 +434,15 @@ class ExtendedOrderSaveService(models.Model):
                     )
                     updated_count += 1
                     # Insert patient vitals on the partner (source of truth)
+                    patient_age = vals.get("patient_age")
+                    patient_sex = vals.get("patient_sex")
                     vitals_vals = {
                         "systolic": self._to_int(vals.get("systolic")),
                         "diastolic": self._to_int(vals.get("diastolic")),
                         "weight": self._to_float(vals.get("weight")),
                         "height": self._to_float(vals.get("height")),
+                        "age": self._to_int(patient_age),
+                        "sex": patient_sex,
                     }
                     clean_vitals = {
                         k: v for k, v in vitals_vals.items() if v is not None
