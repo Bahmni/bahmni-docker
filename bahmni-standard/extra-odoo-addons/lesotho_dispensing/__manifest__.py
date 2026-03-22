@@ -14,6 +14,7 @@
         "lesotho_prepack_dispense_quality_gate",
         "lesotho_sale",
         "lesotho_stock",
+        "lesotho_prepack_batch",
     ],
     "installable": True,
     "application": False,
