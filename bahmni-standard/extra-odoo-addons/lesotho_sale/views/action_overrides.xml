@@ -173,5 +173,14 @@ for line in records:
         line.write({'dispensed': False})
             </field>
         </record>
+        <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
+                           <field name="name">Prescriptions</field>
+                           <field name="view_mode">tree,form</field>
+                       </record>
+
+                       <record id="sale.action_orders" model="ir.actions.act_window">
+                           <field name="name">Served Prescriptions</field>
+                           <field name="view_mode">tree,form</field>
+                       </record>
     </data>
 </odoo>
