@@ -1,30 +1,78 @@
 /* MAIN NAVBAR */
 .o_main_navbar {
-    background-color: #4950E0 !important; 
+  background-color: #4950E0 !important;
 }
 
 /* LEFT SIDEBAR MENU */
 .o_app_drawer .o_app {
-    border-radius: 10px !important;
-    background-color: #4950E0 !important;
-    color: white !important;
+  border-radius: 10px !important;
+  background-color: #4950E0 !important;
+  color: white !important;
 }
 
 /* BUTTONS */
 .btn-primary {
-    background-color: #4950E0 !important;
-    border-color: #4950E0 !important;
-    border-radius: 6px;
-    font-weight: 600;
+  background-color: #4950E0 !important;
+  border-color: #4950E0 !important;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
 /* ACTIVE MENU HIGHLIGHT */
 .o_menu_item .active {
-    background-color: #0055a5 !important;
-    color: white !important;
+  background-color: #0055a5 !important;
+  color: white !important;
 }
 
 /* LOGIN PAGE BACKGROUND */
 .o_login_background {
-    background-color: #4950E0 !important;
+  background-color: #4950E0 !important;
+}
+
+/* =========================================
+   ENHANCED MAIN NAVBAR (HEADER)
+   ========================================= */
+
+/* 1. Make the header taller and align contents */
+.o_main_navbar {
+  background-color: #4950E0 !important;
+  height: 65px !important;
+  /* Increased from default ~46px */
+  padding: 0 1rem !important;
+  /* Add edge spacing */
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 2. Vertically center the text and adjust font size */
+.o_main_navbar>a,
+.o_main_navbar>button,
+.o_main_navbar .o_menu_sections>a,
+.o_main_navbar .o_menu_sections .dropdown-toggle {
+  display: flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  /* Stretch click target to fill the new 65px height */
+  padding: 0 18px !important;
+  /* Wider click area for touch/mouse */
+  font-size: 1.05rem !important;
+  /* Slightly larger text */
+}
+
+/* 3. Responsive Menu Spacing */
+.o_menu_sections {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  /* Allows items to flow naturally on smaller screens */
+  gap: 8px !important;
+  /* Dynamic spacing between menus instead of rigid margins */
+  align-items: center !important;
+}
+
+/* Hover effect to match the new size */
+.o_main_navbar>a:hover,
+.o_main_navbar>button:hover,
+.o_main_navbar .o_menu_sections>a:hover,
+.o_main_navbar .o_menu_sections .dropdown-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
