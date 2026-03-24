@@ -76,3 +76,17 @@
 .o_main_navbar .o_menu_sections .dropdown-toggle:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* =========================================
+   HIDE ADVANCED SEARCH MENUS
+   ========================================= */
+/* Hides Filters, Group By, and Favorites globally to simplify the UI */
+.o_search_options {
+  display: none !important;
+}
+
+/* Optional: Make the main search bar wider since the buttons are gone */
+.o_searchview {
+  max-width: 600px !important;
+  border-radius: 20px !important;
+}
