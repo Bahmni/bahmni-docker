@@ -4,4 +4,5 @@ from . import (
     extended_sale_order_line,
     patient_allergy,
     res_partner,
+    stock_move,
 )

@@ -44,6 +44,10 @@ class CreatePrepackWizard(models.TransientModel):
             "default_code": self.new_default_code or False,
             "is_prepack": True,
             "bulk_product_id": bulk.product_variant_id.id,
+            "is_dispensing_pack": True,
+            "dispensing_base_product_id": bulk.product_variant_id.id,
+            "pack_unit_qty": self.pack_qty,
+            "dispensing_pack_enabled": True,
         })
 
 

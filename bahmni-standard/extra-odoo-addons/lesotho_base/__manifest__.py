@@ -12,6 +12,7 @@
         "sale",
         "account",
         "stock",
+        "mrp",
     ],
     "data": [
         "views/create_prepack_wizard.xml",

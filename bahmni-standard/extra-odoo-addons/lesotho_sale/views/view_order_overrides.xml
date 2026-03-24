@@ -96,6 +96,33 @@
                         </group>
                     </group>
                 </page>
+                <page
+                    string="History"
+                    name="dispensing_history"
+                    groups="sales_team.group_sale_manager,base.group_system"
+                >
+                    <group string="Messages">
+                        <field name="message_ids" nolabel="1" readonly="1">
+                            <tree create="false" delete="false" edit="false">
+                                <field name="date"/>
+                                <field name="author_id"/>
+                                <field name="subtype_id"/>
+                                <field name="body"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Activities">
+                        <field name="activity_ids" nolabel="1" readonly="1">
+                            <tree create="false" delete="false" edit="false">
+                                <field name="activity_type_id"/>
+                                <field name="summary"/>
+                                <field name="user_id"/>
+                                <field name="date_deadline"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
             </xpath>
 
             <!-- Add prescription fields to order line form -->
@@ -150,6 +177,46 @@
                         </group>
                     </group>
 
+                    <group string="Pack Substitution">
+                        <field
+                            name="can_suggest_pack"
+                            invisible="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <field
+                            name="dispensing_pack_candidate_count"
+                            readonly="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <field
+                            name="stock_on_hand"
+                            readonly="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <field
+                            name="is_pack_substituted"
+                            readonly="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <field
+                            name="substitution_timestamp"
+                            readonly="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <field
+                            name="substitution_user_id"
+                            readonly="1"
+                            attrs="{'invisible': [('display_type', '!=', False)]}"
+                        />
+                        <button
+                            name="action_open_pack_selection_wizard"
+                            type="object"
+                            string="Suggest Packs"
+                            class="oe_highlight"
+                            attrs="{'invisible': ['|', ('display_type', '!=', False), ('can_suggest_pack', '=', False)]}"
+                        />
+                    </group>
+
                     <!-- Administration Instructions -->
                     <field
             name="administration_instructions"
@@ -170,6 +237,26 @@
           attrs="{'invisible': [('display_type', '!=', False)]}"
         >
                     <group>
+                        <field
+              name="prescribed_product_id"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="prescribed_qty_base_units"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="prescribed_uom_id"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
+                        <field
+              name="base_product_id"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
                         <field
               name="external_order_uuid"
               readonly="1"
@@ -204,6 +291,11 @@
               readonly="1"
               attrs="{'invisible': [('display_type', '!=', False)]}"
             />
+                        <field
+              name="substitution_note"
+              readonly="1"
+              attrs="{'invisible': [('display_type', '!=', False)]}"
+            />
                     </group>
                 </group>
 
@@ -230,6 +322,7 @@
             <!-- Add prescription columns to order line tree view -->
             <xpath expr="//field[@name='order_line']/tree" position="inside">
                 <!-- Add prescription columns after product_id -->
+                <field name="can_suggest_pack" invisible="1" />
                 <field
                   name="dose"
                   string="Dose"
@@ -287,10 +380,48 @@
                   optional="show"
                 />
                 <field
+                  name="prescribed_product_id"
+                  string="Prescribed Product"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+                <field
+                  name="stock_on_hand"
+                  string="Stock On Hand"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+                <field
+                  name="prescribed_qty_base_units"
+                  string="Prescribed Qty"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+                <field
+                  name="is_pack_substituted"
+                  string="Substituted"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+                
+                <field
+                  name="out_of_stock"
+                  string="Out of Stock"
+                  attrs="{'invisible': [('display_type', '!=', False)]}"
+                  optional="show"
+                />
+
+                <field
                   name="prescription_summary"
                   string="Prescription"
                   attrs="{'invisible': [('display_type', '!=', False)]}"
                   optional="show"
+                />
+                <button
+                  name="action_open_pack_selection_wizard"
+                  string="Suggest Packs"
+                  type="object"
+                  attrs="{'invisible': [('can_suggest_pack', '=', False)]}"
                 />
             </xpath>
 
@@ -313,6 +444,14 @@
                   attrs="{'invisible': ['|', ('state', 'in', ['draft', 'sent', 'cancel']), ('dispensed_line_count', '=', 0)]}"
                   confirm="Are you sure you want to mark all items as dispensed?"
                 />
+                <button
+                  name="action_view_history"
+                  type="object"
+                  string="View History"
+                  class="btn-secondary"
+                  icon="fa-history"
+                  groups="sales_team.group_sale_manager,base.group_system"
+                />
             </xpath>
 
             <!-- Add dispensing stats to button box-->
@@ -332,6 +471,11 @@
                     </div>
                 </button>
 
+            </xpath>
+
+            <!-- Hide chatter/activity panel on the dispensing form to reduce clutter -->
+            <xpath expr="//div[hasclass('oe_chatter')]" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
         </field>

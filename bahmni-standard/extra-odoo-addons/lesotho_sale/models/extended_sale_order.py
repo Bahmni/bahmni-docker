@@ -1,6 +1,6 @@
 import logging
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -192,6 +192,27 @@ class ExtendedSaleOrder(models.Model):
         )
         lines_to_undispense.write({"dispensed": False})
         return True
+
+    def action_view_history(self):
+        """Open chatter/message history in a separate window."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Prescription History"),
+            "res_model": "mail.message",
+            "view_mode": "tree,form",
+            "target": "current",
+            "domain": [
+                ("model", "=", "sale.order"),
+                ("res_id", "=", self.id),
+            ],
+            "context": {
+                "create": False,
+                "edit": False,
+                "delete": False,
+                "search_default_today": 0,
+            },
+        }
 
     # Add a method to help find orders
 

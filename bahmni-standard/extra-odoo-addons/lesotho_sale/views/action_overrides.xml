@@ -31,21 +31,34 @@
           string="Items to Dispense"
           decoration-info="dispensed==False"
           decoration-success="dispensed==True"
+          decoration-warning="is_pack_substituted==True"
         >
                     <field
             name="order_id"
             widget="many2one_avatar"
             options="{'no_open': True, 'no_create': True}"
           />
+                    <field name="can_suggest_pack" invisible="1" />
                     <field name="product_id" widget="many2one_avatar" />
                     <field name="product_uom_qty" string="Qty" />
+                    <field name="stock_on_hand" string="Stock On Hand" optional="show" />
+                    <field name="prescribed_product_id" optional="show" />
+                    <field name="prescribed_qty_base_units" string="Prescribed Qty" optional="show" />
                     <field name="dose" string="Dose" />
                     <field name="dose_units" string="Units" />
                     <field name="frequency" string="Frequency" />
                     <field name="route" string="Route" />
                     <field name="duration" string="Duration" />
                     <field name="duration_units" string="Dur Units" />
+                    <field name="is_pack_substituted" string="Substituted" optional="show" />
                     <field name="prescription_summary" string="Prescription" />
+                    <button
+            name="action_open_pack_selection_wizard"
+            string="Suggest Packs"
+            type="object"
+            class="btn-secondary"
+            attrs="{'invisible': [('can_suggest_pack', '=', False)]}"
+          />
                     <field
             name="dispensed"
             string="Dispensed"
