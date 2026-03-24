@@ -424,6 +424,127 @@ class ExtendedSaleOrderLine(models.Model):
     def search_by_order_number(self, order_number):
         """Find order line by Bahmni order number"""
         return self.search([("order_number", "=", order_number)], limit=1)
+        # ============ ALLERGY FIELDS ============
+
+    allergy_checked = fields.Boolean(
+        string="Allergy Checked",
+        default=False,
+        help="Indicates if allergy check was performed",
+    )
+
+    has_allergy_warning = fields.Boolean(
+        string="Allergy Warning",
+        compute="_compute_has_allergy_warning",
+        store=True,
+        help="True if patient has allergy to this drug",
+    )
+
+    allergy_warning_details = fields.Text(
+        string="Allergy Details", help="Details of drug allergy if present"
+    )
+
+    allergy_override = fields.Boolean(
+        string="Allergy Override",
+        default=False,
+        help="Manual override for allergy warning",
+    )
+
+    allergy_override_reason = fields.Text(
+        string="Override Reason", help="Reason for overriding allergy warning"
+    )
+
+    # ============ COMPUTE METHODS ============
+    @api.depends("order_id.partner_id", "product_id.name")
+    def _compute_has_allergy_warning(self):
+        """Check if drug has allergy warning"""
+        for line in self:
+            if not line.order_id or not line.order_id.partner_id or not line.product_id:
+                line.has_allergy_warning = False
+                continue
+
+            # Only check if line hasn't been overridden
+            if line.allergy_override:
+                line.has_allergy_warning = False
+                continue
+
+            # Perform allergy check
+            has_allergy, allergy_details = line.order_id.partner_id.check_drug_allergy(
+                line.product_id.name
+            )
+
+            line.has_allergy_warning = has_allergy
+
+            if has_allergy and allergy_details:
+                # Store allergy details
+                line.allergy_warning_details = json.dumps(allergy_details, indent=2)
+            else:
+                line.allergy_warning_details = False
+
+    # ============ BUSINESS METHODS ============
+    def check_allergy(self):
+        """Manually trigger allergy check"""
+        self.ensure_one()
+
+        if not self.order_id or not self.order_id.partner_id or not self.product_id:
+            return {
+                "warning": {
+                    "title": "Missing Information",
+                    "message": "Cannot check allergy - missing patient or drug information.",
+                }
+            }
+
+        has_allergy, allergy_details = self.order_id.partner_id.check_drug_allergy(
+            self.product_id.name
+        )
+
+        self.allergy_checked = True
+        self.allergy_override = False  # Reset override on new check
+
+        if has_allergy:
+            self.allergy_warning_details = json.dumps(allergy_details, indent=2)
+            self.has_allergy_warning = True
+
+            warnings = self.order_id.partner_id.get_allergy_warnings(
+                self.product_id.name
+            )
+
+            return {
+                "warning": {
+                    "title": "DRUG ALLERGY WARNING",
+                    "message": f"Patient has allergy to {self.product_id.name}",
+                    "details": warnings,
+                }
+            }
+        else:
+            self.allergy_warning_details = False
+            self.has_allergy_warning = False
+
+            return {
+                "info": {
+                    "title": "Allergy Check Complete",
+                    "message": f"No allergies found for {self.product_id.name}",
+                }
+            }
+
+    def override_allergy_warning(self):
+        """Override allergy warning with reason"""
+        self.ensure_one()
+
+        return {
+            "name": "Override Allergy Warning",
+            "type": "ir.actions.act_window",
+            "res_model": "allergy.override.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_line_id": self.id,
+                "default_patient_id": self.order_id.partner_id.id
+                if self.order_id
+                else False,
+                "default_drug_name": self.product_id.name if self.product_id else "",
+                "default_order_id": self.order_id.id if self.order_id else False,
+            },
+        }
 
     def _get_dispensing_base_product(self):
         self.ensure_one()

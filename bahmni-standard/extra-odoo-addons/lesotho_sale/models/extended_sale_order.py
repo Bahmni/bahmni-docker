@@ -39,7 +39,7 @@ class ExtendedSaleOrder(models.Model):
         store=True,
         readonly=True,
     )
- 
+
     # REGISTRATION VITALS FIELDS
     systolic = fields.Integer(
         related="partner_id.systolic",
@@ -96,7 +96,6 @@ class ExtendedSaleOrder(models.Model):
             else:
                 order.bp_display = 0.0
 
-
     @api.depends("height", "weight")
     def _compute_bmi(self):
         """Compute BMI from height and weight"""
@@ -104,12 +103,11 @@ class ExtendedSaleOrder(models.Model):
             if order.height and order.weight:
                 height_m = order.height / 100.0  # convert cm to meters
                 if height_m > 0:
-                    order.bmi = order.weight / (height_m ** 2)
+                    order.bmi = order.weight / (height_m**2)
                 else:
                     order.bmi = 0.0
             else:
                 order.bmi = 0.0
-
 
     @api.depends("order_line.dispensed")
     def _compute_dispensed_line_count(self):
@@ -119,6 +117,45 @@ class ExtendedSaleOrder(models.Model):
                 lambda l: not l.dispensed and not l.display_type
             )
             order.dispensed_line_count = len(undispensed_lines)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # We need to extract the custom payload from every incoming sale order request
+        allergies_payload_list = []
+        for vals in vals_list:
+            # Pop removes it from vals so Odoo doesn't throw an "Unknown Field" error
+            allergies_payload_list.append(vals.pop("patient_allergies_payload", None))
+
+        # Create the Sale Order(s) normally
+        orders = super(ExtendedSaleOrder, self).create(vals_list)
+
+        # Now process the allergies for each order we just created
+        for order, payload in zip(orders, allergies_payload_list):
+            if payload and order.partner_id:
+                try:
+                    # The XML-RPC client might send it as a JSON string or a native list.
+                    import json
+
+                    allergies_data = (
+                        json.loads(payload) if isinstance(payload, str) else payload
+                    )
+
+                    allergy_model = self.env["patient.allergy"].sudo()
+
+                    # Loop through the array and feed it directly into your excellent custom method!
+                    for allergy_dict in allergies_data:
+                        # Your method expects 'patient_uuid' which maps perfectly to partner.ref
+                        if "patient_uuid" not in allergy_dict:
+                            allergy_dict["patient_uuid"] = order.partner_id.ref
+
+                        allergy_model.create_or_update_allergy(allergy_dict)
+
+                except Exception as e:
+                    _logger.error(
+                        "Failed to process patient allergies from Bahmni: %s", str(e)
+                    )
+
+        return orders
 
     # ============ ACTION METHODS ============
     def action_view_dispensing_lines(self):
@@ -321,3 +358,142 @@ class ExtendedSaleOrder(models.Model):
             "has_clinical_data": self.has_clinical_data,
             "clinical_summary": self.clinical_data_summary,
         }
+        # ============ ALLERGY FIELDS ============
+
+    has_allergy_warnings = fields.Boolean(
+        string="Allergy Warnings",
+        compute="_compute_has_allergy_warnings",
+        store=True,
+        help="True if any line has allergy warning",
+    )
+
+    allergy_warning_count = fields.Integer(
+        string="Allergy Warnings",
+        compute="_compute_allergy_warning_count",
+        store=True,
+        help="Number of lines with allergy warnings",
+    )
+
+    allergy_checked_all = fields.Boolean(
+        string="All Allergy Checked",
+        compute="_compute_allergy_checked_all",
+        store=True,
+        help="True if all prescription lines have been allergy checked",
+    )
+
+    # ============ COMPUTE METHODS ============
+    @api.depends("order_line.has_allergy_warning")
+    def _compute_has_allergy_warnings(self):
+        for order in self:
+            order.has_allergy_warnings = any(
+                order.order_line.filtered(lambda l: l.has_allergy_warning)
+            )
+
+    @api.depends("order_line.has_allergy_warning")
+    def _compute_allergy_warning_count(self):
+        for order in self:
+            warning_lines = order.order_line.filtered(lambda l: l.has_allergy_warning)
+            order.allergy_warning_count = len(warning_lines)
+
+    @api.depends("order_line.allergy_checked")
+    def _compute_allergy_checked_all(self):
+        for order in self:
+            prescription_lines = order.order_line.filtered(
+                lambda l: l.has_prescription_data and not l.display_type
+            )
+            if not prescription_lines:
+                order.allergy_checked_all = True
+            else:
+                checked_lines = prescription_lines.filtered(lambda l: l.allergy_checked)
+                order.allergy_checked_all = len(checked_lines) == len(
+                    prescription_lines
+                )
+
+    # ============ ACTION METHODS ============
+    def action_check_all_allergies(self):
+        """Check allergies for all prescription lines"""
+        self.ensure_one()
+
+        prescription_lines = self.order_line.filtered(
+            lambda l: (
+                l.has_prescription_data
+                and not l.display_type
+                and not l.allergy_override
+            )
+        )
+
+        warnings = []
+        for line in prescription_lines:
+            has_allergy, allergy_details = self.partner_id.check_drug_allergy(
+                line.product_id.name
+            )
+
+            line.allergy_checked = True
+            line.allergy_override = False
+
+            if has_allergy:
+                line.has_allergy_warning = True
+                if allergy_details:
+                    line.allergy_warning_details = json.dumps(allergy_details, indent=2)
+
+                warnings.append(f"- {line.product_id.name}")
+
+        if warnings:
+            return {
+                "warning": {
+                    "title": "Allergy Warnings Found",
+                    "message": f"Found allergies for:\n" + "\n".join(warnings),
+                }
+            }
+        else:
+            return {
+                "info": {
+                    "title": "Allergy Check Complete",
+                    "message": "No allergies found for any prescribed drugs.",
+                }
+            }
+
+    def action_clear_all_allergy_checks(self):
+        """Clear all allergy checks"""
+        self.ensure_one()
+
+        prescription_lines = self.order_line.filtered(
+            lambda l: l.has_prescription_data and not l.display_type
+        )
+
+        prescription_lines.write(
+            {
+                "allergy_checked": False,
+                "has_allergy_warning": False,
+                "allergy_warning_details": False,
+                "allergy_override": False,
+                "allergy_override_reason": False,
+            }
+        )
+
+        return True
+
+    def get_allergy_warnings_report(self):
+        """Get detailed allergy warnings report"""
+        self.ensure_one()
+
+        warning_lines = self.order_line.filtered(lambda l: l.has_allergy_warning)
+
+        report = []
+        for line in warning_lines:
+            try:
+                details = json.loads(line.allergy_warning_details or "[]")
+            except:
+                details = []
+
+            report.append(
+                {
+                    "drug": line.product_id.name if line.product_id else "Unknown",
+                    "prescription": line.full_prescription_text or "",
+                    "allergy_details": details,
+                    "override": line.allergy_override,
+                    "override_reason": line.allergy_override_reason,
+                }
+            )
+
+        return report
