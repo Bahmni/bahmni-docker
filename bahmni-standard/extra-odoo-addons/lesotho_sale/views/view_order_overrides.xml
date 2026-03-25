@@ -574,6 +574,10 @@
             <xpath expr="//page[@name='order_lines']" position="attributes">
                 <attribute name="string">Prescribed Products</attribute>
             </xpath>
+            <xpath expr="//group[@name='sale_total']" position="attributes">
+                                   <attribute name="invisible">1</attribute>
+                               </xpath>
+
 
 
         </field>
