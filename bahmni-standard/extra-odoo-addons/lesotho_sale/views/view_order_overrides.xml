@@ -558,7 +558,8 @@
             <xpath expr="//field[@name='payment_term_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='validity_date']" position="attributes"> <attribute name="invisible">1</attribute>
+            <xpath expr="//field[@name='validity_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
             <xpath expr="//page[@name='optional_products']" position="attributes">
@@ -570,6 +571,8 @@
             <xpath expr="//page[@name='customer_signature']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+
+
 
         </field>
     </record>
