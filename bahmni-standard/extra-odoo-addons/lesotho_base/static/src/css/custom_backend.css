@@ -3,6 +3,122 @@
   background-color: #4950E0 !important;
 }
 
+/* TOP TITLE PANEL */
+.o_web_client::before {
+  content: "Lesotho eLMIS";
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 66px;
+  padding-left: 65px;
+  padding-right: 240px;
+  box-sizing: border-box;
+  background-image: url("/lesotho_base/static/src/img/logo-header.png");
+  background-repeat: no-repeat;
+  background-position: 24px center;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 3.0375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  flex: 0 0 auto;
+}
+
+/* Move the logged-in user display from the navbar into the white title panel */
+.o_main_navbar .o_user_menu {
+  position: fixed !important;
+  top: 0 !important;
+  right: 16px !important;
+  z-index: 1050 !important;
+  height: 66px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.o_main_navbar .o_user_menu > button,
+.o_main_navbar .o_user_menu .dropdown-toggle {
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  color: #000000 !important;
+  background-color: transparent !important;
+  padding: 0 12px !important;
+}
+
+.o_main_navbar .o_user_menu > button:hover,
+.o_main_navbar .o_user_menu .dropdown-toggle:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* ************************ LESOTHO CUSTOMIZATION
+   HIDE AVATAR/USER ICONS
+   ************************
+USERNAME LINK STYLE: comment this block to show the default avatar/user menu again */
+.o_main_navbar .o_user_menu img,
+.o_main_navbar .o_user_menu .o_user_avatar,
+.o_main_navbar .o_user_menu .oe_topbar_avatar,
+.o_main_navbar .o_user_menu i,
+.o_main_navbar .o_user_menu .fa {
+  display: none !important;
+}
+
+.o_main_navbar .o_user_menu > button,
+.o_main_navbar .o_user_menu .dropdown-toggle,
+.o_main_navbar .o_user_menu .oe_topbar_name {
+  color: #0055a5 !important;
+  text-decoration: underline !important;
+}
+/* end of avatar removal block
+   **************************** */
+
+/* ************************ LESOTHO CUSTOMIZATION
+   HIDE CONVERSATIONS AND ACTIVITIES
+   ************************
+   Comment this block to show conversations and activities in the navigation bar again */
+.o_main_navbar .o_menu_systray .o_MessagingMenu,
+.o_main_navbar .o_menu_systray .o_ActivityMenuView,
+.o_main_navbar .o_menu_systray .o_mail_systray_item {
+  display: none !important;
+}
+/* end of conversations and activities removal block
+   **************************** */
+
+/* ************************ LESOTHO CUSTOMIZATION
+   LOG OUT BUTTON
+   ************************
+   Comment this block and remove logout_button.js from __manifest__.py to hide the log out button */
+.o_main_navbar .o_menu_systray {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.o_main_navbar .lesotho_logout_button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: auto !important;
+  height: 37.44px !important;
+  padding: 6px 16px !important;
+  border-radius: 6px !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.o_main_navbar .lesotho_logout_button:hover {
+  background-color: #f3f4f6 !important;
+  color: #000000 !important;
+}
+/* end of log out button block
+   **************************** */
+
 /* LEFT SIDEBAR MENU */
 .o_app_drawer .o_app {
   border-radius: 10px !important;
@@ -36,7 +152,7 @@
 /* 1. Make the header taller and align contents */
 .o_main_navbar {
   background-color: #4950E0 !important;
-  height: 65px !important;
+  height: 52px !important;
   /* Increased from default ~46px */
   padding: 0 1rem !important;
   /* Add edge spacing */
@@ -57,6 +173,22 @@
   /* Wider click area for touch/mouse */
   font-size: 1.05rem !important;
   /* Slightly larger text */
+}
+
+/* Bold only top-level navigation menu items, not dropdown contents */
+.o_main_navbar > a,
+.o_main_navbar > button,
+.o_main_navbar .o_menu_sections > a,
+.o_main_navbar .o_menu_sections > .dropdown > .dropdown-toggle {
+  font-weight: 700 !important;
+  font-size: 1.12rem !important;
+}
+
+.o_main_navbar .dropdown-menu a,
+.o_main_navbar .dropdown-menu button,
+.o_main_navbar .dropdown-menu .dropdown-item {
+  font-weight: 400 !important;
+  font-size: 1rem !important;
 }
 
 /* 3. Responsive Menu Spacing */
@@ -90,3 +222,35 @@
   max-width: 600px !important;
   border-radius: 20px !important;
 }
+
+/* Match search tabs/facets to the navigation menu bar color */
+.o_searchview .o_searchview_facet,
+.o_searchview .o_searchview_facet .o_searchview_facet_label {
+  border-color: #4950E0 !important;
+}
+
+.o_searchview .o_searchview_facet .o_searchview_facet_label {
+  background-color: #4950E0 !important;
+}
+
+/* Hide the empty-state icon above the no-content help text */
+.o_view_nocontent_smiling_face::before,
+.o_nocontent_help .o_view_nocontent_smiling_face::before {
+  display: none !important;
+}
+
+/* ************************ LESOTHO CUSTOMIZATION
+   HIDE ONBOARDING PANELS
+   ************************
+   Comment this block to show Odoo onboarding panels again */
+.o_onboarding,
+.o_onboarding_container,
+.o_onboarding_main,
+.o_onboarding_panel,
+.o_onboarding_step,
+.o_onboarding_progress,
+.o_kanban_dashboard .o_onboarding {
+  display: none !important;
+}
+/* end of onboarding panel removal block
+   **************************** */

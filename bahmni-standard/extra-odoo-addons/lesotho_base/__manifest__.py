@@ -26,6 +26,7 @@
     'assets': {
         'web.assets_backend': [
             'lesotho_base/static/src/css/custom_backend.css',
+            'lesotho_base/static/src/js/logout_button.js',
         ],
         'web.assets_frontend': [
             'lesotho_base/static/src/css/custom_frontend.css',

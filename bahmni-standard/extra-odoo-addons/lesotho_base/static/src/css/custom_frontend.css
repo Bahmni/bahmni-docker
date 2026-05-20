@@ -3,6 +3,27 @@
     height: 60px !important;
 }
 
+/* TOP TITLE PANEL */
+header#top::before,
+body > header::before {
+    content: "Lesotho eLMIS";
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 134px;
+    padding-left: 108px;
+    background-image: url("/lesotho_base/static/src/img/logo-header.png");
+    background-repeat: no-repeat;
+    background-position: 24px center;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 3.0375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
 /* WEBSITE COLORS */
 .navbar-light {
     background-color: #4950E0 !important;

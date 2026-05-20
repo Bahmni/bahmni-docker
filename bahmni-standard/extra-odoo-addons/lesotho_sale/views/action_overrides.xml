@@ -7,6 +7,11 @@
       model="ir.actions.act_window"
     >
             <field name="name">Prescriptions</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new prescription
+                </p>
+            </field>
         </record>
         <record id="sale.action_orders" model="ir.actions.act_window">
             <field name="name">Served Prescriptions</field>
@@ -176,6 +181,11 @@ for line in records:
         <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
                            <field name="name">Prescriptions</field>
                            <field name="view_mode">tree,form</field>
+                           <field name="help" type="html">
+                               <p class="o_view_nocontent_smiling_face">
+                                   Create a new prescription
+                               </p>
+                           </field>
                        </record>
 
                        <record id="sale.action_orders" model="ir.actions.act_window">
