@@ -16,5 +16,6 @@ migration health assessments to promote orderly and safe migration.
 ### Third-Party Software
 
 This product orchestrates the deployment of third-party open-source software
-via Docker.
-These components are not distributed as part of this repository. Their respective licenses apply independently. Refer to each project's documentation for full license terms.
+via Docker. These components are not distributed as part of this repository.
+Their respective licenses apply independently. Refer to each project's
+documentation for full license terms.
