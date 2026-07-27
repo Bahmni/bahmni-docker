@@ -1,9 +1,3 @@
-# MySQL 8.0 vulnerabilities deferred
-# Upgrade to MySQL 8.0.45+ requires major compatibility work and testing
-# Waiting for stable Bahmni MySQL release with proper testing before upgrading
-# Most of these are DoS/Optimizer vulnerabilities that don't cause functional breakdown
-# See: https://github.com/Bahmni/bahmni-docker/issues/BAH-4708
-
 CVE-2026-34271
 CVE-2026-22009
 CVE-2026-21936
