@@ -1,18 +1,11 @@
-CVE-2026-34271
-CVE-2026-22009
-CVE-2026-21936
-CVE-2026-21937
-CVE-2026-21941
-CVE-2026-21948
-CVE-2026-21964
-CVE-2026-21968
-CVE-2025-53040
-CVE-2025-53053
-CVE-2025-53054
-CVE-2025-53062
-CVE-2025-53069
-CVE-2025-50104
-CVE-2025-50102
-CVE-2025-21529
-CVE-2025-21583
-# Plus 10 additional MySQL 8.0 CVEs from 22-07-2026 scan (total 27)
+# glibc CVEs in bahmni/mysql base image - OS-level, no fix available without base image rebuild
+CVE-2015-0235
+CVE-2015-7547
+
+# NSS (Network Security Services) CVEs in bahmni/mysql base image - no fix without base image rebuild
+CVE-2015-7181
+CVE-2015-7182
+CVE-2015-7183
+CVE-2016-1950
+CVE-2017-5461
+CVE-2021-43527
