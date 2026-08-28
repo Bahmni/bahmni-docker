@@ -1,0 +1,21 @@
+# NOTICE
+
+## Bahmni Docker
+
+Copyright © 2026 OpenMRS Inc.
+
+### Contributors
+
+This repository has got source code generated at Thoughtworks.
+
+This repository includes features developed with the International Organization
+for Migration (IOM) under its MiHealth initiative, aligned with IOM's
+commitment to advancing open-source digital public health solutions for
+migration health assessments to promote orderly and safe migration.
+
+### Third-Party Software
+
+This product orchestrates the deployment of third-party open-source software
+via Docker. These components are not distributed as part of this repository.
+Their respective licenses apply independently. Refer to each project's
+documentation for full license terms.
