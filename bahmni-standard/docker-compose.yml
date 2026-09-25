@@ -273,7 +273,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-standard", "metabase", "bahmni-mart"]
-    command: "--sql-mode=${OPENMRS_DB_SQL_MODES:?}"
+    command: "--sql-mode=${OPENMRS_DB_SQL_MODES:?} --log-bin-trust-function-creators=${OPENMRS_DB_TRUST_FUNCTION_CREATORS:-1}"
     environment:
       TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
