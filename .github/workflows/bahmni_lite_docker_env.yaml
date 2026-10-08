@@ -24,14 +24,20 @@ on:
 env:
   UPDATE_BAHMNI_OPTION: ${{ github.event.inputs.update_bahmni_option || 'update_without_removing_volumes'}}
 
+concurrency:
+  group: bahmni-lite-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy to Remote Instance
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.BAHMNI_AWS_ID }}
           aws-secret-access-key: ${{ secrets.BAHMNI_AWS_SECRET }}

@@ -3,3 +3,4 @@
 **/backup-artifacts/*
 **/restore-artifacts/*
 .DS_Store
+.env.local

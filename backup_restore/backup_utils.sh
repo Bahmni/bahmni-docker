@@ -42,9 +42,9 @@ function backup_db() {
     local backup_file_path=$6
     if [[ $(is_compose_container_running $db_service_name) -eq 1 ]]; then
         if [[ $db_type == "mysql" ]]; then
-            docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name mysqldump -u $db_username --password=$db_password --routines $db_name --no-tablespaces >"$backup_file_path"
+            docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec -T $db_service_name mysqldump -u $db_username --password=$db_password --routines $db_name --no-tablespaces >"$backup_file_path"
         elif [[ $db_type == "postgres" ]]; then
-            docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name pg_dump -U $db_username -d $db_name -F p -b -v >"$backup_file_path"
+            docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec -T $db_service_name pg_dump -U $db_username -d $db_name -F p -b -v >"$backup_file_path"
         fi
     else
         log_error "Unable to backup for $db_name database as $db_service_name container is not running"
