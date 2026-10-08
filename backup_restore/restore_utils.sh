@@ -45,7 +45,7 @@ function is_mysql_db_empty() {
     local db_password=$3
     local db_service_name=$4
 
-    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name mysql -N -s -u $db_username --password=$db_password $db_name -e "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${db_name}'")
+    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec -T $db_service_name mysql -N -s -u $db_username --password=$db_password $db_name -e "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${db_name}'" | tr -d '[:space:]')
     if [ $table_count -eq 0 ]; then
         echo 1
     else
@@ -64,7 +64,7 @@ function is_psql_db_empty() {
         schema_name="clinlims"
     fi
 
-    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec $db_service_name psql -U $db_username -d $db_name -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${schema_name}'")
+    local table_count=$(docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} exec -T $db_service_name psql -U $db_username -d $db_name -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${schema_name}'" | tr -d '[:space:]')
     if [ $table_count -eq 0 ]; then
         echo 1
     else

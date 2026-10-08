@@ -1,5 +1,3 @@
-version: '3.7'
-
 x-default-logging: &default
   {}
 
@@ -267,7 +265,7 @@ services:
     profiles: ["emr", "bahmni-lite"]
     environment:
       TZ: ${TZ}
-      NODE_ENV: ${NODE_ENV:?}
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: ${TEMPLATE_SERVICE_PORT:?}
       OPENMRS_URL: http://${OPENMRS_HOST:?}:${OPENMRS_PORT:?}
       TEMPLATES_DIR: /etc/bahmni_config/print-templates
@@ -377,7 +375,7 @@ services:
       - 'sms-token:/opt/tokens'
 
   atomfeed-console:
-    image: bahmni/atomfeed-console:latest
+    image: bahmni/atomfeed-console:${ATOMFEED_CONSOLE_IMAGE_TAG:?}
     profiles: ["atomfeed-console"]
     restart: ${RESTART_POLICY}
     environment:

@@ -1,5 +1,3 @@
-version: '3.7'
-
 x-default-logging: &default
   {}
 
@@ -151,7 +149,7 @@ services:
 #Serivces for odoo-10. These services are used for backward compatibility with bahmni 0.93
   odoo-10:
     profiles: ["odoo-10"]
-    image: 'bahmni/odoo-10:${ODOO_IMAGE_TAG:?[ERROR]}'
+    image: 'bahmni/odoo-10:${ODOO_10_IMAGE_TAG:?[ERROR]}'
     ports:
       - '8070:8069'
     volumes:
@@ -180,6 +178,7 @@ services:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U odoo']
       interval: 10s
       timeout: 5s
+      retries: 10
     environment:
       TZ: ${TZ}
       POSTGRES_DB: ${ODOO_10_DB_NAME:?}
@@ -495,6 +494,8 @@ services:
     volumes:
       - 'dcm4chee-archive:/var/lib/bahmni/dcm4chee/server/default/archive'
       - 'dcm4chee-config:/var/lib/bahmni/dcm4chee/server/default/data/xmbean-attrs'
+    depends_on:
+      - pacsdb
     logging: *log-config
     restart: ${RESTART_POLICY}
 
@@ -512,6 +513,8 @@ services:
       OPENMRS_PORT: ${OPENMRS_PORT:?}
       OPENMRS_ATOMFEED_USER: ${OPENMRS_ATOMFEED_USER:?}
       OPENMRS_ATOMFEED_PASSWORD: ${OPENMRS_ATOMFEED_PASSWORD:?}
+    depends_on:
+      - pacsdb
     logging: *log-config
     restart: ${RESTART_POLICY}
 
@@ -528,7 +531,7 @@ services:
       PACS_INTEGRATION_DB_USERNAME: ${PACS_INTEGRATION_DB_USERNAME:?}
       PACS_INTEGRATION_DB_PASSWORD: ${PACS_INTEGRATION_DB_PASSWORD:?}
     volumes:
-      - '${PWD}/init_pacs_dbs.sh:/docker-entrypoint-initdb.d/init_pacs_dbs.sh'
+      - './init_pacs_dbs.sh:/docker-entrypoint-initdb.d/init_pacs_dbs.sh'
       - 'pacsdbdata:/var/lib/postgresql/data'
     logging: *log-config
     restart: ${RESTART_POLICY}
