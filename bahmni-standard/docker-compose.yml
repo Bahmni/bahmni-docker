@@ -604,6 +604,60 @@ services:
         - 'dcm4chee-archive:/mounts/dcm4chee-archive'
         - 'configuration_checksums:/mounts/configuration_checksums'
 
+  # Scheduled backup -> S3. Runs backup_bahmni_standard.sh on BACKUP_CRON_SCHEDULE, uploads the
+  # archive to S3 and prunes old copies. Enable by adding "backup" to COMPOSE_PROFILES in .env.
+  # Restore: docker compose exec backup bahmni-restore <s3|local> [latest|<name>] --yes
+  backup:
+    build:
+      context: ../backup_restore/s3-backup
+    image: bahmni-s3-backup:local
+    profiles: ["backup"]
+    restart: ${RESTART_POLICY}
+    # Hard resource caps so a backup run can never starve the production services
+    mem_limit: ${BACKUP_MEM_LIMIT:-256m}
+    memswap_limit: ${BACKUP_MEM_LIMIT:-256m}
+    cpus: ${BACKUP_CPUS:-0.5}
+    pids_limit: 200
+    # Make the kernel pick this container first if the host runs out of memory
+    oom_score_adj: 1000
+    environment:
+      COMPOSE_PROJECT_NAME: bahmni-standard
+      BAHMNI_COMPOSE_DIR: /bahmni-docker/bahmni-standard
+      BAHMNI_BACKUP_SCRIPT: ./backup_bahmni_standard.sh
+      BACKUP_NAME_PREFIX: bahmni-standard
+      BACKUP_ROOT_FOLDER: /backups
+      BACKUP_CRON_SCHEDULE: ${BACKUP_CRON_SCHEDULE:-0 0 * * *}
+      BACKUP_RUN_ON_STARTUP: ${BACKUP_RUN_ON_STARTUP:-false}
+      BACKUP_S3_RETENTION_DAYS: ${BACKUP_S3_RETENTION_DAYS:-3}
+      BACKUP_LOCAL_RETENTION_DAYS: ${BACKUP_LOCAL_RETENTION_DAYS:-1}
+      RESTORE_SKIP_INITIALIZER_DOMAINS: ${RESTORE_SKIP_INITIALIZER_DOMAINS-ocl}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_PREFIX: ${S3_PREFIX:-bahmni-standard}
+      S3_STORAGE_CLASS: ${S3_STORAGE_CLASS}
+      S3_SSE: ${S3_SSE}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      AWS_ENDPOINT_URL: ${AWS_ENDPOINT_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Use the server's local time zone (not TZ from .env) for the cron schedule and backup names
+      - /etc/localtime:/etc/localtime:ro
+      - '..:/bahmni-docker:ro'
+      - '${BACKUP_LOCAL_PATH:-./backup-artifacts}:/backups'
+      # OpenMRS Initializer config, read by bahmni-restore for RESTORE_SKIP_INITIALIZER_DOMAINS
+      - '${CONFIG_VOLUME:?}:/mounts/bahmni-config:ro'
+      # File volumes, written only by bahmni-restore
+      - 'bahmni-patient-images:/mounts/bahmni-patient-images'
+      - 'bahmni-document-images:/mounts/bahmni-document-images'
+      - 'bahmni-clinical-forms:/mounts/bahmni-clinical-forms'
+      - 'bahmni-lab-results:/mounts/bahmni-lab-results'
+      - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
+      - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
+      - 'dcm4chee-archive:/mounts/dcm4chee-archive'
+      - 'configuration_checksums:/mounts/configuration_checksums'
+    logging: *log-config
+
   ipd:
     image: bahmni/microfrontend-ipd:${IPD_TAG:?}
     container_name: ipd
