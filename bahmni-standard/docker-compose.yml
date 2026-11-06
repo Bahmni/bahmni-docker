@@ -20,8 +20,8 @@ services:
 
   proxy:
     image: 'bahmni/proxy:${PROXY_IMAGE_TAG:?}'
-    #volumes:
-      # - ${CERTIFICATE_PATH}:/etc/tls
+    # volumes:
+    #   - ${CERTIFICATE_PATH}:/etc/tls
     ports:
       - '80:80'
       - '443:443'
@@ -252,6 +252,7 @@ services:
       LUCENE_MATCH_TYPE: ${LUCENE_MATCH_TYPE}
       DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
       TEMPLATE_SERVICE_URL: ${TEMPLATE_SERVICE_URL:?}
+      BAHMNI_AI_SERVICE_URL: ${BAHMNI_AI_SERVICE_URL:-}
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
@@ -399,6 +400,59 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+
+  bahmni-ai:
+    image: bahmni/bahmni-ai:${BAHMNI_AI_IMAGE_TAG:-0.1.0}
+    profiles: ["bahmni-ai"]
+    # Settings and secrets (AI_MODEL, *_API_KEY, MCP_*, TELEMETRY_*, PROMPT_HUB_*, OTEL_*, ...) live in bahmni-ai.env.
+    env_file:
+      - path: bahmni-ai.env
+        required: false
+    # Only values computed from other compose variables belong here (they override bahmni-ai.env).
+    environment:
+      TZ: ${TZ}
+      PORT: ${BAHMNI_AI_PORT:-8090}
+      OPENMRS_URL: http://${OPENMRS_HOST:?}:${OPENMRS_PORT:?}
+      MCP_CONFIG_PATH: /etc/bahmni_config/ai/mcp-servers.json
+      DATABASE_URL: postgresql+asyncpg://${BAHMNI_AI_DB_USER:-bahmni_ai}:${BAHMNI_AI_DB_PASSWORD:-}@bahmni-ai-db:5432/${BAHMNI_AI_DB_NAME:-bahmni_ai}
+    depends_on:
+      openmrs:
+        condition: service_started
+      bahmni-ai-db:
+        condition: service_healthy
+    volumes:
+      - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+    # Not published: reached only through the bahmni-core proxy (/openmrs/ws/rest/v1/bahmnicore/ai/...).
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BAHMNI_AI_PORT:-8090}/bahmni-ai/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Dedicated database for the AI service (conversation history, pending confirmations). Not shared with OpenMRS.
+  bahmni-ai-db:
+    image: postgres:16
+    profiles: ["bahmni-ai"]
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      TZ: ${TZ}
+      POSTGRES_DB: ${BAHMNI_AI_DB_NAME:-bahmni_ai}
+      POSTGRES_USER: ${BAHMNI_AI_DB_USER:-bahmni_ai}
+      # Required when the bahmni-ai profile is used (an empty password makes the container refuse to start).
+      POSTGRES_PASSWORD: ${BAHMNI_AI_DB_PASSWORD:-}
+    volumes:
+      - bahmni-ai-db-data:/var/lib/postgresql/data
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BAHMNI_AI_DB_USER:-bahmni_ai} -d ${BAHMNI_AI_DB_NAME:-bahmni_ai}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}
@@ -661,6 +715,7 @@ volumes:
   bahmni-clinical-forms:
   dcm4chee-archive:
   bahmni-config:
+  bahmni-ai-db-data:
   bahmni-lab-results:
   bahmni-uploaded-files:
   configuration_checksums:

@@ -3,3 +3,6 @@
 **/backup-artifacts/*
 **/restore-artifacts/*
 .DS_Store
+
+# Local bahmni-ai settings and secrets
+bahmni-standard/bahmni-ai.env
