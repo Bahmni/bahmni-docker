@@ -43,6 +43,10 @@ restore_db "mysql" $CRATER_DB_DATABASE $CRATER_DB_USERNAME $CRATER_DB_PASSWORD $
 
 restore_db "mysql" $CRATER_ATOMFEED_DB_NAME $CRATER_ATOMFEED_DB_USERNAME $CRATER_ATOMFEED_DB_PASSWORD $crater_atomfeed_db_service_name $crater_atomfeed_db_backup_file_path
 
-log_info "Starting File System Restore..."
-docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} up restore_volumes
-docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} rm -f restore_volumes
+restore_volumes
+
+if [ -d "${RESTORE_ARTIFACTS_PATH}/crater_app_data" ]; then
+    fix_volume_owner crater-php /var/www/storage/app/public www-data:www-data
+fi
+
+print_restore_summary || exit 1
