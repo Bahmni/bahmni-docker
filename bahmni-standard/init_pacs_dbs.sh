@@ -2,7 +2,7 @@
 set -e
 
 create_user_and_database() {
-  export PG_PASSWORD=${POSTGRES_PASSWORD}
+  export PGPASSWORD=${POSTGRES_PASSWORD}
   DB_NAME="$1"
   DB_USERNAME="$2"
   DB_PASSWORD="$3"

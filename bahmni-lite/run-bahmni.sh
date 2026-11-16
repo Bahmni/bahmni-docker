@@ -1,2 +1,2 @@
-# Run the bahmni script in the parent folder
-../run-bahmni.sh "$1"
+#!/bin/bash
+cd "$(dirname "$0")" && exec ../run-bahmni.sh "$@"

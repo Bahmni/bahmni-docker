@@ -6,7 +6,7 @@ apk add --no-cache curl
 # Check if snomed-data.zip file exists
 if [ ! -f /snowstorm-data/snomed-data.zip ]; then
   echo "ERROR: snomed-data.zip file not found in /snowstorm-data directory"
-  echo "Please check if you have setup the volumes and .env for SNOMED_RF2_FILES_PATH correctly"
+  echo "Please check if you have setup the volumes and .env for SNOWSTORM_RF2_FILE_PATH correctly"
   exit 1
 fi
 
@@ -26,5 +26,5 @@ while true; do
 done
 
 # Make a POST API call to load data
-curl -v -u admin:${SNOWSTORM_LITE_ADMIN_PASSWORD} --form file='@/snowstorm-data/snomed-data.zip' --form version-uri="http://snomed.info/sct/900000000000207008/version/20230731" http://snowstorm-lite:8080/fhir-admin/load-package
+curl -f -sS -u admin:${SNOWSTORM_LITE_ADMIN_PASSWORD} --form file='@/snowstorm-data/snomed-data.zip' --form version-uri="http://snomed.info/sct/900000000000207008/version/20230731" http://snowstorm-lite:8080/fhir-admin/load-package
 echo "Request for Data Load Sent Successfully"
