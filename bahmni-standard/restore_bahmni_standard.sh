@@ -55,6 +55,10 @@ restore_db "postgres" $DCM4CHEE_DB_NAME $DCM4CHEE_DB_USERNAME $DCM4CHEE_DB_PASSW
 
 restore_db "postgres" $PACS_INTEGRATION_DB_NAME $PACS_INTEGRATION_DB_USERNAME $PACS_INTEGRATION_DB_PASSWORD $pacs_integration_db_service_name $pacs_integration_db_backup_file_path
 
-log_info "Starting File System Restore..."
-docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} up restore_volumes
-docker compose --env-file ${BAHMNI_DOCKER_ENV_FILE} rm -f restore_volumes
+restore_volumes
+
+if [ -d "${RESTORE_ARTIFACTS_PATH}/filestore" ]; then
+    fix_volume_owner odoo /var/lib/odoo/filestore odoo:odoo
+fi
+
+print_restore_summary || exit 1

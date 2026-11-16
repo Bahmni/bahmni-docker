@@ -62,29 +62,29 @@ backup_db "postgres" $PACS_INTEGRATION_DB_NAME $PACS_INTEGRATION_DB_USERNAME $PA
 
 
 log_info "Taking backup for Patient-Documents"
-backup_container_file_system $openmrs_service_name "/home/bahmni/document_images" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/document_images" "$backup_subfolder_path"
 
 log_info "Taking backup for Uploaded-Results"
-backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded_results" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded_results" "$backup_subfolder_path"
 
 log_info "Taking backup for Uploaded-Files"
-backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded-files" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded-files" "$backup_subfolder_path"
 
 log_info "Taking backup for Patient-Images"
-backup_container_file_system $openmrs_service_name "/home/bahmni/patient_images" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/patient_images" "$backup_subfolder_path"
 
 log_info "Taking backup for Clinical-Forms"
-backup_container_file_system $openmrs_service_name "/home/bahmni/clinical_forms" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/clinical_forms" "$backup_subfolder_path"
 
 log_info "Taking backup for Configuration Checksums"
-backup_container_file_system $openmrs_service_name "/openmrs/data/configuration_checksums" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/openmrs/data/configuration_checksums" "$backup_subfolder_path"
 
 log_info "Taking backup for Queued Reports results"
-backup_container_file_system $reports_service_name "/home/bahmni/reports" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $reports_service_name "/home/bahmni/reports" "$backup_subfolder_path"
 
 log_info "Taking backup for Odoo Files"
-backup_container_file_system $odoo_service_name "/var/lib/odoo/filestore" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $odoo_service_name "/var/lib/odoo/filestore" "$backup_subfolder_path"
 
 log_info "Taking backup for DCM4CHEE Archive"
-backup_container_file_system $dcm4chee_service_name "/var/lib/bahmni/dcm4chee/server/default/archive/." "$BACKUP_ROOT_FOLDER/dcm4chee_archive"
+backup_container_file_system $dcm4chee_service_name "/var/lib/bahmni/dcm4chee/server/default/archive/." "$backup_subfolder_path/dcm4chee_archive"
 

@@ -30,20 +30,27 @@ function log_info() {
 }
 
 
+SKIPPED=0
+
 function copy_from_restore_to_mount(){
   source=$1
   destination=$2
   artifact_name=$(echo "$source" | awk -F "/" '{print $3}')
   volume_mount_name=$(echo "$destination" | awk -F "/" '{print $3}')
+  # Volumes differ per distribution (e.g. no Odoo filestore in Lite, no Crater in Standard)
+  if ! is_directory_exists "$destination"; then
+    return
+  fi
   if is_directory_exists "$source" && ! is_directory_empty "$source" ; then
     if is_directory_empty "$destination"; then
       log_info "Copying $source to $destination"
-      cp -r "$source"/* "$destination"
+      cp -r "$source"/. "$destination"/
     else
       log_warning "Destination volume mount $volume_mount_name is not empty. So skipping restore for $artifact_name into $volume_mount_name."
+      SKIPPED=$((SKIPPED + 1))
     fi
   else
-    log_error "Source directory for $artifact_name does not exist or is empty. So skipping restore for $artifact_name."
+    log_warning "Source directory for $artifact_name does not exist or is empty. So skipping restore for $artifact_name."
   fi
 }
 
@@ -56,5 +63,11 @@ copy_from_restore_to_mount /restore-artifacts/uploaded_results /mounts/bahmni-la
 copy_from_restore_to_mount /restore-artifacts/reports /mounts/bahmni-queued-reports
 copy_from_restore_to_mount /restore-artifacts/uploaded-files /mounts/bahmni-uploaded-files
 copy_from_restore_to_mount /restore-artifacts/dcm4chee_archive /mounts/dcm4chee-archive
+copy_from_restore_to_mount /restore-artifacts/filestore /mounts/odoofilestore
+copy_from_restore_to_mount /restore-artifacts/crater_app_data /mounts/crater-app-data
 
-log_info -e "File System Restore completed."
+if [ "$SKIPPED" -gt 0 ]; then
+  log_error "File System Restore finished with $SKIPPED volume(s) skipped because they already contain data."
+  exit 2
+fi
+log_info "File System Restore completed."

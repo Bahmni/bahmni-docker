@@ -44,23 +44,26 @@ log_info "Taking backup for Crater Atomfeed Database"
 backup_db "mysql" $CRATER_ATOMFEED_DB_NAME $CRATER_ATOMFEED_DB_USERNAME $CRATER_ATOMFEED_DB_PASSWORD $crater_atomfeed_db_service_name $crater_atomfeed_db_backup_file_path
 
 log_info "Taking backup for Patient-Documents"
-backup_container_file_system $openmrs_service_name "/home/bahmni/document_images" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/document_images" "$backup_subfolder_path"
 
 log_info "Taking backup for Uploaded-Results"
-backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded_results" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded_results" "$backup_subfolder_path"
 
 log_info "Taking backup for Uploaded-Files"
-backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded-files" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/uploaded-files" "$backup_subfolder_path"
 
 log_info "Taking backup for Patient-Images"
-backup_container_file_system $openmrs_service_name "/home/bahmni/patient_images" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/patient_images" "$backup_subfolder_path"
 
 log_info "Taking backup for Clinical-Forms"
-backup_container_file_system $openmrs_service_name "/home/bahmni/clinical_forms" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/home/bahmni/clinical_forms" "$backup_subfolder_path"
 
 log_info "Taking backup for Configuration Checksums"
-backup_container_file_system $openmrs_service_name "/openmrs/data/configuration_checksums" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $openmrs_service_name "/openmrs/data/configuration_checksums" "$backup_subfolder_path"
 
 log_info "Taking backup for Queued Reports results"
-backup_container_file_system $reports_service_name "/home/bahmni/reports" "$BACKUP_ROOT_FOLDER"
+backup_container_file_system $reports_service_name "/home/bahmni/reports" "$backup_subfolder_path"
+
+log_info "Taking backup for Crater App Data"
+backup_container_file_system crater-php "/var/www/storage/app/public/." "$backup_subfolder_path/crater_app_data"
 

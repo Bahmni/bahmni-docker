@@ -417,6 +417,8 @@ services:
       MYSQL_DATABASE: ${CRATER_ATOMFEED_DB_NAME:?}
       MYSQL_USER: ${CRATER_ATOMFEED_DB_USERNAME:?}
       MYSQL_PASSWORD: ${CRATER_ATOMFEED_DB_PASSWORD:?}
+    volumes:
+      - 'crater-atomfeed-dbdata:/var/lib/mysql'
 
   restore_volumes:
     image: bash:5.2.15
@@ -432,6 +434,7 @@ services:
         - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
         - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
         - 'configuration_checksums:/mounts/configuration_checksums'
+        - 'crater-app-data:/mounts/crater-app-data'
   
   cdss:
     profiles: [ "cdss" ]
@@ -471,6 +474,7 @@ volumes:
   bahmni-document-images:
   bahmni-clinical-forms:
   crater-app-data:
+  crater-atomfeed-dbdata:
   bahmni-config:
   configuration_checksums:
   mart-data:

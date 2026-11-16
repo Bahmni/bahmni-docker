@@ -44,6 +44,15 @@ function checkIfDirectoryIsCorrect {
     fi
 }
 
+# Every profile defined in the compose file, so stop/reset/status also cover
+# optional services (sms, cdss, snowstorm-lite, odoo-10, atomfeed-console, ...)
+function allProfiles {
+    local profile
+    for profile in $(docker compose --env-file "$file" config --profiles); do
+        printf -- '--profile %s ' "$profile"
+    done
+}
+
 function start {
     echo "Executing command: 'docker compose up -d' with the images specified in the $file file"
     echo "Starting Bahmni with default profile from $file file"
@@ -53,13 +62,13 @@ function start {
 
 function stop {
     echo "Executing command: 'docker compose down' with all profiles"
-    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" $(allProfiles) down
 }
 
 function sshIntoService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" $(allProfiles) ps
 
     echo "Enter the SERVICE name which you wish to ssh into:"
     read serviceName
@@ -70,7 +79,7 @@ function sshIntoService {
 function showLogsOfService {
     # Using all profiles, so that we can status of all services
     echo "Listing the running services..."
-    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" $(allProfiles) ps
 
     echo "Enter the SERVICE name whose logs you wish to see:"
     read serviceName
@@ -81,7 +90,7 @@ function showLogsOfService {
 
 function showOpenMRSlogs {
     echo "Opening OpenMRS Logs..."
-    docker compose logs openmrs -f 
+    docker compose --env-file "$file" logs openmrs -f
 }
 
 function startMart {
@@ -97,7 +106,7 @@ function pullLatestImages {
 function showStatus {
     echo "Listing status of running Services with command: 'docker compose ps'"
     # Using all profiles, so that we can status of all services
-    docker compose --env-file "$file" --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart ps
+    docker compose --env-file "$file" $(allProfiles) ps
 
 }
 
@@ -127,12 +136,12 @@ function resetAndEraseALLVolumes {
     echo "Proceeding with a DELETE.... "
     
     echo "1. Stopping all services, using all profiles.."
-    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down
+    docker compose --env-file "$file" $(allProfiles) down
     
     docker compose --env-file "$file" ps
     
     echo "2. Deleting all volumes (-v) .."
-    docker compose --env-file "$file" --profile emr --profile bahmni-lite --profile bahmni-standard --profile bahmni-mart down -v
+    docker compose --env-file "$file" $(allProfiles) down -v
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         echo "Volumes deleted successfully."

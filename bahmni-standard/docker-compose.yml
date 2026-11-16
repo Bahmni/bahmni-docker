@@ -602,6 +602,7 @@ services:
         - 'bahmni-queued-reports:/mounts/bahmni-queued-reports'
         - 'bahmni-uploaded-files:/mounts/bahmni-uploaded-files'
         - 'dcm4chee-archive:/mounts/dcm4chee-archive'
+        - 'odoofilestore:/mounts/odoofilestore'
         - 'configuration_checksums:/mounts/configuration_checksums'
 
   ipd:
