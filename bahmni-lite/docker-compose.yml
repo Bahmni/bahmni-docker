@@ -77,6 +77,7 @@ services:
       OMRS_DB_EXTRA_ARGS: ${OMRS_DB_EXTRA_ARGS}
       LUCENE_MATCH_TYPE: ${LUCENE_MATCH_TYPE}
       DOCUMENT_MAX_SIZE_MB: ${DOCUMENT_MAX_SIZE_MB}
+      TEMPLATE_SERVICE_URL: ${TEMPLATE_SERVICE_URL:?}
     #ports:
       # - ${OMRS_DEV_DEBUG_PORT}:${OMRS_DEV_DEBUG_PORT}
     volumes:
@@ -99,7 +100,7 @@ services:
     image: ${OPENMRS_DB_IMAGE_NAME:?}
     restart: always
     profiles: ["emr","bahmni-lite", "metabase", "bahmni-mart"]
-    command: --character-set-server=utf8 --collation-server=utf8_general_ci
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci --sql-mode=${OPENMRS_DB_SQL_MODES:?} --log-bin-trust-function-creators=${OPENMRS_DB_TRUST_FUNCTION_CREATORS:-1}
     environment:
       TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
@@ -257,10 +258,34 @@ services:
     image: bahmni/bahmni-apps-frontend:${BAHMNI_APPS_FRONTEND_IMAGE_TAG:?}
     profiles: ["emr","bahmni-lite"]
     # volumes:
-    #  - "${BAHMNI_APPS_FRONTEND_PATH:?}/distro/dist/:/usr/local/apache2/htdocs/bahmni-new"
+    #  - "${BAHMNI_APPS_FRONTEND_PATH:?}/distro/dist/:/usr/local/apache2/htdocs/bahmni-v2"
     logging: *log-config
     restart: ${RESTART_POLICY}
 
+  template-service:
+    image: bahmni/bahmni-template-service:${TEMPLATE_SERVICE_IMAGE_TAG:?}
+    profiles: ["emr", "bahmni-lite"]
+    environment:
+      TZ: ${TZ}
+      NODE_ENV: ${NODE_ENV:?}
+      PORT: ${TEMPLATE_SERVICE_PORT:?}
+      OPENMRS_URL: http://${OPENMRS_HOST:?}:${OPENMRS_PORT:?}
+      TEMPLATES_DIR: /etc/bahmni_config/print-templates
+    depends_on:
+      - openmrs
+    volumes:
+      - "${CONFIG_VOLUME:?}:/etc/bahmni_config/:ro"
+    shm_size: '256mb'
+    logging: *log-config
+    restart: ${RESTART_POLICY}
+    # ports:
+    #   - "${TEMPLATE_SERVICE_PORT}:${TEMPLATE_SERVICE_PORT}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${TEMPLATE_SERVICE_PORT}/template-service/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   implementer-interface:
     image: bahmni/implementer-interface:${IMPLEMENTER_INTERFACE_IMAGE_TAG:?}

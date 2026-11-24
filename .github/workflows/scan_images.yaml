@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      retention_count:
+        description: 'Number of most recent scan snapshots to keep (snapshots, not days: a manual run adds one on top of that day''s scheduled run)'
+        required: false
+        default: '30'
 
 jobs:
   scan-images:
@@ -30,12 +35,86 @@ jobs:
       - name: Scan Images In Bahmni Namespace
         run: |
           ./image-scanner.sh bahmni
+      - name: Prune Old Scan Snapshots
+        id: prune
+        env:
+          RETENTION_COUNT: ${{ inputs.retention_count || '30' }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          if ! [[ "$RETENTION_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+            echo "RETENTION_COUNT must be a positive integer, got '$RETENTION_COUNT'" >&2
+            exit 1
+          fi
+          cd image-scanner-reports
+
+          # Snapshot dirs are bahmni-DD-MM-YYYY or bahmni-DD-MM-YYYY_HH-MM-SS, which
+          # do not sort chronologically as-is, so re-key each to YYYY-MM-DD first.
+          # A name not matching that shape is skipped rather than re-keyed, because a
+          # partial match yields a key like "-st-la" that sorts ahead of every real
+          # date and would be deleted first regardless of the retention window.
+          #
+          # summary/*.txt is never pruned. It is the per-run severity table the triage
+          # cards read (BAH-4708 links these files directly) and all of them together
+          # are ~3 MB, so keeping the full series back to 14-05-2024 costs nothing.
+          # Those summaries are self-contained text tables and carry no links into the
+          # HTML, so pruning the HTML does not leave them broken.
+          snapshots=$(
+            for d in bahmni-*/; do
+              name=${d%/}
+              rest=${name#bahmni-}
+              if [[ ! $rest =~ ^[0-9]{2}-[0-9]{2}-[0-9]{4} ]]; then
+                echo "skipping unrecognised directory: $name" >&2
+                continue
+              fi
+              printf '%s-%s-%s\t%s\n' "${rest:6:4}" "${rest:3:2}" "${rest:0:2}" "$name"
+            done | sort
+          ) || { echo "failed to enumerate snapshot directories" >&2; exit 1; }
+
+          rows=()
+          if [ -n "$snapshots" ]; then
+            mapfile -t rows <<< "$snapshots"
+          fi
+          total=${#rows[@]}
+
+          if [ "$total" -le "$RETENTION_COUNT" ]; then
+            echo "Nothing to prune: $total snapshot(s) present, keeping newest $RETENTION_COUNT."
+            echo "pruned=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Slice the sorted list with bash rather than piping it to `head`. Both forms
+          # of head are unusable here: `head -n -N` is a GNU-only extension, and
+          # `head -n N` closes the pipe as soon as it has N lines, so the upstream
+          # printf takes EPIPE and pipefail turns a correct selection into a failed
+          # step. Slicing avoids the pipe, and so avoids both problems.
+          prune_count=$(( total - RETENTION_COUNT ))
+          stale_dirs=()
+          for row in "${rows[@]:0:$prune_count}"; do
+            stale_dirs+=("${row#*$'\t'}")
+          done
+
+          if [ "${#stale_dirs[@]}" -ne "$prune_count" ]; then
+            echo "expected to prune $prune_count snapshot(s) but selected ${#stale_dirs[@]}" >&2
+            exit 1
+          fi
+
+          printf 'pruning %s\n' "${stale_dirs[@]}"
+          rm -rf -- "${stale_dirs[@]}"
+          echo "Pruned ${#stale_dirs[@]} snapshot(s), kept newest $RETENTION_COUNT of $total."
+          echo "pruned=${#stale_dirs[@]}" >> "$GITHUB_OUTPUT"
       - name: Commit and push changes
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "[Bahmni Infra] | Add. Image Scan Report ${{ steps.date.outputs.date }}"
-          file_pattern: '*.html *.txt'
+          commit_message: "[Bahmni Infra] | Image Scan Report ${{ steps.date.outputs.date }} | pruned ${{ steps.prune.outputs.pruned }} old snapshot(s)"
+          # Stage the reports directory wholesale rather than an extension allowlist.
+          # With '*.html *.txt', any future artifact the scanner emits (a .json SBOM,
+          # a .sarif) would be removed by the prune locally but never staged, so it
+          # would reappear on the next checkout and hold a retention slot forever
+          # while being re-pruned every run.
+          add_options: '-A'
+          file_pattern: 'image-scanner-reports'
           repository: .
           commit_user_name: Bahmni Infra
           commit_user_email: infrastructure@bahmni.org

@@ -1,0 +1,11 @@
+# glibc CVEs in bahmni/mysql base image - OS-level, no fix available without base image rebuild
+CVE-2015-0235
+CVE-2015-7547
+
+# NSS (Network Security Services) CVEs in bahmni/mysql base image - no fix without base image rebuild
+CVE-2015-7181
+CVE-2015-7182
+CVE-2015-7183
+CVE-2016-1950
+CVE-2017-5461
+CVE-2021-43527
